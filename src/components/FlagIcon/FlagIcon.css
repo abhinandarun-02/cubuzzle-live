@@ -1,0 +1,11 @@
+.fi-size-lg {
+  font-size: 1.35em;
+}
+
+.fi-tw {
+  background-image: url("./images/4x3/tw.svg");
+}
+
+.fi-tw.fis {
+  background-image: url("./images/1x1/tw.svg");
+}
