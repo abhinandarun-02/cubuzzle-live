@@ -1,15 +1,9 @@
-// import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Paper } from "@mui/material";
 import HomeCompetitions from "./HomeCompetitions";
 import { competitionData } from "./data";
 
-
-
 function Home() {
-  // Static placeholder data
   const competitions = competitionData;
-
-
 
   return (
     <Box

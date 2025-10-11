@@ -16,40 +16,12 @@ import {
 const NA_VALUE = -3;
 const SUCCESS_VALUE = -4;
 
-const english_ordinal_rules = new Intl.PluralRules("en", { type: "ordinal" });
-const suffixes = {
-  one: "st",
-  two: "nd",
-  few: "rd",
-  other: "th",
-};
-
-/**
- * Returns the number with its suffix appended.
- *
- * 1 => 1st
- * 2 => 2nd
- * 3 => 3rd
- * 4 => 4th
- * etc.
- */
-function numberWithSuffix(number) {
-  const category = english_ordinal_rules.select(number);
-  const suffix = suffixes[category];
-  return number + suffix;
-}
-
 /**
  * Returns a list of objects corresponding to result statistics - best and average.
  * The first statistic is the one that determines the ranking.
  * This is a common logic used in all result tables/dialogs.
  */
-export function orderedResultStats(
-  eventId,
-  format,
-  forecastView = false,
-  advancementCondition = null,
-) {
+export function orderedResultStats(eventId, format) {
   const { numberOfAttempts, sortBy } = format;
 
   if (!shouldComputeAverage(eventId, numberOfAttempts)) {
@@ -59,29 +31,12 @@ export function orderedResultStats(
   let stats = [
     { name: "Best", field: "best", recordTagField: "singleRecordTag" },
     {
-      name: numberOfAttempts === 3 ? "Mean" : "Average",
+      name: "Average",
       field: "average",
       recordTagField: "averageRecordTag",
     },
   ];
   stats = sortBy === "best" ? stats : stats.reverse();
-
-  if (forecastView && eventId != "333fm") {
-    stats.push({ name: "For 1st", field: "forFirst" });
-    stats.push({
-      name:
-        "For " +
-        (advancementCondition
-          ? numberWithSuffix(advancementCondition.level)
-          : numberWithSuffix(3)),
-      field: "forAdvance",
-    });
-  }
-
-  if (forecastView && numberOfAttempts === 5) {
-    stats.push({ name: "BPA", field: "bestPossibleAverage" });
-    stats.push({ name: "WPA", field: "worstPossibleAverage" });
-  }
 
   return stats;
 }
@@ -115,8 +70,7 @@ export function forecastViewSupported(round) {
     !round.finished &&
     // Only final rounds or rounds with a ranking based
     // advancement condition are supported
-    (round.advancementCondition === null ||
-      round.advancementCondition.type === "ranking")
+    (round.advancementCondition === null || round.advancementCondition.type === "ranking")
   );
 }
 
@@ -147,13 +101,7 @@ function sum(values) {
  *   * `worstPossibleAverage` - worst possible averge of 5 after 4 solves
  *
  */
-export function resultsForView(
-  results,
-  eventId,
-  format,
-  forecastView,
-  advancementCondition,
-) {
+export function resultsForView(results, eventId, format, forecastView, advancementCondition) {
   if (results.length == 0 || !forecastView) return results;
 
   let resultsForView = results.map((result) => {
@@ -192,8 +140,7 @@ export function resultsForView(
     }
 
     if (
-      toMonotonic(currentResult.projectedAverage) ===
-        toMonotonic(prevResult.projectedAverage) &&
+      toMonotonic(currentResult.projectedAverage) === toMonotonic(prevResult.projectedAverage) &&
       toMonotonic(currentResult.best) === toMonotonic(prevResult.best)
     ) {
       // Rankings tie
@@ -202,8 +149,7 @@ export function resultsForView(
       currentResult.ranking = i + 1;
     }
 
-    const isClinched =
-      currentResult.advancing && !currentResult.advancingQuestionable;
+    const isClinched = currentResult.advancing && !currentResult.advancingQuestionable;
 
     // A clinched result must still be clinched in the projected ranking,
     // so we keep advancing state as is
@@ -231,20 +177,11 @@ export function resultsForView(
         // For current 1st place, calculate time needed to stay in first,
         // by comparing with second place
         let firstIndex = i == 0 ? 1 : 0;
-        result.forFirst = timeNeededToOvertake(
-          result,
-          format,
-          resultsForView[firstIndex],
-        );
+        result.forFirst = timeNeededToOvertake(result, format, resultsForView[firstIndex]);
         // Same as 1st, compare against (i+1)th place for current ith place.
-        let advancementIndex =
-          i < advancementRanking ? advancementRanking : advancementRanking - 1;
+        let advancementIndex = i < advancementRanking ? advancementRanking : advancementRanking - 1;
         if (advancementIndex < resultsForView.length) {
-          result.forAdvance = timeNeededToOvertake(
-            result,
-            format,
-            resultsForView[advancementIndex],
-          );
+          result.forAdvance = timeNeededToOvertake(result, format, resultsForView[advancementIndex]);
         }
       }
     }
@@ -267,23 +204,16 @@ export function timeNeededToOvertake(result, format, overtakeResult) {
 
   let attemptResults = result.attempts.map((attempt) => attempt.result);
   const resultWorst = attemptResults.slice().sort(compareAttemptResults).pop();
-  const betterBest =
-    compareAttemptResults(result.best, overtakeResult.best) < 0;
+  const betterBest = compareAttemptResults(result.best, overtakeResult.best) < 0;
 
   // Projection will change from a mean to a median after a time is added
   if (attemptResults.length === 2 && format.numberOfAttempts === 5) {
-    let worstVsProjected = compareAttemptResults(
-      resultWorst,
-      overtakeResult.projectedAverage,
-    );
+    let worstVsProjected = compareAttemptResults(resultWorst, overtakeResult.projectedAverage);
     if (worstVsProjected < 0 || (worstVsProjected == 0 && betterBest)) {
       // Worst possible average beats overtake average
       return DNF_VALUE;
     }
-    let bestVsProjected = compareAttemptResults(
-      result.best,
-      overtakeResult.projectedAverage,
-    );
+    let bestVsProjected = compareAttemptResults(result.best, overtakeResult.projectedAverage);
     if (bestVsProjected < 0) {
       // Best possible average beats overtake average
       if (isComplete(overtakeResult.projectedAverage)) {
@@ -293,9 +223,7 @@ export function timeNeededToOvertake(result, format, overtakeResult) {
     }
     if (bestVsProjected == 0) {
       // Best possible average ties overtake average
-      return isComplete(overtakeResult.best)
-        ? overtakeResult.best - 1
-        : SUCCESS_VALUE;
+      return isComplete(overtakeResult.best) ? overtakeResult.best - 1 : SUCCESS_VALUE;
     }
     // Best possbile average loses to overtake average
     return NA_VALUE;
@@ -310,9 +238,7 @@ export function timeNeededToOvertake(result, format, overtakeResult) {
     }
     if (!isComplete(result.projectedAverage)) {
       // Both results incomplete. Overtake on best
-      return isComplete(overtakeResult.best)
-        ? overtakeResult.best - 1
-        : SUCCESS_VALUE;
+      return isComplete(overtakeResult.best) ? overtakeResult.best - 1 : SUCCESS_VALUE;
     }
     if (!isMean && isComplete(resultWorst)) {
       // Next result will always be complete
@@ -351,8 +277,7 @@ export function timeNeededToOvertake(result, format, overtakeResult) {
   }
 
   let bestPossibleSolve = isMean ? 1 : result.best;
-  let worstPossibleSolve =
-    isMean || !isComplete(resultWorst) ? Infinity : resultWorst;
+  let worstPossibleSolve = isMean || !isComplete(resultWorst) ? Infinity : resultWorst;
   if (needed < bestPossibleSolve) {
     return NA_VALUE;
   }

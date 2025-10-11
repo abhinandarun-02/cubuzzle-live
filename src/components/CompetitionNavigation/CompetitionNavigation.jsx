@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import CompetitionHome from "../CompetitionHome/CompetitionHome";
 import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
-import Competitor from "../Competitor/Competitor";
 import Podiums from "../Podiums/Podiums";
 import CompetitionLayout from "./CompetitionLayout";
 import { competitionData } from "./data";
@@ -30,7 +29,6 @@ function CompetitionNavigation() {
         <Route path="" element={<CompetitionHome />} />
         <Route path="rounds/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
-        <Route path="competitors/:competitorId" element={<Competitor />} />
         <Route path="podiums" element={<Podiums />} />
         <Route path="*" element={<Navigate to={`/competitions/${competitionId}`} />} />
       </Routes>
