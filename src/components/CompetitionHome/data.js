@@ -50,8 +50,8 @@ export const competitionHomeData = {
         },
       ],
       competitionRecords: [],
-      id: "8992",
-      name: "Kanto Autumn AM 2025",
+  id: "8992",
+  name: "Cubuzzle 2025",
       venues: [
         {
           id: "9506",
@@ -61,26 +61,26 @@ export const competitionHomeData = {
                 {
                   id: "484974",
                   activityCode: "333bf-r1",
-                  endTime: "2025-10-11T01:50:00Z",
-                  startTime: "2025-10-11T00:50:00Z",
+                  endTime: "2025-10-17T01:50:00Z",
+                  startTime: "2025-10-17T00:50:00Z",
                 },
                 {
                   id: "484977",
                   activityCode: "333-r1",
-                  endTime: "2025-10-11T03:30:00Z",
-                  startTime: "2025-10-11T01:50:00Z",
+                  endTime: "2025-10-17T03:30:00Z",
+                  startTime: "2025-10-17T01:50:00Z",
                 },
                 {
                   id: "484982",
                   activityCode: "333bf-r2",
-                  endTime: "2025-10-11T03:40:00Z",
-                  startTime: "2025-10-11T03:30:00Z",
+                  endTime: "2025-10-17T03:40:00Z",
+                  startTime: "2025-10-17T03:30:00Z",
                 },
                 {
                   id: "484984",
                   activityCode: "333-r2",
-                  endTime: "2025-10-11T03:55:00Z",
-                  startTime: "2025-10-11T03:40:00Z",
+                  endTime: "2025-10-17T03:55:00Z",
+                  startTime: "2025-10-17T03:40:00Z",
                 },
               
               ],
@@ -91,7 +91,6 @@ export const competitionHomeData = {
           ],
         },
       ],
-      wcaId: "KantoAutumnAM2025",
     },
   },
 };
