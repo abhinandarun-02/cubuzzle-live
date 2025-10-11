@@ -1,19 +1,14 @@
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { Card, CardActionArea, CardHeader, Grid, Typography } from "@mui/material";
-// import Schedule from "../Schedule/Schedule";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { flatMap } from "../../lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
-// import { competitionHomeData } from "./data";
 
 function CompetitionHome() {
   const params = useParams();
-
-  // const { data } = competitionHomeData;
-  // const { competition } = data;
 
   const {
     data: details,

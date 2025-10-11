@@ -5,7 +5,6 @@ import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
 import Podiums from "../Podiums/Podiums";
 import CompetitionLayout from "./CompetitionLayout";
-// import { competitionData } from "./data";
 import { useQuery } from "@tanstack/react-query";
 import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
 import Loading from "../Loading/Loading";
@@ -13,8 +12,6 @@ import Error from "../Error/Error";
 
 function CompetitionNavigation() {
   const { competitionId } = useParams();
-
-  // const { data } = competitionData;
 
   const {
     data: competition,
@@ -31,7 +28,6 @@ function CompetitionNavigation() {
   if (isError) {
     return <Error />;
   }
-
 
   return (
     <CompetitionLayout competition={competition}>
