@@ -1,9 +1,15 @@
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Button, Grid, Toolbar, Typography } from "@mui/material";
+import { Box, Grid, Toolbar, Typography, IconButton } from "@mui/material";
 import logo from "./logo.svg";
-import UserMenuAvatar from "../UserMenuAvatar/UserMenuAvatar";
+import { useTheme } from "@mui/material/styles";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
+import useToggleTheme from "../ThemeProvider/useToggleTheme";
 
-function DefaultLayout({ currentUser, loaded, children }) {
+function DefaultLayout({ children }) {
+  const theme = useTheme();
+  const toggleTheme = useToggleTheme();
+
   return (
     <Box
       sx={{
@@ -25,31 +31,19 @@ function DefaultLayout({ currentUser, loaded, children }) {
                 color: "inherit",
               }}
             >
-              <img src={logo} alt="wca logo" height="40" />
+              <img src={logo} alt="cubuzzle logo" height="40" />
               <Typography variant="h6" sx={{ ml: 1 }}>
-                WCA Live
+                Cubuzzle Live
               </Typography>
             </Box>
           </Grid>
           <Grid item sx={{ flexGrow: 1 }} />
-          {loaded &&
-            (currentUser ? (
-              <Grid item>
-                <UserMenuAvatar user={currentUser} />
-              </Grid>
-            ) : (
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="inherit"
-                  component={RouterLink}
-                  to="/sign-in"
-                >
-                  Sign in
-                </Button>
-              </Grid>
-            ))}
+
+          <Grid item>
+            <IconButton size="small" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme.palette.mode === "dark" ? <EmojiObjectsIcon /> : <EmojiObjectsOutlinedIcon />}
+            </IconButton>
+          </Grid>
         </Grid>
       </Toolbar>
       <Box sx={{ flexGrow: 1 }}>{children}</Box>

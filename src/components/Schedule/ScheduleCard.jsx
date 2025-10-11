@@ -16,7 +16,7 @@ import { formatTimeRange } from "../../lib/date";
 import { parseISO } from "date-fns";
 import { min, max, clamp } from "../../lib/utils";
 
-function ScheduleCard({
+function  ScheduleCard({
   activityCode,
   activities,
   competitionEvents,

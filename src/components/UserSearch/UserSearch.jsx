@@ -1,17 +1,14 @@
 import { useState } from "react";
-import { useQuery, gql } from "@apollo/client";
+// import { useQuery, gql } from "@apollo/client";
 import { TextField } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import useDebounce from "../../hooks/useDebounce";
 
-const USERS = gql`
-  query Users($filter: String!) {
-    users(filter: $filter) {
-      id
-      name
-    }
-  }
-`;
+const STATIC_USERS = [
+  { id: "1", name: "Alice" },
+  { id: "2", name: "Bob" },
+  { id: "3", name: "Charlie" },
+];
 
 const DEBOUNCE_MS = 250;
 
@@ -19,11 +16,10 @@ function UserSearch({ onChange, TextFieldProps = {} }) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, DEBOUNCE_MS);
 
-  const { data, loading } = useQuery(USERS, {
-    variables: { filter: debouncedSearch },
-  });
-
-  const users = data ? data.users : [];
+  // Filter static users by search
+  const users = STATIC_USERS.filter(u =>
+    u.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
 
   function handleInputChange(event, value, reason) {
     if (reason === "input") {
@@ -42,8 +38,7 @@ function UserSearch({ onChange, TextFieldProps = {} }) {
       clearOnBlur
       blurOnSelect
       options={users}
-      getOptionLabel={(user) => user.name}
-      loading={loading}
+  getOptionLabel={(user) => user.name}
       onInputChange={handleInputChange}
       value={null}
       onChange={handleChange}
