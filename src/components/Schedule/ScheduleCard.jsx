@@ -48,7 +48,7 @@ function  ScheduleCard({
     >
       <CardActionArea
         component={RouterLink}
-        to={`/competitions/${competitionId}/rounds/${round.id}`}
+        to={`/competitions/${competitionId}/${round.competitionEvent.id}/${round.id}`}
         disabled={!round.open}
       >
         <CardHeader avatar={<CubingIcon eventId={event.id} />} title={title} />

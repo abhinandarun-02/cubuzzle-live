@@ -31,12 +31,12 @@ function CompetitionEventList({ competitionEvents, competitionId }) {
             onClick={(event) =>
               handleCompetitionEventClick(event, competitionEvent)
             }
-            disabled={!competitionEvent.rounds.some((round) => round.open)}
+            disabled={!competitionEvent.rounds.some((round) => !round.finished)}
           >
             <ListItemIcon>
-              <CubingIcon eventId={competitionEvent.event.id} />
+              <CubingIcon eventId={competitionEvent.id} />
             </ListItemIcon>
-            <ListItemText primary={competitionEvent.event.name} />
+            <ListItemText primary={competitionEvent.name} />
           </ListItemButton>
           <Collapse
             in={selectedId === competitionEvent.id}
@@ -55,8 +55,8 @@ function CompetitionEventList({ competitionEvents, competitionId }) {
                 <ListItemButton
                   key={round.id}
                   component={RouterLink}
-                  to={`/competitions/${competitionId}/rounds/${round.id}`}
-                  disabled={!round.open}
+                  to={`/competitions/${competitionId}/${competitionEvent.id}/${round.id}`}
+                  disabled={!round.finished}
                 >
                   <ListItemText primary={round.name} />
                   {round.label && (

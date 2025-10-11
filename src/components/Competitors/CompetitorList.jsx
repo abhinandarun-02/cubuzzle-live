@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { Grid, IconButton, InputBase, List, ListItemText, ListItemIcon, Paper, ListItem } from "@mui/material";
+import {
+  Grid,
+  IconButton,
+  InputBase,
+  List,
+  ListItemText,
+  ListItemIcon,
+  Paper,
+  Avatar,
+  ListItemButton,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import FlagIcon from "../FlagIcon/FlagIcon";
 
 function searchCompetitors(competitors, search) {
   const searchParts = search.toLowerCase().split(/\s+/);
@@ -36,12 +45,13 @@ function CompetitorList({ competitors }) {
       <Grid item sx={{ width: "100%" }}>
         <List>
           {filteredCompetitors.map((competitor) => (
-            <ListItem key={competitor.id}>
+            <ListItemButton key={competitor.id}>
+              {/* render profile picture */}
               <ListItemIcon>
-                <FlagIcon code={competitor.country.iso2.toLowerCase()} size="lg" />
+                <Avatar src={competitor.imageUrl} alt={competitor.name} sx={{ width: 32, height: 32 }} />
               </ListItemIcon>
               <ListItemText primary={competitor.name} />
-            </ListItem>
+            </ListItemButton>
           ))}
         </List>
       </Grid>

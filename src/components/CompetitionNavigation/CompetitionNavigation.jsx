@@ -5,29 +5,44 @@ import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
 import Podiums from "../Podiums/Podiums";
 import CompetitionLayout from "./CompetitionLayout";
-import { competitionData } from "./data";
+// import { competitionData } from "./data";
+import { useQuery } from "@tanstack/react-query";
+import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
+import Loading from "../Loading/Loading";
+import Error from "../Error/Error";
 
 function CompetitionNavigation() {
   const { competitionId } = useParams();
 
-  const { data } = competitionData;
+  // const { data } = competitionData;
 
+  const {
+    data: competition,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["competition", competitionId, "details"],
+    queryFn: async () => getCompetitionDetailsById(competitionId),
+  });
 
-  // Render the layout even if the competition is not loaded.
-  // This improves UX and also starts loading data for the actual page (like CompetitionHome).
-  const competition = data ? data.competition : null;
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (isError) {
+    return <Error />;
+  }
+
 
   return (
     <CompetitionLayout competition={competition}>
-
       {competition && (
         <Helmet>
-          <title>{competition.shortName} - WCA Live</title>
+          <title>{competition.name}</title>
         </Helmet>
       )}
       <Routes>
         <Route path="" element={<CompetitionHome />} />
-        <Route path="rounds/:roundId/*" element={<Round />} />
+        <Route path=":eventId/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
         <Route path="podiums" element={<Podiums />} />
         <Route path="*" element={<Navigate to={`/competitions/${competitionId}`} />} />

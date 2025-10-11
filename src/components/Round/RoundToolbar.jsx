@@ -1,16 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Grid, IconButton, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import TvIcon from "@mui/icons-material/Tv";
 import PrintIcon from "@mui/icons-material/Print";
 
 function RoundToolbar({ round, competitionId }) {
   const mdScreen = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const {eventId} = useParams();
 
   return (
     <Grid item container alignItems="center">
       <Grid item>
         <Typography variant="h5">
-          {round.competitionEvent.event.name} - {round.name}
+          {round.competitionEvent.name} - {round.name}
         </Typography>
       </Grid>
       <Grid item style={{ flexGrow: 1 }} />
@@ -25,7 +26,7 @@ function RoundToolbar({ round, competitionId }) {
           <Tooltip title="Projector view" placement="top">
             <IconButton
               component={Link}
-              to={`/competitions/${competitionId}/rounds/${round.id}/projector`}
+              to={`/competitions/${competitionId}/${eventId}/${round.id}/projector`}
               size="large"
             >
               <TvIcon />

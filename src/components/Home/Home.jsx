@@ -4,6 +4,7 @@ import { competitionData } from "./data";
 
 function Home() {
   const competitions = competitionData;
+  
 
   return (
     <Box

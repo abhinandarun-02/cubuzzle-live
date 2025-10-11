@@ -24,7 +24,7 @@ function CompetitorResultDialog({ result, competitionId, onClose }) {
               <Grid item>
                 <Typography variant="subtitle2">Event</Typography>
                 <Typography variant="body2">
-                  {result.round.competitionEvent.event.name}
+                  {result.round.competitionEvent.name}
                 </Typography>
               </Grid>
               <Grid item>
@@ -32,7 +32,7 @@ function CompetitorResultDialog({ result, competitionId, onClose }) {
                 <Typography variant="body2">{result.round.name}</Typography>
                 <Link
                   component={RouterLink}
-                  to={`/competitions/${competitionId}/rounds/${result.round.id}`}
+                  to={`/competitions/${competitionId}/${result.round.competitionEvent.id}/${result.round.id}`}
                   underline="hover"
                 >
                   All results
@@ -47,14 +47,14 @@ function CompetitorResultDialog({ result, competitionId, onClose }) {
                         .map((attempt) =>
                           formatAttemptResult(
                             attempt.result,
-                            result.round.competitionEvent.event.id,
+                            result.round.competitionEvent.id,
                           ),
                         )
                         .join(", ")}
                     </Typography>
                   </Grid>
                   {orderedResultStats(
-                    result.round.competitionEvent.event.id,
+                    result.round.competitionEvent.id,
                     result.round.format,
                   ).map(({ name, field, recordTagField }) => (
                     <Grid item key={name}>
@@ -63,7 +63,7 @@ function CompetitorResultDialog({ result, competitionId, onClose }) {
                         <RecordTagBadge recordTag={result[recordTagField]}>
                           {formatAttemptResult(
                             result[field],
-                            result.round.competitionEvent.event.id,
+                            result.round.competitionEvent.id,
                           )}
                         </RecordTagBadge>
                       </Typography>

@@ -1,6 +1,5 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Divider, IconButton, Toolbar } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import FormatListNumberedRoundedIcon from "@mui/icons-material/FormatListNumberedRounded";
 import CompetitionEventList from "./CompetitionEventList";
@@ -16,14 +15,7 @@ function CompetitionDrawerContent({ competition }) {
           px: 1,
         }}
       >
-        <IconButton
-          component={RouterLink}
-          to="/"
-          aria-label="Homepage"
-          size="large"
-        >
-          <ArrowBackIcon />
-        </IconButton>
+
         <IconButton
           component={RouterLink}
           to={`/competitions/${competition.id}/competitors`}

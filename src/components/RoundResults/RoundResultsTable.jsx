@@ -6,6 +6,8 @@ import { formatAttemptResult } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import ResultStat from "../ResultStat/ResultStat";
 
+const UNRANKED_POSITION = 1000000;
+
 const styles = {
   cell: {
     pr: { xs: "6px", md: "16px" },
@@ -34,15 +36,13 @@ const styles = {
   },
 };
 
-const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView, advancementCondition }) => {
+const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView }) => {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   const stats = orderedResultStats(
     eventId,
-    format,
+    format
     // Only show forecast view stat columns on wider screens
-    forecastView && smScreen,
-    advancementCondition
   );
 
   return (
@@ -54,6 +54,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               #
             </TableCell>
             <TableCell sx={styles.cell}>Name</TableCell>
+            <TableCell sx={styles.cell}>Division</TableCell>
+            <TableCell sx={styles.cell}>Category</TableCell>
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -87,9 +89,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                   ...(result.advancingQuestionable ? styles.advancingQuestionable : {}),
                 }}
               >
-                {result.ranking}
+                {result.ranking === UNRANKED_POSITION ? "" : result.ranking}
               </TableCell>
-              <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.person.name}</TableCell>
+              <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
+              <TableCell sx={{ ...styles.cell }}>{result.division}</TableCell>
+              <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>
               {smScreen &&
                 paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                   <TableCell key={index} align="right" sx={styles.cell}>

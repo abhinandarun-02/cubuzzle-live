@@ -1,12 +1,31 @@
+import { useQuery } from "@tanstack/react-query";
 import CompetitorList from "./CompetitorList";
-import { competitorsData } from "./data";
+import { useParams } from "react-router-dom";
+import Loading from "../Loading/Loading";
+import Error from "../Error/Error";
+import { getParticipantsByCompetition } from "../../lib/firebase/firestore";
 
 function Competitors() {
-  const { data } = competitorsData;
+  const { competitionId } = useParams();
 
-  const { competition } = data;
+  const {
+    data: competitors,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["competition", competitionId, "competitors"],
+    queryFn: async () => getParticipantsByCompetition(competitionId),
+  });
 
-  return <CompetitorList competitors={competition.competitors} competitionId={competition.id} />;
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <Error message="Failed to load competitors." />;
+  }
+
+  return <CompetitorList competitors={competitors} competitionId={competitionId} />;
 }
 
 export default Competitors;

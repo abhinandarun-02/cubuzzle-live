@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Grid, Toolbar, Typography, IconButton } from "@mui/material";
-import logo from "./logo.svg";
+import logo from "./logo.png";
 import { useTheme } from "@mui/material/styles";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
@@ -32,7 +32,7 @@ function DefaultLayout({ children }) {
               }}
             >
               <img src={logo} alt="cubuzzle logo" height="40" />
-              <Typography variant="h6" sx={{ ml: 1 }}>
+              <Typography variant="h6" sx={{ ml: 3 }}>
                 Cubuzzle Live
               </Typography>
             </Box>

@@ -93,7 +93,7 @@ function CompetitorResultsTable({ results, competitionId, onResultClick }) {
                 {smScreen ? (
                   <Link
                     component={RouterLink}
-                    to={`/competitions/${competitionId}/rounds/${result.round.id}`}
+                    to={`/competitions/${competitionId}/${result.round.competitionEvent.id}/${result.round.id}`}
                     underline="hover"
                   >
                     {result.round.name}

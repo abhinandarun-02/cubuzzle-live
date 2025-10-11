@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   AppBar,
+  Avatar,
   Box,
   Dialog,
   Fade,
@@ -19,14 +20,9 @@ import { yellow, green } from "@mui/material/colors";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CloseIcon from "@mui/icons-material/Close";
-import FlagIcon from "../FlagIcon/FlagIcon";
 import { times } from "../../lib/utils";
 import { formatAttemptResult } from "../../lib/attempt-result";
-import {
-  resultsForView,
-  orderedResultStats,
-  paddedAttemptResults,
-} from "../../lib/result";
+import { resultsForView, orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 import ResultStat from "../ResultStat/ResultStat";
 
@@ -67,6 +63,8 @@ const STATUS = {
   PAUSED: Symbol("paused"),
 };
 
+const UNRANKED_POSITION = 1000000;
+
 const DURATION = {
   SHOWN: 10 * 1000,
   FORECAST_SHOWN: 20 * 1000,
@@ -79,31 +77,14 @@ function getNumberOfRows() {
   return Math.floor((window.innerHeight - 64 - 56) / 67);
 }
 
-function ResultsProjector({
-  results,
-  format,
-  eventId,
-  title,
-  exitUrl,
-  forecastView,
-  advancementCondition,
-}) {
+function ResultsProjector({ results, format, eventId, title, exitUrl, forecastView, advancementCondition }) {
   const [status, setStatus] = useState(STATUS.SHOWING);
   const [topResultIndex, setTopResultIndex] = useState(0);
 
-  const stats = orderedResultStats(
-    eventId,
-    format,
-    forecastView,
-    advancementCondition,
+  const stats = orderedResultStats(eventId, format, forecastView, advancementCondition);
+  const nonemptyResults = resultsForView(results, eventId, format, forecastView, advancementCondition).filter(
+    (result) => result.scored
   );
-  const nonemptyResults = resultsForView(
-    results,
-    eventId,
-    format,
-    forecastView,
-    advancementCondition,
-  ).filter((result) => result.attempts.length > 0);
 
   const nonemptyResultsRef = useRef(nonemptyResults);
   useEffect(() => {
@@ -121,7 +102,7 @@ function ResultsProjector({
           () => {
             setStatus(STATUS.HIDING);
           },
-          forecastView ? DURATION.FORECAST_SHOWN : DURATION.SHOWN,
+          forecastView ? DURATION.FORECAST_SHOWN : DURATION.SHOWN
         );
         return () => clearTimeout(timeout);
       } else {
@@ -143,9 +124,7 @@ function ResultsProjector({
             // When forecast view is enabled, the focus is usually on the advancing
             // results, so we only show a single page of non-advancing results and
             // roll back to the first page afterwards.
-            (forecastView &&
-              !nonemptyResults[topResultIndex].advancing &&
-              !nonemptyResults[newIndex].advancing)
+            (forecastView && !nonemptyResults[topResultIndex].advancing && !nonemptyResults[newIndex].advancing)
             ? 0
             : newIndex;
         });
@@ -176,28 +155,15 @@ function ResultsProjector({
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             {status === STATUS.PAUSED ? (
-              <IconButton
-                color="inherit"
-                onClick={() => setStatus(STATUS.HIDING)}
-                size="large"
-              >
+              <IconButton color="inherit" onClick={() => setStatus(STATUS.HIDING)} size="large">
                 <PlayArrowIcon />
               </IconButton>
             ) : (
-              <IconButton
-                color="inherit"
-                onClick={() => setStatus(STATUS.PAUSED)}
-                size="large"
-              >
+              <IconButton color="inherit" onClick={() => setStatus(STATUS.PAUSED)} size="large">
                 <PauseIcon />
               </IconButton>
             )}
-            <IconButton
-              color="inherit"
-              component={Link}
-              to={exitUrl}
-              size="large"
-            >
+            <IconButton color="inherit" component={Link} to={exitUrl} size="large">
               <CloseIcon />
             </IconButton>
           </Toolbar>
@@ -209,16 +175,13 @@ function ResultsProjector({
         >
           <TableHead>
             <TableRow>
-              <TableCell
-                sx={{ ...styles.cell, ...styles.ranking }}
-                align="right"
-              >
+              <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="right">
                 #
               </TableCell>
-              <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                Name
-              </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.country }}></TableCell>
+              <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
+              <TableCell sx={{ ...styles.cell }}>Division</TableCell>
+              <TableCell sx={{ ...styles.cell }}>Category</TableCell>
               {times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
                   {index + 1}
@@ -232,82 +195,68 @@ function ResultsProjector({
             </TableRow>
           </TableHead>
           <TableBody>
-            {nonemptyResults
-              .slice(topResultIndex, topResultIndex + getNumberOfRows())
-              .map((result, index) => (
-                <Fade
-                  timeout={{ enter: DURATION.SHOWING, exit: DURATION.HIDING }}
-                  style={
-                    status === STATUS.SHOWING
-                      ? {
-                          transitionDelay: `${index * (forecastView ? 50 : 150)}ms`,
-                        }
-                      : {}
-                  }
-                  in={[STATUS.SHOWING, STATUS.SHOWN, STATUS.PAUSED].includes(
-                    status,
-                  )}
-                  key={result.person.id}
+            {nonemptyResults.slice(topResultIndex, topResultIndex + getNumberOfRows()).map((result, index) => (
+              <Fade
+                timeout={{ enter: DURATION.SHOWING, exit: DURATION.HIDING }}
+                style={
+                  status === STATUS.SHOWING
+                    ? {
+                        transitionDelay: `${index * (forecastView ? 50 : 150)}ms`,
+                      }
+                    : {}
+                }
+                in={[STATUS.SHOWING, STATUS.SHOWN, STATUS.PAUSED].includes(status)}
+                key={result.id}
+              >
+                <TableRow
+                  sx={{
+                    whiteSpace: "nowrap",
+                    "&:last-child td": { border: 0 },
+                  }}
                 >
-                  <TableRow
+                  <TableCell
+                    align="right"
                     sx={{
-                      whiteSpace: "nowrap",
-                      "&:last-child td": { border: 0 },
+                      ...styles.cell,
+                      ...styles.ranking,
+                      ...(result.advancing ? styles.advancing : {}),
                     }}
                   >
+                    {result.ranking === UNRANKED_POSITION ? "" : result.ranking}
+                  </TableCell>
+                  <TableCell sx={styles.country}>
+                    <Avatar variant="rounded"
+                      alt={result.name}
+                      src={result.imageUrl}
+                      sx={{ width: 40, height: 40, fontSize: "1.5rem" }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
+                  <TableCell sx={styles.cell}>{result.division}</TableCell>
+                  <TableCell sx={styles.cell}>{result.category}</TableCell>
+
+                  {paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
+                    <TableCell key={index} align="right" sx={styles.cell}>
+                      {formatAttemptResult(attemptResult, eventId)}
+                    </TableCell>
+                  ))}
+                  {stats.map(({ name, field, recordTagField }, index) => (
                     <TableCell
+                      key={name}
                       align="right"
                       sx={{
                         ...styles.cell,
-                        ...styles.ranking,
-                        ...(result.advancing ? styles.advancing : {}),
-                        ...(result.advancingQuestionable
-                          ? styles.advancingQuestionable
-                          : {}),
+                        fontWeight: index === 0 ? 600 : 400,
                       }}
                     >
-                      {result.ranking}
+                      <RecordTagBadge recordTag={result[recordTagField]} hidePr>
+                        <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
+                      </RecordTagBadge>
                     </TableCell>
-                    <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                      {result.person.name}
-                    </TableCell>
-                    <TableCell sx={styles.cell} align="center">
-                      <FlagIcon
-                        code={result.person.country.iso2.toLowerCase()}
-                      />
-                    </TableCell>
-                    {paddedAttemptResults(result, format.numberOfAttempts).map(
-                      (attemptResult, index) => (
-                        <TableCell key={index} align="right" sx={styles.cell}>
-                          {formatAttemptResult(attemptResult, eventId)}
-                        </TableCell>
-                      ),
-                    )}
-                    {stats.map(({ name, field, recordTagField }, index) => (
-                      <TableCell
-                        key={name}
-                        align="right"
-                        sx={{
-                          ...styles.cell,
-                          fontWeight: index === 0 ? 600 : 400,
-                        }}
-                      >
-                        <RecordTagBadge
-                          recordTag={result[recordTagField]}
-                          hidePr
-                        >
-                          <ResultStat
-                            result={result}
-                            field={field}
-                            eventId={eventId}
-                            forecastView={forecastView}
-                          />
-                        </RecordTagBadge>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </Fade>
-              ))}
+                  ))}
+                </TableRow>
+              </Fade>
+            ))}
           </TableBody>
         </Table>
       </Box>

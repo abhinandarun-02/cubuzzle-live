@@ -6,26 +6,37 @@ import { StyledEngineProvider } from "@mui/material/styles";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import ThemeProvider from "../ThemeProvider/ThemeProvider";
 import Navigation from "../Navigation/Navigation";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: Infinity,
+      },
+    },
+  });
+
   return (
     <HelmetProvider>
       <Helmet>
-        <title>WCA Live</title>
+        <title>Cubuzzle 2025</title>
       </Helmet>
       <Router>
+        <QueryClientProvider client={queryClient}>
           <StyledEngineProvider injectFirst>
             <ThemeProvider>
-              <SnackbarProvider
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              >
+              <SnackbarProvider anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
                 <ConfirmProvider>
                   <CssBaseline />
                   <Navigation />
                 </ConfirmProvider>
               </SnackbarProvider>
+              <ReactQueryDevtools initialIsOpen={false} />
             </ThemeProvider>
           </StyledEngineProvider>
+        </QueryClientProvider>
       </Router>
     </HelmetProvider>
   );

@@ -25,12 +25,12 @@ function Podiums() {
           {finishedPodiums.map(({ round, results }) => (
             <Grid item key={round.id}>
               <Typography variant="subtitle1" gutterBottom>
-                {round.competitionEvent.event.name}
+                {round.competitionEvent.name}
               </Typography>
               <RoundResults
                 results={results}
                 format={round.format}
-                eventId={round.competitionEvent.event.id}
+                eventId={round.competitionEvent.id}
                 competitionId={competition.id}
               />
             </Grid>

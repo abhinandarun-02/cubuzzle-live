@@ -14,10 +14,10 @@ function CompetitorResults({ results, competitionId }) {
   );
   const resultsByEventName = groupBy(
     orderBy(nonemptyResults, [
-      (result) => result.round.competitionEvent.event.rank,
+      (result) => result.round.competitionEvent.rank,
       (result) => result.round.number,
     ]),
-    (result) => result.round.competitionEvent.event.name,
+    (result) => result.round.competitionEvent.name,
   );
 
   return (

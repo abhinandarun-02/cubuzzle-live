@@ -5,29 +5,33 @@ import Error from "../Error/Error";
 import ResultsProjector from "../ResultsProjector/ResultsProjector";
 import RoundResults from "../RoundResults/RoundResults";
 import RoundToolbar from "./RoundToolbar";
-import { roundData } from "./data";
+import { useQuery } from "@tanstack/react-query";
+import { getRoundResults } from "../../lib/firebase/firestore";
 
 function Round() {
-  const { competitionId, roundId } = useParams();
+  const { competitionId, eventId, roundId } = useParams();
 
-  const { data, loading, error } = roundData;
+  const {
+    data: round,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: [competitionId, eventId, roundId, "results"],
+    queryFn: async () => getRoundResults(competitionId, eventId, roundId),
+  });
 
-  if (!data) return <Loading />;
+  if (isLoading) return <Loading />;
+
   if (error) return <Error error={error} />;
-  const { round } = data;
+
+  
 
   return (
-    <>
-      {loading && <Loading />}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <RoundToolbar
-            round={round}
-            competitionId={competitionId}
-           
-          />
+    <Grid container direction="column" spacing={1}>
+      <Grid item>
+          <RoundToolbar round={round} competitionId={competitionId} />
         </Grid>
-        <Grid item>
+      <Grid item>
           <Routes>
             <Route
               path="projector"
@@ -35,9 +39,9 @@ function Round() {
                 <ResultsProjector
                   results={round.results}
                   format={round.format}
-                  eventId={round.competitionEvent.event.id}
-                  title={`${round.competitionEvent.event.name} - ${round.name}`}
-                  exitUrl={`/competitions/${competitionId}/rounds/${roundId}`}
+                  eventId={round.competitionEvent.id}
+                  title={`${round.competitionEvent.name} - ${round.name}`}
+                  exitUrl={`/competitions/${competitionId}/${eventId}/${roundId}`}
                   advancementCondition={round.advancementCondition}
                 />
               }
@@ -47,20 +51,19 @@ function Round() {
               element={
                 <RoundResults
                   // We use key to reset component state on round change
-                  key={data.round.id}
+                  key={round.id}
                   results={round.results}
                   format={round.format}
-                  eventId={round.competitionEvent.event.id}
+                  eventId={round.competitionEvent.id}
                   competitionId={competitionId}
                   advancementCondition={round.advancementCondition}
                 />
               }
             />
-            <Route path="*" element={<Navigate to={`/competitions/${competitionId}/rounds/${roundId}`} />} />
+            <Route path="*" element={<Navigate to={`/competitions/${competitionId}/${round.competitionEvent.id}/${roundId}`} />} />
           </Routes>
         </Grid>
-      </Grid>
-    </>
+    </Grid>
   );
 }
 

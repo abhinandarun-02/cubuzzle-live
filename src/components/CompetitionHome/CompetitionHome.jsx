@@ -1,19 +1,38 @@
-import { Link as RouterLink } from "react-router-dom";
-import { Card, CardActionArea, CardHeader, Grid, Tooltip, Typography } from "@mui/material";
-import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import Schedule from "../Schedule/Schedule";
+import { Link as RouterLink, useParams } from "react-router-dom";
+import { Card, CardActionArea, CardHeader, Grid, Typography } from "@mui/material";
+// import Schedule from "../Schedule/Schedule";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { flatMap } from "../../lib/utils";
-import { getTimezone } from "../../lib/date";
-import { competitionHomeData } from "./data";
+import { useQuery } from "@tanstack/react-query";
+import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
+import Loading from "../Loading/Loading";
+import Error from "../Error/Error";
+// import { competitionHomeData } from "./data";
 
 function CompetitionHome() {
-  const { data } = competitionHomeData;
+  const params = useParams();
 
-  const { competition } = data;
-  const { competitionRecords } = competition;
+  // const { data } = competitionHomeData;
+  // const { competition } = data;
 
-  const active = flatMap(competition.competitionEvents, (competitionEvent) =>
+  const {
+    data: details,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["competition", params.competitionId, "details"],
+    queryFn: async () => getCompetitionDetailsById(params.competitionId),
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <Error />;
+  }
+
+  const active = flatMap(details.competitionEvents, (competitionEvent) =>
     competitionEvent.rounds.filter((round) => round.active).map((round) => [competitionEvent, round])
   );
 
@@ -26,12 +45,15 @@ function CompetitionHome() {
           </Typography>
           <Grid container spacing={1}>
             {active.map(([competitionEvent, round]) => (
-              <Grid item key={round.id} xs={12} sm={6} lg={4}>
+              <Grid item key={`${round.id}-${round.competitionEvent.id}`} xs={12} sm={6} lg={4}>
                 <Card>
-                  <CardActionArea component={RouterLink} to={`/competitions/${competition.id}/rounds/${round.id}`}>
+                  <CardActionArea
+                    component={RouterLink}
+                    to={`/competitions/${params.competitionId}/${competitionEvent.id}/${round.id}`}
+                  >
                     <CardHeader
-                      avatar={<CubingIcon eventId={competitionEvent.event.id} />}
-                      title={`${competitionEvent.event.name} - ${round.name}`}
+                      avatar={<CubingIcon eventId={competitionEvent.id} />}
+                      title={`${competitionEvent.name} - ${round.name}`}
                     />
                   </CardActionArea>
                 </Card>
@@ -41,34 +63,18 @@ function CompetitionHome() {
         </Grid>
       )}
       <Grid item sx={{ width: "100%" }}>
-        <Grid container alignContent="center" sx={{ mb: 1 }}>
+        {/* <Grid container alignContent="center" sx={{ mb: 1 }}>
           <Grid item>
             <Typography variant="h5">Schedule</Typography>
           </Grid>
           <Grid item sx={{ flexGrow: 1 }} />
-          <Grid item>
-            <Tooltip
-              title={`
-              All the dates and times below are displayed in your local timezone: ${getTimezone()}
-              `}
-            >
-              <NotificationImportantIcon color="action" />
-            </Tooltip>
-          </Grid>
-        </Grid>
-        <Schedule
+        </Grid> */}
+        {/* <Schedule
           venues={competition.venues}
           competitionEvents={competition.competitionEvents}
           competitionId={competition.id}
-        />
+        /> */}
       </Grid>
-      {competitionRecords.length > 0 && (
-        <Grid item sx={{ width: "100%" }}>
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            Records
-          </Typography>
-        </Grid>
-      )}
     </Grid>
   );
 }

@@ -1,10 +1,15 @@
-import { Link as RouterLink, useLocation } from "react-router-dom";
-import { Box, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
+import { Link as RouterLink } from "react-router-dom";
+import { Box, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useTheme } from "@mui/material/styles";
+import useToggleTheme from "../ThemeProvider/useToggleTheme";
+import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+
 
 function CompetitionToolbar({ competition, onMenuClick }) {
-  const location = useLocation();
+  const theme = useTheme();
+  const toggleTheme = useToggleTheme();
 
   return (
     <Toolbar>
@@ -35,21 +40,13 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         component={RouterLink}
         to={`/competitions/${competition.id}`}
       >
-        {competition.shortName}
+        {competition.name}
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
-      {competition.access.canScoretake && (
-        <Tooltip title="Admin view">
-          <IconButton
-            color="inherit"
-            component={RouterLink}
-            to={`/admin${location.pathname}`}
-            size="large"
-          >
-            <LockIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+
+      <IconButton size="small" onClick={toggleTheme} aria-label="Toggle theme">
+        {theme.palette.mode === "dark" ? <EmojiObjectsIcon /> : <EmojiObjectsOutlinedIcon />}
+      </IconButton>
     </Toolbar>
   );
 }
