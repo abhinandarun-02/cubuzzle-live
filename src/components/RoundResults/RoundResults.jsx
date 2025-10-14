@@ -37,9 +37,16 @@ function RoundResults({
     [results, eventId, format, forecastView, advancementCondition],
   );
 
-  const divisionResults = useMemo(() => {
-    return splitResultsByDivision(viewResults);
+
+
+  // Filter to only show scored results
+  const scoredResults = useMemo(() => {
+    return viewResults.filter((result) => result.scored);
   }, [viewResults]);
+
+  const divisionResults = useMemo(() => {
+    return splitResultsByDivision(scoredResults);
+  }, [scoredResults]);
 
   const totalResultsCount = useMemo(() => {
     return divisionResults.reduce((total, division) => total + division.results.length, 0);
@@ -77,7 +84,7 @@ function RoundResults({
           <Grid item key={division.name} style={{ width: "100%" }}>
             {divisionResults.length > 1 && (
               <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" component="h3" color="primary">
+                <Typography variant="h6" component="h3" >
                   Division {division.name}
                 </Typography>
               </Box>
