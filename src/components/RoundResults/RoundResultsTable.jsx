@@ -70,7 +70,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
           </TableRow>
         </TableHead>
         <TableBody>
-          {results.map((result) => (
+          {results.map((result, index) => (
             <TableRow
               key={result.id}
               hover
@@ -89,7 +89,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                   ...(result.advancingQuestionable ? styles.advancingQuestionable : {}),
                 }}
               >
-                {result.ranking === UNRANKED_POSITION ? "" : result.ranking}
+                {result.ranking === UNRANKED_POSITION ? "" : (typeof result.ranking === "number" ? result.ranking : index + 1)}
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
               <TableCell sx={{ ...styles.cell }}>{result.division}</TableCell>

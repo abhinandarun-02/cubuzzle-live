@@ -85,3 +85,28 @@ export function formatSentence(message) {
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+/**
+ * Splits results into divisions and returns an array of division objects.
+ * Each division object contains the division name and its results.
+ * Divisions are ordered by priority: A+, A, B, C, D, then any other divisions alphabetically.
+ */
+export function splitResultsByDivision(results) {
+  const divisionOrder = ["A+", "A", "B", "C", "D"];
+  
+  // Group results by division
+  const resultsByDivision = groupBy(results, (result) => result.division || "Unknown");
+  
+  // Get all division names and sort them
+  const divisionNames = Object.keys(resultsByDivision);
+  const sortedDivisions = [
+    ...divisionOrder.filter(div => divisionNames.includes(div)),
+    ...divisionNames.filter(div => !divisionOrder.includes(div)).sort()
+  ];
+  
+  // Return array of division objects
+  return sortedDivisions.map(division => ({
+    name: division,
+    results: resultsByDivision[division]
+  }));
+}

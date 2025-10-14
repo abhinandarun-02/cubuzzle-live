@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
-import { Button, Grid, useMediaQuery } from "@mui/material";
+import { Button, Grid, useMediaQuery, Typography, Box } from "@mui/material";
 import RoundResultsTable from "./RoundResultsTable";
 import RoundResultDialog from "./RoundResultDialog";
 import { resultsForView } from "../../lib/result";
+import { splitResultsByDivision } from "../../lib/utils";
 
 const DEFAULT_VISIBLE_RESULTS = 100;
 
@@ -37,29 +38,63 @@ function RoundResults({
     [results, eventId, format, forecastView, advancementCondition],
   );
 
-  const visibleResults = useMemo(() => {
+  const divisionResults = useMemo(() => {
+    return splitResultsByDivision(viewResults);
+  }, [viewResults]);
+
+  const totalResultsCount = useMemo(() => {
+    return divisionResults.reduce((total, division) => total + division.results.length, 0);
+  }, [divisionResults]);
+
+  const visibleDivisionResults = useMemo(() => {
     if (showAll) {
-      return viewResults;
+      return divisionResults;
     } else {
-      return viewResults.slice(0, DEFAULT_VISIBLE_RESULTS);
+      let currentCount = 0;
+      const visibleDivisions = [];
+      
+      for (const division of divisionResults) {
+        const remainingLimit = DEFAULT_VISIBLE_RESULTS - currentCount;
+        if (remainingLimit <= 0) break;
+        
+        const visibleResults = division.results.slice(0, remainingLimit);
+        visibleDivisions.push({
+          ...division,
+          results: visibleResults
+        });
+        currentCount += visibleResults.length;
+        
+        if (currentCount >= DEFAULT_VISIBLE_RESULTS) break;
+      }
+      
+      return visibleDivisions;
     }
-  }, [viewResults, showAll]);
+  }, [divisionResults, showAll]);
 
   return (
     <>
       <Grid container direction="column" alignItems="center" spacing={2}>
-        <Grid item style={{ width: "100%" }}>
-          <RoundResultsTable
-            results={visibleResults}
-            format={format}
-            eventId={eventId}
-            competitionId={competitionId}
-            onResultClick={handleResultClick}
-            forecastView={forecastView}
-            advancementCondition={advancementCondition}
-          />
-        </Grid>
-        {!showAll && (
+        {visibleDivisionResults.map((division) => (
+          <Grid item key={division.name} style={{ width: "100%" }}>
+            {divisionResults.length > 1 && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" component="h3" color="primary">
+                  Division {division.name}
+                </Typography>
+              </Box>
+            )}
+            <RoundResultsTable
+              results={division.results}
+              format={format}
+              eventId={eventId}
+              competitionId={competitionId}
+              onResultClick={handleResultClick}
+              forecastView={forecastView}
+              advancementCondition={advancementCondition}
+            />
+          </Grid>
+        ))}
+        {!showAll && totalResultsCount > DEFAULT_VISIBLE_RESULTS && (
           <Grid item>
             <Button
               variant="contained"
@@ -67,7 +102,7 @@ function RoundResults({
               size="small"
               onClick={() => setShowAll(true)}
             >
-              {results.length - DEFAULT_VISIBLE_RESULTS} more
+              {totalResultsCount - DEFAULT_VISIBLE_RESULTS} more
             </Button>
           </Grid>
         )}
