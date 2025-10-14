@@ -1,33 +1,11 @@
-import { Link as RouterLink } from "react-router-dom";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from "@mui/material";
 import { formatAttemptResult } from "../../lib/attempt-result";
 import { orderedResultStats } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 import ResultStat from "../ResultStat/ResultStat";
 
-function RoundResultDialog({
-  result,
-  format,
-  eventId,
-  forecastView,
-  advancementCondition,
-  onClose,
-}) {
-  const stats = orderedResultStats(
-    eventId,
-    format,
-    forecastView,
-    advancementCondition,
-  );
+function RoundResultDialog({ result, format, eventId, forecastView, advancementCondition, onClose }) {
+  const stats = orderedResultStats(eventId, format, forecastView, advancementCondition);
 
   return (
     <Dialog open={!!result} fullWidth={true} onClose={onClose}>
@@ -41,30 +19,22 @@ function RoundResultDialog({
               <Grid item>
                 <Typography variant="subtitle2">Name</Typography>
                 <Typography variant="body2">{result.name}</Typography>
-                <Link
-                  component={RouterLink}
-                  to={`/competitors/${result.id}`}
-                  underline="hover"
-                >
-                  All results
-                </Link>
+              </Grid>
+
+              <Grid item>
+                <Typography variant="subtitle2">Division</Typography>
+                <Typography variant="body2">{result.division}</Typography>
               </Grid>
               <Grid item>
-                <Typography variant="subtitle2">Country</Typography>
-                <Typography variant="body2">
-                  {result.country.name}
-                </Typography>
+                <Typography variant="subtitle2">Category</Typography>
+                <Typography variant="body2">{result.category}</Typography>
               </Grid>
               {result.ranking && (
                 <>
                   <Grid item>
                     <Typography variant="subtitle2">Attempts</Typography>
                     <Typography variant="body2">
-                      {result.attempts
-                        .map((attempt) =>
-                          formatAttemptResult(attempt.result, eventId),
-                        )
-                        .join(", ")}
+                      {result.attempts.map((attempt) => formatAttemptResult(attempt.result, eventId)).join(", ")}
                     </Typography>
                   </Grid>
                   {stats.map(({ name, field, recordTagField }) => (
@@ -72,12 +42,7 @@ function RoundResultDialog({
                       <Typography variant="subtitle2">{name}</Typography>
                       <Typography variant="body2">
                         <RecordTagBadge recordTag={result[recordTagField]}>
-                          <ResultStat
-                            result={result}
-                            field={field}
-                            eventId={eventId}
-                            forecastView={forecastView}
-                          />
+                          <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
                         </RecordTagBadge>
                       </Typography>
                     </Grid>
