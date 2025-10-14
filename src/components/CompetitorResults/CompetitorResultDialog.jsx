@@ -32,7 +32,7 @@ function CompetitorResultDialog({ result, onClose }) {
                 <Typography variant="body2">{result.round.name}</Typography>
                 <Link
                   component={RouterLink}
-                  to={`/${result.round.competitionEvent.id}/${result.round.id}`}
+                  to={`/events/${result.round.competitionEvent.id}/rounds/${result.round.id}`}
                   underline="hover"
                 >
                   All results

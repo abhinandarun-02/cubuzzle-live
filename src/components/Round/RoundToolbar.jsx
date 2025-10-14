@@ -26,7 +26,7 @@ function RoundToolbar({ round }) {
           <Tooltip title="Projector view" placement="top">
             <IconButton
               component={Link}
-              to={`/${eventId}/${roundId}/projector`}
+              to={`/events/${eventId}/rounds/${roundId}/projector`}
               size="large"
             >
               <TvIcon />

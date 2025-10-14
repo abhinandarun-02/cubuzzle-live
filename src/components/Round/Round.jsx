@@ -42,7 +42,7 @@ function Round() {
                   format={round.format}
                   eventId={round.competitionEvent.id}
                   title={`${round.competitionEvent.name} - ${round.name}`}
-                  exitUrl={`/${eventId}/${roundId}`}
+                  exitUrl={`/events/${eventId}/rounds/${roundId}`}
                   advancementCondition={round.advancementCondition}
                 />
               }
@@ -60,7 +60,7 @@ function Round() {
                 />
               }
             />
-            <Route path="*" element={<Navigate to={`/${eventId}/${roundId}`} />} />
+            <Route path="*" element={<Navigate to={`/events/${eventId}/rounds/${roundId}`} />} />
           </Routes>
         </Grid>
     </Grid>

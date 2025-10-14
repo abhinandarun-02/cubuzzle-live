@@ -44,7 +44,7 @@ function CompetitionHome() {
                 <Card>
                   <CardActionArea
                     component={RouterLink}
-                    to={`/${competitionEvent.id}/${round.id}`}
+                    to={`/events/${competitionEvent.id}/rounds/${round.id}`}
                   >
                     <CardHeader
                       avatar={<CubingIcon eventId={competitionEvent.id} />}

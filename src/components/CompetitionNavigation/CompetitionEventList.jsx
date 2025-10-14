@@ -55,7 +55,7 @@ function CompetitionEventList({ competitionEvents }) {
                 <ListItemButton
                   key={round.id}
                   component={RouterLink}
-                  to={`/${competitionEvent.id}/${round.id}`}
+                  to={`/events/${competitionEvent.id}/rounds/${round.id}`}
                   disabled={!round.finished}
                 >
                   <ListItemText primary={round.name} />

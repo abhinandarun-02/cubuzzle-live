@@ -38,7 +38,7 @@ function CompetitionNavigation() {
       )}
       <Routes>
         <Route path="" element={<CompetitionHome />} />
-        <Route path=":eventId/:roundId/*" element={<Round />} />
+        <Route path="events/:eventId/rounds/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
         <Route path="podiums" element={<Podiums />} />
         <Route path="*" element={<Navigate to="/" />} />
