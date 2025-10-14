@@ -12,7 +12,7 @@ import scrollIntoView from "scroll-into-view-if-needed";
 
 import CubingIcon from "../CubingIcon/CubingIcon";
 
-function CompetitionEventList({ competitionEvents, competitionId }) {
+function CompetitionEventList({ competitionEvents }) {
   const [selectedId, setSelectedId] = useState(null);
 
   function handleCompetitionEventClick(event, competitionEvent) {
@@ -55,7 +55,7 @@ function CompetitionEventList({ competitionEvents, competitionId }) {
                 <ListItemButton
                   key={round.id}
                   component={RouterLink}
-                  to={`/competitions/${competitionId}/${competitionEvent.id}/${round.id}`}
+                  to={`/${competitionEvent.id}/${round.id}`}
                   disabled={!round.finished}
                 >
                   <ListItemText primary={round.name} />

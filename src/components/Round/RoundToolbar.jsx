@@ -3,9 +3,9 @@ import { Grid, IconButton, Tooltip, Typography, useMediaQuery } from "@mui/mater
 import TvIcon from "@mui/icons-material/Tv";
 import PrintIcon from "@mui/icons-material/Print";
 
-function RoundToolbar({ round, competitionId }) {
+function RoundToolbar({ round }) {
   const mdScreen = useMediaQuery((theme) => theme.breakpoints.up("md"));
-  const {eventId} = useParams();
+  const {eventId, roundId} = useParams();
 
   return (
     <Grid item container alignItems="center">
@@ -26,7 +26,7 @@ function RoundToolbar({ round, competitionId }) {
           <Tooltip title="Projector view" placement="top">
             <IconButton
               component={Link}
-              to={`/competitions/${competitionId}/${eventId}/${round.id}/projector`}
+              to={`/${eventId}/${roundId}/projector`}
               size="large"
             >
               <TvIcon />

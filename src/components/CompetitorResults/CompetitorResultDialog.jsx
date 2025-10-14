@@ -13,7 +13,7 @@ import { formatAttemptResult } from "../../lib/attempt-result";
 import { orderedResultStats } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 
-function CompetitorResultDialog({ result, competitionId, onClose }) {
+function CompetitorResultDialog({ result, onClose }) {
   return (
     <Dialog open={!!result} fullWidth={true} onClose={onClose}>
       {!!result && (
@@ -32,7 +32,7 @@ function CompetitorResultDialog({ result, competitionId, onClose }) {
                 <Typography variant="body2">{result.round.name}</Typography>
                 <Link
                   component={RouterLink}
-                  to={`/competitions/${competitionId}/${result.round.competitionEvent.id}/${result.round.id}`}
+                  to={`/${result.round.competitionEvent.id}/${result.round.id}`}
                   underline="hover"
                 >
                   All results

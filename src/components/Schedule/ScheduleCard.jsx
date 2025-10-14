@@ -20,7 +20,6 @@ function  ScheduleCard({
   activityCode,
   activities,
   competitionEvents,
-  competitionId,
 }) {
   const { attemptNumber } = parseActivityCode(activityCode);
   const { event, round } = eventRoundForActivityCode(
@@ -48,7 +47,7 @@ function  ScheduleCard({
     >
       <CardActionArea
         component={RouterLink}
-        to={`/competitions/${competitionId}/${round.competitionEvent.id}/${round.id}`}
+        to={`/${round.competitionEvent.id}/${round.id}`}
         disabled={!round.open}
       >
         <CardHeader avatar={<CubingIcon eventId={event.id} />} title={title} />

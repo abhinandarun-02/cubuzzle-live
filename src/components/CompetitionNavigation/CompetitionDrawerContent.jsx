@@ -18,7 +18,7 @@ function CompetitionDrawerContent({ competition }) {
 
         <IconButton
           component={RouterLink}
-          to={`/competitions/${competition.id}/competitors`}
+          to="/competitors"
           aria-label="Competitor"
           size="large"
         >
@@ -26,7 +26,7 @@ function CompetitionDrawerContent({ competition }) {
         </IconButton>
         <IconButton
           component={RouterLink}
-          to={`/competitions/${competition.id}/podiums`}
+          to="/podiums"
           aria-label="Podiums"
           size="large"
         >
@@ -36,7 +36,6 @@ function CompetitionDrawerContent({ competition }) {
       <Divider />
       <CompetitionEventList
         competitionEvents={competition.competitionEvents}
-        competitionId={competition.id}
       />
     </>
   );

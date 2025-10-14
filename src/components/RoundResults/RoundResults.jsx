@@ -11,7 +11,6 @@ function RoundResults({
   results,
   format,
   eventId,
-  competitionId,
   forecastView,
   advancementCondition,
 }) {
@@ -87,7 +86,6 @@ function RoundResults({
               results={division.results}
               format={format}
               eventId={eventId}
-              competitionId={competitionId}
               onResultClick={handleResultClick}
               forecastView={forecastView}
               advancementCondition={advancementCondition}
@@ -112,7 +110,6 @@ function RoundResults({
           result={selectedResult}
           format={format}
           eventId={eventId}
-          competitionId={competitionId}
           forecastView={forecastView}
           advancementCondition={advancementCondition}
           onClose={() => setSelectedResult(null)}

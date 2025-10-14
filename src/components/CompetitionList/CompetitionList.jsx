@@ -24,7 +24,7 @@ function CompetitionList({ title, competitions }) {
               key={competition.id}
               style={style}
               component={Link}
-              to={`/competitions/${competition.id}`}
+              to="/"
             >
               <ListItemIcon>
                 <ListItemIcon>

@@ -38,7 +38,7 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         }}
         noWrap={true}
         component={RouterLink}
-        to={`/competitions/${competition.id}`}
+        to="/"
       >
         {competition.name}
       </Typography>

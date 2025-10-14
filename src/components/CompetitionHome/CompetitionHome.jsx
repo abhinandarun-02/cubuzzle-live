@@ -1,4 +1,4 @@
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { Card, CardActionArea, CardHeader, Grid, Typography } from "@mui/material";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { flatMap } from "../../lib/utils";
@@ -8,15 +8,15 @@ import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 
 function CompetitionHome() {
-  const params = useParams();
+  const competitionId = "cubuzzle2025";
 
   const {
     data: details,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["competition", params.competitionId, "details"],
-    queryFn: async () => getCompetitionDetailsById(params.competitionId),
+    queryKey: ["competition", competitionId, "details"],
+    queryFn: async () => getCompetitionDetailsById(competitionId),
   });
 
   if (isLoading) {
@@ -44,7 +44,7 @@ function CompetitionHome() {
                 <Card>
                   <CardActionArea
                     component={RouterLink}
-                    to={`/competitions/${params.competitionId}/${competitionEvent.id}/${round.id}`}
+                    to={`/${competitionEvent.id}/${round.id}`}
                   >
                     <CardHeader
                       avatar={<CubingIcon eventId={competitionEvent.id} />}

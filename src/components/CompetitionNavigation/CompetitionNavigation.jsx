@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import CompetitionHome from "../CompetitionHome/CompetitionHome";
 import Round from "../Round/Round";
@@ -11,7 +11,7 @@ import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 
 function CompetitionNavigation() {
-  const { competitionId } = useParams();
+  const competitionId = "cubuzzle2025";
 
   const {
     data: competition,
@@ -41,7 +41,7 @@ function CompetitionNavigation() {
         <Route path=":eventId/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
         <Route path="podiums" element={<Podiums />} />
-        <Route path="*" element={<Navigate to={`/competitions/${competitionId}`} />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </CompetitionLayout>
   );

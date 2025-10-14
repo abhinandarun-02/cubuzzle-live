@@ -4,7 +4,7 @@ import CompetitorResultsTable from "./CompetitorResultsTable";
 import CompetitorResultDialog from "./CompetitorResultDialog";
 import { groupBy, orderBy } from "../../lib/utils";
 
-function CompetitorResults({ results, competitionId }) {
+function CompetitorResults({ results }) {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   const [selectedResult, setSelectedResult] = useState(null);
@@ -30,7 +30,6 @@ function CompetitorResults({ results, competitionId }) {
             </Typography>
             <CompetitorResultsTable
               results={results}
-              competitionId={competitionId}
               onResultClick={(result) => setSelectedResult(result)}
             />
           </Grid>
@@ -39,7 +38,6 @@ function CompetitorResults({ results, competitionId }) {
       {!smScreen && (
         <CompetitorResultDialog
           result={selectedResult}
-          competitionId={competitionId}
           onClose={() => setSelectedResult(null)}
         />
       )}

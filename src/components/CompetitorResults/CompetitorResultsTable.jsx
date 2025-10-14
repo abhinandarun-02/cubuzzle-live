@@ -33,7 +33,7 @@ const styles = {
   },
 };
 
-function CompetitorResultsTable({ results, competitionId, onResultClick }) {
+function CompetitorResultsTable({ results, onResultClick }) {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   /* Assume every round has the same format. */
@@ -93,7 +93,7 @@ function CompetitorResultsTable({ results, competitionId, onResultClick }) {
                 {smScreen ? (
                   <Link
                     component={RouterLink}
-                    to={`/competitions/${competitionId}/${result.round.competitionEvent.id}/${result.round.id}`}
+                    to={`/${result.round.competitionEvent.id}/${result.round.id}`}
                     underline="hover"
                   >
                     {result.round.name}

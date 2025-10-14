@@ -18,7 +18,6 @@ function RoundResultDialog({
   result,
   format,
   eventId,
-  competitionId,
   forecastView,
   advancementCondition,
   onClose,
@@ -44,7 +43,7 @@ function RoundResultDialog({
                 <Typography variant="body2">{result.name}</Typography>
                 <Link
                   component={RouterLink}
-                  to={`/competitions/${competitionId}/competitors/${result.id}`}
+                  to={`/competitors/${result.id}`}
                   underline="hover"
                 >
                   All results
