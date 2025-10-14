@@ -3,7 +3,7 @@ import CompetitorList from "./CompetitorList";
 import { useParams } from "react-router-dom";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
-import { getParticipantsByCompetition } from "../../lib/firebase/firestore";
+import { getCompetitorsByCompetition } from "../../lib/firebase/firestore";
 
 function Competitors() {
   const { competitionId } = useParams();
@@ -14,7 +14,7 @@ function Competitors() {
     isError,
   } = useQuery({
     queryKey: ["competition", competitionId, "competitors"],
-    queryFn: async () => getParticipantsByCompetition(competitionId),
+    queryFn: async () => getCompetitorsByCompetition(competitionId),
   });
 
   if (isLoading) {

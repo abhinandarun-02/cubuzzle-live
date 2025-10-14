@@ -76,15 +76,15 @@ export const getCompetitionDetailsById = async (competitionId) => {
   }
 };
 
-export const getParticipantsByCompetition = async (competitionId) => {
+export const getCompetitorsByCompetition = async (competitionId) => {
   try {
-    const participantsRef = collection(db, "competitions", competitionId, "participants");
-    const q = query(participantsRef);
-    const participantsSnapshot = await getDocs(q);
-    const participants = participantsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return participants;
+    const competitorsRef = collection(db, "competitions", competitionId, "competitors");
+    const q = query(competitorsRef);
+    const competitorsSnapshot = await getDocs(q);
+    const competitors = competitorsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return competitors;
   } catch (error) {
-    console.error("Error getting all participants: ", error);
+    console.error("Error getting all competitors: ", error);
     throw error;
   }
 };
