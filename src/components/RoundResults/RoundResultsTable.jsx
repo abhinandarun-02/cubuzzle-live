@@ -92,7 +92,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 {result.ranking === UNRANKED_POSITION ? "" : (typeof result.ranking === "number" ? result.ranking : index + 1)}
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
-              <TableCell sx={{ ...styles.cell }}>{result.division}</TableCell>
+              <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>
               <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>
               {smScreen &&
                 paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (

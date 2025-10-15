@@ -95,7 +95,7 @@ export function splitResultsByDivision(results) {
   const divisionOrder = ["A+", "A", "B", "C", "D"];
   
   // Group results by division
-  const resultsByDivision = groupBy(results, (result) => result.division || "Unknown");
+  const resultsByDivision = groupBy(results, (result) => result.calculatedDivision || "Unknown");
   
   // Get all division names and sort them
   const divisionNames = Object.keys(resultsByDivision);
