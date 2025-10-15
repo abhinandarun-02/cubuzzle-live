@@ -52,7 +52,7 @@ const styles = {
     textOverflow: "ellipsis",
   },
   country: {
-    width: 50,
+    width: 70,
   },
 };
 
@@ -74,7 +74,7 @@ const DURATION = {
 
 /* (window height - app bar - table header) / row height */
 function getNumberOfRows() {
-  return Math.floor((window.innerHeight - 64 - 56) / 67);
+  return Math.floor((window.innerHeight - 64 - 56) / 90);
 }
 
 function ResultsProjector({ results, format, eventId, title, exitUrl, forecastView, advancementCondition }) {
@@ -228,7 +228,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                     <Avatar variant="rounded"
                       alt={result.name}
                       src={result.imageUrl}
-                      sx={{ width: 40, height: 40, fontSize: "1.5rem" }}
+                      sx={{ width: 56, height: 56, fontSize: "1.5rem" }}
                     />
                   </TableCell>
                   <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
