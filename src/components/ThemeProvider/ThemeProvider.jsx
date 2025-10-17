@@ -3,7 +3,6 @@ import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
 import { blue, grey, pink } from "@mui/material/colors";
 
 import { ToggleThemeContext } from "./useToggleTheme";
@@ -46,11 +45,9 @@ function setStoredThemeType(themeType) {
 }
 
 export function ThemeProvider({ children }) {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const preferredThemeType = prefersDarkMode ? "dark" : "light";
   const storedThemeType = useMemo(getStoredThemeType, []);
   const [themeType, setThemeType] = useState(
-    storedThemeType || preferredThemeType,
+    storedThemeType || "dark",
   );
 
   const toggleTheme = useCallback(() => {
