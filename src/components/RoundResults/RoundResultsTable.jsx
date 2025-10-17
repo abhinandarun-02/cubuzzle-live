@@ -120,6 +120,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
   );
 });
 
+
 RoundResultsTable.displayName = "RoundResultsTable";
 
 export default RoundResultsTable;
