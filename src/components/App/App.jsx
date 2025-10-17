@@ -8,6 +8,7 @@ import ThemeProvider from "../ThemeProvider/ThemeProvider";
 import Navigation from "../Navigation/Navigation";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const queryClient = new QueryClient({
@@ -36,6 +37,7 @@ function App() {
               <ReactQueryDevtools initialIsOpen={false} />
             </ThemeProvider>
           </StyledEngineProvider>
+          <Analytics/>
         </QueryClientProvider>
       </Router>
     </HelmetProvider>
