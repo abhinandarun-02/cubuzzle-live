@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import CompetitionHome from "../CompetitionHome/CompetitionHome";
 import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
-import Podiums from "../Podiums/Podiums";
+
 import CompetitionLayout from "./CompetitionLayout";
 import { useQuery } from "@tanstack/react-query";
 import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
@@ -40,7 +40,6 @@ function CompetitionNavigation() {
         <Route path="" element={<CompetitionHome />} />
         <Route path="events/:eventId/rounds/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
-        <Route path="podiums" element={<Podiums />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </CompetitionLayout>
