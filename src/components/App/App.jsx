@@ -8,16 +8,10 @@ import ThemeProvider from "../ThemeProvider/ThemeProvider";
 import Navigation from "../Navigation/Navigation";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: Infinity,
-      },
-    },
-  });
+  const queryClient = new QueryClient();
 
   return (
     <HelmetProvider>
@@ -37,7 +31,7 @@ function App() {
               <ReactQueryDevtools initialIsOpen={false} />
             </ThemeProvider>
           </StyledEngineProvider>
-          <Analytics/>
+          <Analytics />
         </QueryClientProvider>
       </Router>
     </HelmetProvider>
