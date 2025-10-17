@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, useMediaQuery } from "@mui/material";
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, useMediaQuery, Typography } from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
 import { formatAttemptResult } from "../../lib/attempt-result";
@@ -45,6 +45,13 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
     // Only show forecast view stat columns on wider screens
   );
 
+  // Calculate total number of columns for the empty state colspan
+  const totalColumns = 2 + // # and Name columns
+    (smScreen ? 1 : 0) + // Category column
+    (smScreen && isDivisionBased ? 1 : 0) + // Division column
+    (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
+    stats.length; // Stat columns
+
   return (
     <Paper>
       <Table size="small">
@@ -70,7 +77,24 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
           </TableRow>
         </TableHead>
         <TableBody>
-          {results.map((result, index) => (
+          {(!results || results.length === 0) ? (
+            <TableRow>
+              <TableCell 
+                colSpan={totalColumns} 
+                align="center" 
+                sx={{ 
+                  py: 4,
+                  color: "text.secondary",
+                  fontStyle: "italic"
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  No results available
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ) : (
+            results.map((result, index) => (
             <TableRow
               key={result.id}
               hover
@@ -117,7 +141,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 </TableCell>
               ))}
             </TableRow>
-          ))}
+          ))
+          )}
         </TableBody>
       </Table>
     </Paper>
