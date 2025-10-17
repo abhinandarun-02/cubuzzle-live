@@ -198,7 +198,7 @@ function CompetitionHome() {
               <Chip label="3x3x3" variant="outlined" />
             </Grid>
             <Grid item>
-              <Chip label="Wildcard Event" variant="outlined" />
+              <Chip label="Pyraminx" variant="outlined" />
             </Grid>
           </Grid>
         </CardContent>

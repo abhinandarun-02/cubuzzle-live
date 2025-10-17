@@ -101,6 +101,15 @@ function CompetitorList({ competitors }) {
 
   const filteredCompetitors = searchCompetitors(competitors, search).sort((a, b) => a.name.localeCompare(b.name));
 
+  const getEventDisplayName = (eventId) => {
+    const eventMap = {
+      222: "2x2x2",
+      333: "3x3x3",
+      pyram: "Pyraminx",
+    };
+    return eventMap[eventId] || eventId.toUpperCase();
+  };
+
   return (
     <Grid container direction="column" alignItems="center" spacing={1}>
       <Grid item>
@@ -153,11 +162,11 @@ function CompetitorList({ competitors }) {
                 <Box sx={styles.bottomRow}>
                   {competitor.events && competitor.events.length > 0 ? (
                     <Stack direction="row" spacing={0.3} sx={styles.eventsStack}>
-                      {competitor.events.slice(0, 4).map((eventId) => (
+                      {competitor.events.map((eventId) => (
                         <Chip
                           key={eventId}
                           icon={<CubingIcon eventId={eventId} small />}
-                          label={eventId.toUpperCase()}
+                          label={getEventDisplayName(eventId)}
                           size="small"
                           variant="outlined"
                           sx={styles.eventChip}
