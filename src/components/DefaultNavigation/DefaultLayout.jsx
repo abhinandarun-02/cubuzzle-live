@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
 import useToggleTheme from "../ThemeProvider/useToggleTheme";
+import Footer from "../Footer/Footer";
 
 function DefaultLayout({ children }) {
   const theme = useTheme();
@@ -46,7 +47,10 @@ function DefaultLayout({ children }) {
           </Grid>
         </Grid>
       </Toolbar>
-      <Box sx={{ flexGrow: 1 }}>{children}</Box>
+      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        {children}
+        <Footer />
+      </Box>
     </Box>
   );
 }

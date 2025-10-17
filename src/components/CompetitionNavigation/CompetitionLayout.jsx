@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import CompetitionDrawerContent from "./CompetitionDrawerContent";
 import CompetitionToolbar from "./CompetitionToolbar";
+import Footer from "../Footer/Footer";
 
 const DRAWER_WIDTH = 250;
 
@@ -73,9 +74,15 @@ function CompetitionLayout({ competition, children }) {
           py: { xs: 2, md: 3 },
           px: { xs: 1, md: 3 },
           ...styles.appBarShift,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "calc(100vh - 64px)", // Account for AppBar height
         }}
       >
-        {children}
+        <Box sx={{ flexGrow: 1 }}>
+          {children}
+        </Box>
+        <Footer />
       </Box>
     </>
   );
