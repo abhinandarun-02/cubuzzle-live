@@ -44,6 +44,7 @@ function Round() {
                   title={`${round.competitionEvent.name} - ${round.name}`}
                   exitUrl={`/events/${eventId}/rounds/${roundId}`}
                   advancementCondition={round.advancementCondition}
+                  isDivisionBased={round.format?.divisionBased === true}
                 />
               }
             />

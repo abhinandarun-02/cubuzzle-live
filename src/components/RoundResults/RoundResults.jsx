@@ -44,9 +44,20 @@ function RoundResults({
     return viewResults.filter((result) => result.scored);
   }, [viewResults]);
 
+  // Check if we should show results by division or together
+  const isDivisionBased = format?.divisionBased === true;
+
   const divisionResults = useMemo(() => {
-    return splitResultsByDivision(scoredResults);
-  }, [scoredResults]);
+    if (isDivisionBased) {
+      return splitResultsByDivision(scoredResults);
+    } else {
+      // Show all results together in a single group
+      return [{
+        name: "All",
+        results: scoredResults
+      }];
+    }
+  }, [scoredResults, isDivisionBased]);
 
   const totalResultsCount = useMemo(() => {
     return divisionResults.reduce((total, division) => total + division.results.length, 0);
@@ -82,7 +93,7 @@ function RoundResults({
       <Grid container direction="column" alignItems="center" spacing={2}>
         {visibleDivisionResults.map((division) => (
           <Grid item key={division.name} style={{ width: "100%" }}>
-            {divisionResults.length > 1 && (
+            {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
               <Box sx={{ mb: 2 }}>
                 <Typography variant="h6" component="h3" >
                   Division {division.name}
@@ -96,6 +107,7 @@ function RoundResults({
               onResultClick={handleResultClick}
               forecastView={forecastView}
               advancementCondition={advancementCondition}
+              isDivisionBased={isDivisionBased}
             />
           </Grid>
         ))}
@@ -119,6 +131,7 @@ function RoundResults({
           eventId={eventId}
           forecastView={forecastView}
           advancementCondition={advancementCondition}
+          isDivisionBased={isDivisionBased}
           onClose={() => setSelectedResult(null)}
         />
       )}

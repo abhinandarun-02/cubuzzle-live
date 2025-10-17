@@ -4,7 +4,7 @@ import { orderedResultStats } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 import ResultStat from "../ResultStat/ResultStat";
 
-function RoundResultDialog({ result, format, eventId, forecastView, advancementCondition, onClose }) {
+function RoundResultDialog({ result, format, eventId, forecastView, advancementCondition, isDivisionBased = false, onClose }) {
   const stats = orderedResultStats(eventId, format, forecastView, advancementCondition);
 
   return (
@@ -25,10 +25,12 @@ function RoundResultDialog({ result, format, eventId, forecastView, advancementC
                 <Typography variant="subtitle2">Division</Typography>
                 <Typography variant="body2">{result.division}</Typography>
               </Grid>
-              <Grid item>
-                <Typography variant="subtitle2">Category</Typography>
-                <Typography variant="body2">{result.category}</Typography>
-              </Grid>
+              {isDivisionBased && (
+                <Grid item>
+                  <Typography variant="subtitle2">Category</Typography>
+                  <Typography variant="body2">{result.category}</Typography>
+                </Grid>
+              )}
               {result.ranking && (
                 <>
                   <Grid item>

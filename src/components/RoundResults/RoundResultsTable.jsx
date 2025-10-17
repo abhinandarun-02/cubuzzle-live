@@ -36,7 +36,7 @@ const styles = {
   },
 };
 
-const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView }) => {
+const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView, isDivisionBased = false }) => {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   const stats = orderedResultStats(
@@ -55,7 +55,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             </TableCell>
             <TableCell sx={styles.cell}>Name</TableCell>
             <TableCell sx={styles.cell}>Division</TableCell>
-            <TableCell sx={styles.cell}>Category</TableCell>
+            {isDivisionBased && <TableCell sx={styles.cell}>Category</TableCell>}
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -93,7 +93,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
               <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>
-              <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>
+              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
               {smScreen &&
                 paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                   <TableCell key={index} align="right" sx={styles.cell}>
@@ -119,7 +119,6 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
     </Paper>
   );
 });
-
 
 RoundResultsTable.displayName = "RoundResultsTable";
 

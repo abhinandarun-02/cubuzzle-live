@@ -77,7 +77,7 @@ function getNumberOfRows() {
   return Math.floor((window.innerHeight - 64 - 56) / 90);
 }
 
-function ResultsProjector({ results, format, eventId, title, exitUrl, forecastView, advancementCondition }) {
+function ResultsProjector({ results, format, eventId, title, exitUrl, forecastView, advancementCondition, isDivisionBased = false }) {
   const [status, setStatus] = useState(STATUS.SHOWING);
   const [topResultIndex, setTopResultIndex] = useState(0);
 
@@ -181,7 +181,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
               <TableCell sx={{ ...styles.cell, ...styles.country }}></TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
               <TableCell sx={{ ...styles.cell }}>Division</TableCell>
-              <TableCell sx={{ ...styles.cell }}>Category</TableCell>
+              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>Category</TableCell>}
               {times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
                   {index + 1}
@@ -233,7 +233,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                   </TableCell>
                   <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
                   <TableCell sx={styles.cell}>{result.calculatedDivision}</TableCell>
-                  <TableCell sx={styles.cell}>{result.category}</TableCell>
+                  {isDivisionBased && <TableCell sx={styles.cell}>{result.category}</TableCell>}
 
                   {paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                     <TableCell key={index} align="right" sx={styles.cell}>
