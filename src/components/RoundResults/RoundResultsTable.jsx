@@ -55,7 +55,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             </TableCell>
             <TableCell sx={styles.cell}>Name</TableCell>
             {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
-            {isDivisionBased && <TableCell sx={styles.cell}>Division</TableCell>}
+            {smScreen && isDivisionBased && <TableCell sx={styles.cell}>Division</TableCell>}
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -97,7 +97,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
               {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
-              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>}
+              {smScreen && isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>}
               {smScreen &&
                 paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                   <TableCell key={index} align="right" sx={styles.cell}>
