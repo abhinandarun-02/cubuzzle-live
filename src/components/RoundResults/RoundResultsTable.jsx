@@ -54,8 +54,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               #
             </TableCell>
             <TableCell sx={styles.cell}>Name</TableCell>
-            <TableCell sx={styles.cell}>Division</TableCell>
-            {isDivisionBased && <TableCell sx={styles.cell}>Category</TableCell>}
+            {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
+            {isDivisionBased && <TableCell sx={styles.cell}>Division</TableCell>}
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -89,11 +89,15 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                   ...(result.advancingQuestionable ? styles.advancingQuestionable : {}),
                 }}
               >
-                {result.ranking === UNRANKED_POSITION ? "" : (typeof result.ranking === "number" ? result.ranking : index + 1)}
+                {result.ranking === UNRANKED_POSITION
+                  ? ""
+                  : typeof result.ranking === "number"
+                    ? result.ranking
+                    : index + 1}
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
-              <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>
-              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
+              {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
+              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>}
               {smScreen &&
                 paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                   <TableCell key={index} align="right" sx={styles.cell}>

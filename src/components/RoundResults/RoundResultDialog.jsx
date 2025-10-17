@@ -22,13 +22,13 @@ function RoundResultDialog({ result, format, eventId, forecastView, advancementC
               </Grid>
 
               <Grid item>
-                <Typography variant="subtitle2">Division</Typography>
-                <Typography variant="body2">{result.division}</Typography>
+                <Typography variant="subtitle2">Category</Typography>
+                <Typography variant="body2">{result.category}</Typography>
               </Grid>
               {isDivisionBased && (
                 <Grid item>
-                  <Typography variant="subtitle2">Category</Typography>
-                  <Typography variant="body2">{result.category}</Typography>
+                  <Typography variant="subtitle2">Division</Typography>
+                  <Typography variant="body2">{result.calculatedDivision}</Typography>
                 </Grid>
               )}
               {result.ranking && (

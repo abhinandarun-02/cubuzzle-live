@@ -180,8 +180,8 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.country }}></TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
-              <TableCell sx={{ ...styles.cell }}>Division</TableCell>
-              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>Category</TableCell>}
+              {isDivisionBased && <TableCell sx={{ ...styles.cell }}>Division</TableCell>}
+              <TableCell sx={{ ...styles.cell }}>Category</TableCell>
               {times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
                   {index + 1}
@@ -233,7 +233,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                   </TableCell>
                   <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
                   {isDivisionBased && <TableCell sx={styles.cell}>{result.calculatedDivision}</TableCell>}
-                  {/* <TableCell sx={styles.cell}>{result.category}</TableCell> */}
+                  <TableCell sx={styles.cell}>{result.category}</TableCell>
 
                   {paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                     <TableCell key={index} align="right" sx={styles.cell}>
