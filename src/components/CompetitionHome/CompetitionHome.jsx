@@ -1,19 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
-import { 
-  Card, 
-  CardActionArea, 
-  CardContent,
-  CardHeader, 
-  Grid, 
-  Typography, 
-  Box, 
-  Chip, 
-  Container
-} from "@mui/material";
-import { 
-  CalendarToday as CalendarIcon,
-  EmojiEvents as TrophyIcon
-} from "@mui/icons-material";
+import { Card, CardActionArea, CardContent, CardHeader, Grid, Typography, Box, Chip, Container } from "@mui/material";
+import { CalendarToday as CalendarIcon, EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import { keyframes } from "@mui/system";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { flatMap } from "../../lib/utils";
@@ -34,6 +21,94 @@ const pulse = keyframes`
     opacity: 1;
   }
 `;
+
+const styles = {
+  container: {
+    py: 3,
+  },
+  header: {
+    mb: 4,
+    textAlign: "center",
+  },
+  card: {
+    mb: 3,
+  },
+  sectionTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+  },
+  roundCard: {
+    position: "relative",
+    overflow: "hidden",
+    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.900" : "grey.50"),
+    borderColor: (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.300"),
+    borderWidth: 2,
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow: (theme) =>
+        theme.palette.mode === "dark" ? "0 4px 12px rgba(255, 255, 255, 0.1)" : "0 4px 12px rgba(0, 0, 0, 0.1)",
+    },
+  },
+  roundCardContent: {
+    textAlign: "center",
+    py: 3,
+  },
+  liveIndicatorTop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+  },
+  liveIndicatorDot: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+    animation: `${pulse} 2s ease-in-out infinite`,
+  },
+  liveDotHeader: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+    animation: `${pulse} 2s ease-in-out infinite`,
+  },
+  roundTitle: {
+    mb: 1,
+  },
+  roundDates: (isLive) => ({
+    fontWeight: isLive ? 500 : 400,
+  }),
+  liveChip: {
+    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.200"),
+    color: (theme) => (theme.palette.mode === "dark" ? "grey.300" : "grey.700"),
+    fontWeight: "medium",
+    border: "none",
+    mt: 2,
+  },
+  upcomingChip: {
+    mt: 2,
+    borderColor: "divider",
+    color: "text.secondary",
+    fontWeight: "normal",
+  },
+  noSessionsContainer: {
+    textAlign: "center",
+    py: 4,
+  },
+  noSessionsIcon: {
+    fontSize: 48,
+    color: "text.secondary",
+    mb: 2,
+  },
+};
 
 function CompetitionHome() {
   const competitionId = "cubuzzle2025";
@@ -59,17 +134,21 @@ function CompetitionHome() {
     competitionEvent.rounds.filter((round) => round.finished).map((round) => [competitionEvent, round])
   );
 
+  const live = flatMap(details.competitionEvents, (competitionEvent) =>
+    competitionEvent.rounds.filter((round) => round.active && !round.finished).map((round) => [competitionEvent, round])
+  );
+
   // Competition information
   const rounds = [
     { name: "Round 1", dates: "17-19 Oct", status: "live" },
     { name: "Semi-Finals", dates: "24-26 Oct", status: "upcoming" },
-    { name: "Finals", dates: "31 Oct - 2 Nov", status: "upcoming" }
+    { name: "Finals", dates: "31 Oct - 2 Nov", status: "upcoming" },
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
+    <Container maxWidth="lg" sx={styles.container}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
+      <Box sx={styles.header}>
         <Typography variant="h4" component="h1" gutterBottom>
           Cubuzzle Champion League - Season 2
         </Typography>
@@ -79,9 +158,9 @@ function CompetitionHome() {
       </Box>
 
       {/* Current Round Status */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={styles.card}>
         <CardContent>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
             <CalendarIcon />
             Tournament Progress
           </Typography>
@@ -90,91 +169,35 @@ function CompetitionHome() {
               <Grid item xs={12} sm={4} key={index}>
                 <Card
                   variant="outlined"
-                  sx={{ 
-                    position: 'relative',
-                    overflow: 'hidden',
-                    bgcolor: round.status === 'live' 
-                      ? (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'
-                      : 'background.paper',
-                    borderColor: round.status === 'live' 
-                      ? (theme) => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300'
-                      : 'divider',
-                    borderWidth: round.status === 'live' ? 2 : 1,
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: round.status === 'live'
-                        ? (theme) => theme.palette.mode === 'dark' 
-                          ? '0 4px 12px rgba(255, 255, 255, 0.1)'
-                          : '0 4px 12px rgba(0, 0, 0, 0.1)'
-                        : 2
-                    }
+                  sx={{
+                    ...styles.roundCard,
+                    bgcolor:
+                      round.status === "live"
+                        ? (theme) => (theme.palette.mode === "dark" ? "grey.900" : "grey.50")
+                        : "background.paper",
+                    borderColor:
+                      round.status === "live"
+                        ? (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.300")
+                        : "divider",
+                    borderWidth: round.status === "live" ? 2 : 1,
                   }}
                 >
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    {round.status === 'live' && (
+                  <CardContent sx={styles.roundCardContent}>
+                    {round.status === "live" && (
                       <>
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            height: 3,
-                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
-                            animation: `${pulse} 2s ease-in-out infinite`,
-                          }}
-                        />
+                        <Box sx={styles.liveIndicatorTop} />
+                        <Box sx={styles.liveIndicatorDot} />
                       </>
                     )}
-                    <Typography variant="subtitle1" fontWeight="600" sx={{ mb: 1 }}>
+                    <Typography variant="subtitle1" fontWeight="600" sx={styles.roundTitle}>
                       {round.name}
                     </Typography>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ 
-                        fontWeight: round.status === 'live' ? 500 : 400
-                      }}
-                    >
+                    <Typography variant="body2" color="text.secondary" sx={styles.roundDates(round.status === "live")}>
                       {round.dates}
                     </Typography>
-                    {round.status === 'live' && (
-                      <Chip 
-                        label="● LIVE" 
-                        size="small" 
-                        sx={{ 
-                          mt: 2, 
-                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.200',
-                          color: (theme) => theme.palette.mode === 'dark' ? 'grey.300' : 'grey.700',
-                          fontWeight: 'medium',
-                          border: 'none'
-                        }} 
-                      />
-                    )}
-                    {round.status === 'upcoming' && (
-                      <Chip 
-                        label="Upcoming" 
-                        size="small" 
-                        variant="outlined"
-                        sx={{ 
-                          mt: 2,
-                          borderColor: 'divider',
-                          color: 'text.secondary',
-                          fontWeight: 'normal'
-                        }} 
-                      />
+                    {round.status === "live" && <Chip label="● LIVE" size="small" sx={styles.liveChip} />}
+                    {round.status === "upcoming" && (
+                      <Chip label="Upcoming" size="small" variant="outlined" sx={styles.upcomingChip} />
                     )}
                   </CardContent>
                 </Card>
@@ -185,7 +208,7 @@ function CompetitionHome() {
       </Card>
 
       {/* Events */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Events
@@ -205,7 +228,7 @@ function CompetitionHome() {
       </Card>
 
       {/* Competition Info */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Competition Details
@@ -215,44 +238,38 @@ function CompetitionHome() {
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Location
               </Typography>
-              <Typography variant="body1">
-                Cubuzzle Lounge, Dubai
-              </Typography>
+              <Typography variant="body1">Cubuzzle Lounge, Dubai</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Participation
               </Typography>
-              <Typography variant="body1">
-                On-site & Online
-              </Typography>
+              <Typography variant="body1">On-site & Online</Typography>
             </Grid>
           </Grid>
         </CardContent>
       </Card>
 
-      {/* Results Section */}
-      {finished.length > 0 && (
-        <Card>
+      {/* Live Sessions Section */}
+      {live.length > 0 && (
+        <Card sx={styles.card}>
           <CardContent>
-            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <TrophyIcon />
-              Latest Results
+            <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
+              <Box sx={styles.liveDotHeader} />
+              Live Sessions
             </Typography>
             <Grid container spacing={2}>
-              {finished.map(([competitionEvent, round]) => (
-                <Grid item key={`${round.id}-${round.competitionEvent.id}`} xs={12} sm={6} md={4}>
+              {live.map(([competitionEvent, round]) => (
+                <Grid item key={`${round.id}-${competitionEvent.id}-live`} xs={12} sm={6} md={4}>
                   <Card variant="outlined">
-                    <CardActionArea
-                      component={RouterLink}
-                      to={`/events/${competitionEvent.id}/rounds/${round.id}`}
-                    >
+                    <Box sx={styles.liveIndicatorTop} />
+                    <CardActionArea component={RouterLink} to={`/events/${competitionEvent.id}/rounds/${round.id}`}>
                       <CardHeader
                         avatar={<CubingIcon eventId={competitionEvent.id} />}
                         title={competitionEvent.name}
                         subheader={round.name}
-                        titleTypographyProps={{ variant: 'subtitle1' }}
-                        subheaderTypographyProps={{ variant: 'body2' }}
+                        titleTypographyProps={{ variant: "subtitle1" }}
+                        subheaderTypographyProps={{ variant: "body2" }}
                       />
                     </CardActionArea>
                   </Card>
@@ -263,16 +280,45 @@ function CompetitionHome() {
         </Card>
       )}
 
-      {/* No Results Message */}
-      {finished.length === 0 && (
+      {/* Results Section */}
+      {finished.length > 0 && (
+        <Card sx={styles.card}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
+              <TrophyIcon />
+              Latest Results
+            </Typography>
+            <Grid container spacing={2}>
+              {finished.map(([competitionEvent, round]) => (
+                <Grid item key={`${round.id}-${competitionEvent.id}`} xs={12} sm={6} md={4}>
+                  <Card variant="outlined">
+                    <CardActionArea component={RouterLink} to={`/events/${competitionEvent.id}/rounds/${round.id}`}>
+                      <CardHeader
+                        avatar={<CubingIcon eventId={competitionEvent.id} />}
+                        title={competitionEvent.name}
+                        subheader={round.name}
+                        titleTypographyProps={{ variant: "subtitle1" }}
+                        subheaderTypographyProps={{ variant: "body2" }}
+                      />
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Sessions/Results Message */}
+      {live.length === 0 && finished.length === 0 && (
         <Card>
-          <CardContent sx={{ textAlign: 'center', py: 4 }}>
-            <TrophyIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+          <CardContent sx={styles.noSessionsContainer}>
+            <TrophyIcon sx={styles.noSessionsIcon} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              Results Coming Soon
+              No Active Sessions
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Check back once the rounds begin for live results and rankings.
+              Check back once the rounds begin for live sessions and results.
             </Typography>
           </CardContent>
         </Card>

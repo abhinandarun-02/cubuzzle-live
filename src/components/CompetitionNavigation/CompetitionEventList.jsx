@@ -1,13 +1,6 @@
 import { Fragment, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import {
-  Chip,
-  Collapse,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Chip, Collapse, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import scrollIntoView from "scroll-into-view-if-needed";
 
 import CubingIcon from "../CubingIcon/CubingIcon";
@@ -16,9 +9,7 @@ function CompetitionEventList({ competitionEvents }) {
   const [selectedId, setSelectedId] = useState(null);
 
   function handleCompetitionEventClick(event, competitionEvent) {
-    setSelectedId(
-      selectedId === competitionEvent.id ? null : competitionEvent.id,
-    );
+    setSelectedId(selectedId === competitionEvent.id ? null : competitionEvent.id);
     // Prevent swipeable drawer from closing when event gets selected.
     event.stopPropagation();
   }
@@ -28,10 +19,8 @@ function CompetitionEventList({ competitionEvents }) {
       {competitionEvents.map((competitionEvent) => (
         <Fragment key={competitionEvent.id}>
           <ListItemButton
-            onClick={(event) =>
-              handleCompetitionEventClick(event, competitionEvent)
-            }
-            disabled={!competitionEvent.rounds.some((round) => !round.finished)}
+            onClick={(event) => handleCompetitionEventClick(event, competitionEvent)}
+            disabled={!competitionEvent.rounds.some((round) => !round.finished && !round.active)}
           >
             <ListItemIcon>
               <CubingIcon eventId={competitionEvent.id} />
@@ -56,12 +45,24 @@ function CompetitionEventList({ competitionEvents }) {
                   key={round.id}
                   component={RouterLink}
                   to={`/events/${competitionEvent.id}/rounds/${round.id}`}
-                  disabled={!round.finished}
+                  disabled={!round.finished && !round.active}
                 >
                   <ListItemText primary={round.name} />
-                  {round.label && (
+                  {round.active && !round.finished && (
                     <Chip
-                      label={round.label}
+                      label="Live"
+                      size="small"
+                      sx={{
+                        borderRadius: "6px",
+                        fontSize: "0.7em",
+                        fontWeight: 500,
+                      }}
+                    />
+                  )}
+
+                  {round.finished && (
+                    <Chip
+                      label="Done"
                       size="small"
                       sx={{
                         borderRadius: "6px",
