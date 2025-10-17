@@ -96,7 +96,7 @@ function RoundResults({
             {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
               <Box sx={{ mb: 2 }}>
                 <Typography variant="h6" component="h3" >
-                  Division {division.name}
+                  {division.name === "Unknown" ? "DNF/DNS" : `Division ${division.name}`}
                 </Typography>
               </Box>
             )}
