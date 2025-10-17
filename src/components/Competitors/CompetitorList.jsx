@@ -129,9 +129,16 @@ function CompetitorList({ competitors }) {
               <Box sx={styles.mainContent}>
                 {/* Top row: Name and Country */}
                 <Box sx={styles.topRow}>
-                  <Typography variant="subtitle2" fontWeight="medium" noWrap sx={styles.competitorName}>
-                    {competitor.name}
-                  </Typography>
+                  <Box sx={styles.competitorName}>
+                    <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                      <Typography variant="subtitle2" fontWeight="medium" noWrap>
+                        {competitor.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        ID: {competitor.id}
+                      </Typography>
+                    </Box>
+                  </Box>
 
                   {/* Country - always visible but responsive */}
                   <Box sx={styles.countryContainer}>
