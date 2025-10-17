@@ -6,15 +6,18 @@ import useToggleTheme from "../ThemeProvider/useToggleTheme";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 
-
 function CompetitionToolbar({ competition, onMenuClick }) {
   const theme = useTheme();
   const toggleTheme = useToggleTheme();
 
   return (
-    <Toolbar>
+    <Toolbar
+      sx={{
+        bgcolor: theme.palette.mode === "light" ? "background.paper" : "transparent",
+      }}
+    >
       <IconButton
-        color="inherit"
+    
         sx={{
           ml: "-12px",
           mr: "20px",
@@ -33,8 +36,8 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         color="inherit"
         sx={{
           flexGrow: 1,
-          color: "inherit",
           textDecoration: "none",
+          color: theme.palette.text.primary,
         }}
         noWrap={true}
         component={RouterLink}
