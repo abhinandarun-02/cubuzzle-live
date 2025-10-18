@@ -21,6 +21,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CloseIcon from "@mui/icons-material/Close";
 import { times } from "../../lib/utils";
+import { withImageWidth } from "../../lib/utils";
 import { formatAttemptResult } from "../../lib/attempt-result";
 import { resultsForView, orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
@@ -225,9 +226,10 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                     {result.ranking === UNRANKED_POSITION ? "" : result.ranking}
                   </TableCell>
                   <TableCell sx={styles.country}>
-                    <Avatar variant="rounded"
+                    <Avatar
+                      variant="rounded"
                       alt={result.name}
-                      src={result.imageUrl}
+                      src={withImageWidth(result.imageUrl, 56)}
                       sx={{ width: 56, height: 56, fontSize: "1.5rem" }}
                     />
                   </TableCell>

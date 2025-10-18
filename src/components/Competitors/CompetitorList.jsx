@@ -13,6 +13,7 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import { withImageWidth } from "../../lib/utils";
 import SearchIcon from "@mui/icons-material/Search";
 import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
@@ -131,7 +132,7 @@ function CompetitorList({ competitors }) {
             <ListItemButton key={competitor.id} sx={styles.listItemButton}>
               {/* Profile picture */}
               <ListItemIcon sx={styles.listItemIcon}>
-                <Avatar src={competitor.imageUrl} alt={competitor.name} sx={styles.avatar} />
+                <Avatar src={withImageWidth(competitor.imageUrl, 40)} alt={competitor.name} sx={styles.avatar} />
               </ListItemIcon>
 
               {/* Main content - responsive layout */}

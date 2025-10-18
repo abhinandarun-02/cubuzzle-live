@@ -86,6 +86,37 @@ function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// Utility to append or set a width search param on image URLs while preserving existing
+// query parameters and fragments. Returns the original url if falsy.
+export function withImageWidth(imageUrl, width = 100) {
+  if (!imageUrl) return imageUrl;
+
+  try {
+    // Use base origin to allow relative URLs in the browser environment.
+    const base = typeof window !== "undefined" && window.location?.origin ? window.location.origin : undefined;
+    const u = base ? new URL(imageUrl, base) : new URL(imageUrl);
+    // Only modify images served from Shopify CDN
+    if (u.hostname !== "cdn.shopify.com") return imageUrl;
+    u.searchParams.set("width", String(width));
+    return u.toString();
+  } catch (e) {
+    // Fallback: handle by string manipulation
+    try {
+      // Only add/replace width if the hostname in the URL string is cdn.shopify.com
+  const match = imageUrl.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+      if (!match) return imageUrl;
+      const host = match[1].toLowerCase();
+      if (host !== "cdn.shopify.com") return imageUrl;
+      if (/[?&]width=/.test(imageUrl)) {
+        return imageUrl.replace(/([?&])width=[^&]*/, `$1width=${width}`);
+      }
+      return imageUrl + (imageUrl.includes("?") ? `&width=${width}` : `?width=${width}`);
+    } catch (fallbackError) {
+      return imageUrl;
+    }
+  }
+}
+
 /**
  * Splits results into divisions and returns an array of division objects.
  * Each division object contains the division name and its results.
