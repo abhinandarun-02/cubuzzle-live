@@ -81,19 +81,19 @@ function CompetitorDialog({ competitor, onClose }) {
               {/* image shown in title */}
               <Grid item>
                 <Grid container spacing={1}>
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">ID</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     <Typography variant="body2" sx={{ color: "text.primary" }}>
                       {competitor.id ?? "—"}
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Country</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     <Box display="flex" alignItems="center" gap={1}>
                       <FlagIcon code={competitor.country?.code?.toLowerCase()} />
                       <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
@@ -102,37 +102,37 @@ function CompetitorDialog({ competitor, onClose }) {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Gender</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     <Typography variant="body2" sx={{ color: "text.primary" }}>
                       {genderLabel || "—"}
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Age Category</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     <Typography variant="body2" sx={{ color: "text.primary" }}>
                       {categoryLabel || "—"}
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Mode</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     <Typography variant="body2" sx={{ color: "text.primary" }}>
                       {modeLabel || "—"}
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Events</Typography>
                   </Grid>
-                  <Grid item xs={8} sm={9}>
+                  <Grid item xs={8}>
                     {competitor.events && competitor.events.length > 0 ? (
                       <Box>
                         <Stack direction="row" spacing={0.3} sx={{ flexWrap: "wrap", gap: 0.3 }}>
