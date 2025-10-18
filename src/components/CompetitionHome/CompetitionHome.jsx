@@ -1,4 +1,6 @@
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import { useRef } from "react";
+import scrollIntoView from "scroll-into-view-if-needed";
 import { Card, CardActionArea, CardContent, CardHeader, Grid, Typography, Box, Chip, Container } from "@mui/material";
 import { CalendarToday as CalendarIcon, EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import { keyframes } from "@mui/system";
@@ -113,6 +115,28 @@ const styles = {
 function CompetitionHome() {
   const competitionId = "cubuzzle2025";
 
+  const liveSectionRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToLive = () => {
+    try {
+      navigate(`${location.pathname}#live-sessions`);
+    } catch (e) {
+      // fallback
+      window.location.hash = "live-sessions";
+    }
+
+    if (liveSectionRef.current) {
+      scrollIntoView(liveSectionRef.current, {
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest",
+        scrollMode: "if-needed",
+      });
+    }
+  };
+
   const {
     data: details,
     isLoading,
@@ -169,6 +193,7 @@ function CompetitionHome() {
               <Grid item xs={12} sm={4} key={index}>
                 <Card
                   variant="outlined"
+                  onClick={round.status === "live" ? scrollToLive : undefined}
                   sx={{
                     ...styles.roundCard,
                     bgcolor:
@@ -252,7 +277,7 @@ function CompetitionHome() {
 
       {/* Live Sessions Section */}
       {live.length > 0 && (
-        <Card sx={styles.card}>
+        <Card sx={styles.card} ref={liveSectionRef} id="live-sessions">
           <CardContent>
             <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
               <Box sx={styles.liveDotHeader} />
