@@ -298,7 +298,7 @@ function CompetitionHome() {
               {live.map(([competitionEvent, round]) => (
                 <Grid item key={`${round.id}-${competitionEvent.id}-live`} xs={12} sm={6} md={4}>
                   <Card variant="outlined">
-                    <Box sx={styles.liveIndicatorTop} />
+                    <Box />
                     <CardActionArea component={RouterLink} to={`/events/${competitionEvent.id}/rounds/${round.id}`}>
                       <CardHeader
                         avatar={<CubingIcon eventId={competitionEvent.id} />}
