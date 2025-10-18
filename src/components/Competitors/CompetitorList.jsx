@@ -17,6 +17,7 @@ import { withImageWidth } from "../../lib/utils";
 import SearchIcon from "@mui/icons-material/Search";
 import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
+import CompetitorDialog from "./CompetitorDialog";
 
 const styles = {
   searchPaper: {
@@ -109,6 +110,7 @@ function searchCompetitors(competitors, search) {
 
 function CompetitorList({ competitors }) {
   const [search, setSearch] = useState("");
+  const [selectedCompetitor, setSelectedCompetitor] = useState(null);
 
   const filteredCompetitors = searchCompetitors(competitors, search).sort((a, b) => a.name.localeCompare(b.name));
 
@@ -139,7 +141,11 @@ function CompetitorList({ competitors }) {
       <Grid item sx={styles.fullWidth}>
         <List>
           {filteredCompetitors.map((competitor) => (
-            <ListItemButton key={competitor.id} sx={styles.listItemButton}>
+            <ListItemButton
+              key={competitor.id}
+              sx={styles.listItemButton}
+              onClick={() => setSelectedCompetitor(competitor)}
+            >
               {/* Profile picture */}
               <ListItemIcon sx={styles.listItemIcon}>
                 <Avatar src={withImageWidth(competitor.imageUrl, 40)} alt={competitor.name} sx={styles.avatar} />
@@ -158,9 +164,6 @@ function CompetitorList({ competitors }) {
                         sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                       >
                         {competitor.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 0 }}>
-                        ID: {competitor.id}
                       </Typography>
                     </Box>
                   </Box>
@@ -207,6 +210,7 @@ function CompetitorList({ competitors }) {
             </ListItemButton>
           ))}
         </List>
+        <CompetitorDialog competitor={selectedCompetitor} onClose={() => setSelectedCompetitor(null)} />
       </Grid>
     </Grid>
   );
