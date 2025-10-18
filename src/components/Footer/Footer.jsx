@@ -12,6 +12,30 @@ function Footer() {
         mt: "auto",
       }}
     >
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          fontSize: "0.65rem",
+          opacity: 0.9,
+          fontStyle: "italic",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0.5,
+        }}
+      >
+        Gifts for participants and prizes for winners sponsored by
+        <img
+          src={yjLogo}
+          alt="YJ logo"
+          style={{
+            height: "14px",
+            width: "auto",
+            marginLeft: "2px",
+          }}
+        />
+      </Typography>
       <Box
         sx={{
           fontSize: "0.7rem",
@@ -21,6 +45,7 @@ function Footer() {
           alignItems: "center",
           justifyContent: "center",
           gap: 1,
+          mt: 0.5,
         }}
       >
         <Link
@@ -64,31 +89,6 @@ function Footer() {
           • Powered by Hariology
         </Typography>
       </Box>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{
-          fontSize: "0.65rem",
-          opacity: 0.8,
-          mt: 0.5,
-          fontStyle: "italic",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 0.5,
-        }}
-      >
-        Gifts for participants and prizes for winners sponsored by
-        <img
-          src={yjLogo}
-          alt="YJ logo"
-          style={{
-            height: "14px",
-            width: "auto",
-            marginLeft: "2px",
-          }}
-        />
-      </Typography>
     </Box>
   );
 }
