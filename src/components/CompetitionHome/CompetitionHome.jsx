@@ -1,6 +1,5 @@
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useRef } from "react";
-import scrollIntoView from "scroll-into-view-if-needed";
 import { Card, CardActionArea, CardContent, CardHeader, Grid, Typography, Box, Chip, Container } from "@mui/material";
 import { CalendarToday as CalendarIcon, EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import { keyframes } from "@mui/system";
@@ -116,24 +115,33 @@ function CompetitionHome() {
   const competitionId = "cubuzzle2025";
 
   const liveSectionRef = useRef(null);
+  const resultsSectionRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const scrollToLive = () => {
-    try {
-      navigate(`${location.pathname}#live-sessions`);
-    } catch (e) {
-      // fallback
-      window.location.hash = "live-sessions";
+  const scrollToSection = (status) => {
+    // Only scroll on large screens (sm breakpoint is 600px)
+    if (window.innerWidth >= 600) {
+      return;
     }
 
-    if (liveSectionRef.current) {
-      scrollIntoView(liveSectionRef.current, {
-        behavior: "smooth",
-        block: "start",
-        inline: "nearest",
-        scrollMode: "if-needed",
-      });
+    const targetRef = status === "live" ? liveSectionRef : resultsSectionRef;
+    const hashName = status === "live" ? "live-sessions" : "latest-results";
+
+    try {
+      navigate(`${location.pathname}#${hashName}`);
+    } catch (e) {
+      // fallback
+      window.location.hash = hashName;
+    }
+
+    if (targetRef.current) {
+      const el = targetRef.current;
+      const APP_BAR_OFFSET = 64;
+      const rect = el.getBoundingClientRect();
+      const absoluteTop = rect.top + window.pageYOffset;
+      const target = Math.max(0, absoluteTop - APP_BAR_OFFSET - 8); // small padding
+      window.scrollTo({ top: target, behavior: "smooth" });
     }
   };
 
@@ -193,7 +201,7 @@ function CompetitionHome() {
               <Grid item xs={12} sm={4} key={index}>
                 <Card
                   variant="outlined"
-                  onClick={round.status === "live" ? scrollToLive : undefined}
+                  onClick={round.status === "live" || round.status === "completed" ? () => scrollToSection(round.status) : undefined}
                   sx={{
                     ...styles.roundCard,
                     bgcolor:
@@ -223,6 +231,9 @@ function CompetitionHome() {
                     {round.status === "live" && <Chip label="● LIVE" size="small" sx={styles.liveChip} />}
                     {round.status === "upcoming" && (
                       <Chip label="Upcoming" size="small" variant="outlined" sx={styles.upcomingChip} />
+                    )}
+                    {round.status === "completed" && (
+                      <Chip label="Completed" size="small" variant="outlined" sx={styles.upcomingChip} />
                     )}
                   </CardContent>
                 </Card>
@@ -307,7 +318,7 @@ function CompetitionHome() {
 
       {/* Results Section */}
       {finished.length > 0 && (
-        <Card sx={styles.card}>
+        <Card sx={styles.card} ref={resultsSectionRef} id="latest-results">
           <CardContent>
             <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
               <TrophyIcon />
