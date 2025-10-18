@@ -49,12 +49,22 @@ const styles = {
   competitorName: {
     flex: 1,
     mr: 1,
+    minWidth: 0, // allow flex item to shrink and enable text truncation
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   countryContainer: {
     display: "flex",
     alignItems: "center",
     gap: 0.5,
     flexShrink: 0,
+  },
+  nameContainer: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 1,
+    minWidth: 0,
   },
   countryName: {
     display: { xs: "none", sm: "block" },
@@ -140,11 +150,16 @@ function CompetitorList({ competitors }) {
                 {/* Top row: Name and Country */}
                 <Box sx={styles.topRow}>
                   <Box sx={styles.competitorName}>
-                    <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                      <Typography variant="subtitle2" fontWeight="medium" noWrap>
+                    <Box sx={styles.nameContainer}>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight="medium"
+                        noWrap
+                        sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                      >
                         {competitor.name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
+                      <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 0 }}>
                         ID: {competitor.id}
                       </Typography>
                     </Box>
