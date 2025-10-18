@@ -3,9 +3,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ConfirmProvider } from "material-ui-confirm";
 import { SnackbarProvider } from "notistack";
 import { StyledEngineProvider } from "@mui/material/styles";
-import { Helmet, HelmetProvider } from "react-helmet-async";
+import { HelmetProvider } from "react-helmet-async";
 import ThemeProvider from "../ThemeProvider/ThemeProvider";
 import Navigation from "../Navigation/Navigation";
+import SEO from "../SEO/SEO";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
@@ -16,9 +17,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <HelmetProvider>
-      <Helmet>
-        <title>Cubuzzle 2025</title>
-      </Helmet>
+      <SEO />
       <Router>
         <QueryClientProvider client={queryClient}>
           <StyledEngineProvider injectFirst>

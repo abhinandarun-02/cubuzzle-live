@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import CompetitionHome from "../CompetitionHome/CompetitionHome";
 import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
@@ -31,11 +30,6 @@ function CompetitionNavigation() {
 
   return (
     <CompetitionLayout competition={competition}>
-      {competition && (
-        <Helmet>
-          <title>{competition.name}</title>
-        </Helmet>
-      )}
       <Routes>
         <Route path="" element={<CompetitionHome />} />
         <Route path="events/:eventId/rounds/:roundId/*" element={<Round />} />

@@ -1,0 +1,14 @@
+# Robots.txt for Cubuzzle Champion League
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow crawling of API endpoints if any
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://cubuzzle-leaderboard.vercel.app/sitemap.xml
+
+# Crawl-delay for polite crawling (optional)
+Crawl-delay: 1

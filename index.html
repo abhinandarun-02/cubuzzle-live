@@ -1,15 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="description" content="Platform for running Cubuzzle competitions and sharing live results with the world.">
-    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- Primary Meta Tags -->
+    <title>Cubuzzle Champion League - Leaderboard & Live Results</title>
+    <meta name="title" content="Cubuzzle Champion League - Leaderboard & Live Results" />
+    <meta
+      name="description"
+      content="Cubuzzle Champion League leaderboard: watch live results in real-time. Track competitors and view schedules"
+    />
+    <meta
+      name="keywords"
+      content="cubuzzle, cubing competition, rubik's cube, speedcubing, live results, cube competition, WCA, speedsolving, puzzle competition, cube timer, cubing leaderboard"
+    />
+    <meta name="author" content="Cubuzzle" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://cubuzzle-leaderboard.vercel.app/" />
+
+    <!-- Favicon and Icons -->
+    <link rel="shortcut icon" href="/favicon/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1976d2" />
-    <!-- Disable automatic translation. -->
-    <meta name="google" content="notranslate">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Cubuzzle Live</title>
+
+    <!-- Web app manifest and favicons -->
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cubuzzle-leaderboard.vercel.app/" />
+    <meta property="og:title" content="Cubuzzle Champion League - Leaderboard & Live Results" />
+    <meta
+      property="og:description"
+      content="Watch live cubing competition results in real-time. Track competitors and view schedules"
+    />
+    <meta property="og:image" content="https://cubuzzle-leaderboard.vercel.app/og-image.png" />
+    <meta property="og:site_name" content="Cubuzzle Champion League" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://cubuzzle-leaderboard.vercel.app/" />
+    <meta property="twitter:title" content="Cubuzzle Champion League - Leaderboard & Live Results" />
+    <meta
+      property="twitter:description"
+      content="Watch live cubing competition results in real-time. Track competitors, view schedules, and follow Rubik's cube speedsolving events."
+    />
+    <meta property="twitter:image" content="https://cubuzzle-leaderboard.vercel.app/og-image.png" />
+
+    <!-- Additional Meta Tags -->
+    <meta name="google" content="notranslate" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Cubuzzle Champion League" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Cubuzzle Champion League",
+        "url": "https://cubuzzle-leaderboard.vercel.app/",
+        "description": "Platform for running Cubuzzle competitions and sharing live leaderboard results.",
+        "applicationCategory": "SportsApplication",
+        "operatingSystem": "Any",
+        "author": {
+          "@type": "Organization",
+          "name": "Cubuzzle Champion League"
+        }
+      }
+    </script>
+
     <!-- Roboto font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
   </head>

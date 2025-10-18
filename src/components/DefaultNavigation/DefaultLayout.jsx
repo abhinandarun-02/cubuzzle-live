@@ -32,9 +32,9 @@ function DefaultLayout({ children }) {
                 color: "inherit",
               }}
             >
-              <img src={logo} alt="cubuzzle logo" height="40" />
+              <img src={logo} alt="cubuzzle champion league logo" height="40" />
               <Typography variant="h6" sx={{ ml: 3 }}>
-                Cubuzzle Live
+                Cubuzzle Champion League
               </Typography>
             </Box>
           </Grid>
