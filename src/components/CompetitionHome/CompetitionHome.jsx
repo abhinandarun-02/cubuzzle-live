@@ -181,6 +181,24 @@ function CompetitionHome() {
     <Container maxWidth="lg" sx={styles.container}>
       {/* Header */}
       <Box sx={styles.header}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mb: 3,
+          }}
+        >
+          <img
+            src="/ccl-logo.png"
+            alt="Cubuzzle Champion League"
+            style={{
+              height: "auto",
+              width: "100%",
+              maxWidth: "180px",
+              display: "block",
+            }}
+          />
+        </Box>
         <Typography variant="h4" component="h1" gutterBottom>
           Cubuzzle Champion League - Season 2
         </Typography>

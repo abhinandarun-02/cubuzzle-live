@@ -20,7 +20,6 @@ function CompetitionToolbar({ competition, onMenuClick }) {
     
         sx={{
           ml: "-12px",
-          mr: "20px",
           display: {
             lg: "none",
           },
@@ -31,13 +30,34 @@ function CompetitionToolbar({ competition, onMenuClick }) {
       >
         <MenuIcon />
       </IconButton>
+      <Box
+        component={RouterLink}
+        to="/"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          textDecoration: "none",
+          mr: 1,
+        }}
+      >
+        <img
+          src="/ccl-logo.png"
+          alt="CCL Logo"
+          style={{
+            height: "40px",
+            display: "block",
+          }}
+        />
+      </Box>
       <Typography
-        variant="h6"
+
         color="inherit"
         sx={{
           flexGrow: 1,
           textDecoration: "none",
           color: theme.palette.text.primary,
+          fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+          fontWeight: 500,
         }}
         noWrap={true}
         component={RouterLink}
