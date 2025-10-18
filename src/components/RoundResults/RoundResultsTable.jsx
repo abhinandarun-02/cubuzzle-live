@@ -32,7 +32,8 @@ const styles = {
     textOverflow: "ellipsis",
     overflow: "hidden",
     pr: 0,
-    maxWidth: { xs: 150, md: 250 },
+    width: { xs: "100%", md: 350 },
+    maxWidth: { xs: 150, md: 350 },
   },
 };
 
