@@ -1,5 +1,6 @@
 import { Box, Typography, Link } from "@mui/material";
 import logo from "../DefaultNavigation/logo.png";
+import yjLogo from "/yj-logo.png";
 
 function Footer() {
   return (
@@ -16,39 +17,39 @@ function Footer() {
           fontSize: "0.7rem",
           opacity: 0.8,
           fontWeight: 400,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           gap: 1,
         }}
       >
-        <Link 
-          href="https://cubuzzle.com" 
-          target="_blank" 
+        <Link
+          href="https://cubuzzle.com"
+          target="_blank"
           rel="noopener noreferrer"
-          sx={{ 
-            color: 'text.secondary',
-            textDecoration: 'underline',
-            display: 'flex',
-            alignItems: 'center',
+          sx={{
+            color: "text.secondary",
+            textDecoration: "underline",
+            display: "flex",
+            alignItems: "center",
             gap: 0.5,
             fontSize: "0.7rem",
-            cursor: 'pointer',
+            cursor: "pointer",
             opacity: 0.8,
-            '&:hover': {
+            "&:hover": {
               opacity: 1,
-              textDecoration: 'underline'
-            }
+              textDecoration: "underline",
+            },
           }}
         >
-          <img 
-            src={logo} 
-            alt="cubuzzle logo" 
-            style={{ 
-              height: '16px', 
-              width: 'auto',
-              opacity: 0.8 
-            }} 
+          <img
+            src={logo}
+            alt="cubuzzle logo"
+            style={{
+              height: "16px",
+              width: "auto",
+              opacity: 0.8,
+            }}
           />
           cubuzzle.com
         </Link>
@@ -57,12 +58,37 @@ function Footer() {
           color="text.secondary"
           sx={{
             fontSize: "0.7rem",
-            opacity: 0.6,
+            opacity: 0.8,
           }}
         >
           • Powered by Hariology
         </Typography>
       </Box>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          fontSize: "0.65rem",
+          opacity: 0.8,
+          mt: 0.5,
+          fontStyle: "italic",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0.5,
+        }}
+      >
+        Gifts for participants and prizes for winners sponsored by
+        <img
+          src={yjLogo}
+          alt="YJ logo"
+          style={{
+            height: "14px",
+            width: "auto",
+            marginLeft: "2px",
+          }}
+        />
+      </Typography>
     </Box>
   );
 }
