@@ -9,6 +9,7 @@ import Navigation from "../Navigation/Navigation";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ function App() {
             </ThemeProvider>
           </StyledEngineProvider>
           <Analytics />
+          <SpeedInsights />
         </QueryClientProvider>
       </Router>
     </HelmetProvider>
