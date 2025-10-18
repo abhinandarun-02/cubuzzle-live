@@ -91,15 +91,6 @@ function CompetitorDialog({ competitor, onClose }) {
                   </Grid>
 
                   <Grid item xs={4} sm={3}>
-                    <Typography variant="subtitle2">Category</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <Typography variant="body2" sx={{ color: "text.primary" }}>
-                      {categoryLabel || "—"}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={4} sm={3}>
                     <Typography variant="subtitle2">Country</Typography>
                   </Grid>
                   <Grid item xs={8} sm={9}>
@@ -117,6 +108,15 @@ function CompetitorDialog({ competitor, onClose }) {
                   <Grid item xs={8} sm={9}>
                     <Typography variant="body2" sx={{ color: "text.primary" }}>
                       {genderLabel || "—"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="subtitle2">Age Category</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    <Typography variant="body2" sx={{ color: "text.primary" }}>
+                      {categoryLabel || "—"}
                     </Typography>
                   </Grid>
 
