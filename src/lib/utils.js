@@ -44,7 +44,7 @@ export function orderBy(arr, fns, orders = []) {
         acc = orders[i] === "desc" ? -result : result;
       }
       return acc;
-    }, 0),
+    }, 0)
   );
 }
 
@@ -54,7 +54,7 @@ export function partition(arr, fn) {
       acc[fn(val, i, arr) ? 0 : 1].push(val);
       return acc;
     },
-    [[], []],
+    [[], []]
   );
 }
 
@@ -103,7 +103,7 @@ export function withImageWidth(imageUrl, width = 100) {
     // Fallback: handle by string manipulation
     try {
       // Only add/replace width if the hostname in the URL string is cdn.shopify.com
-  const match = imageUrl.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+      const match = imageUrl.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
       if (!match) return imageUrl;
       const host = match[1].toLowerCase();
       if (host !== "cdn.shopify.com") return imageUrl;
@@ -124,20 +124,28 @@ export function withImageWidth(imageUrl, width = 100) {
  */
 export function splitResultsByDivision(results) {
   const divisionOrder = ["A+", "A", "B", "C", "D"];
-  
+  const divisionTime = {
+    "A+": "Sub 10 seconds",
+    A: "10-19 seconds",
+    B: "20-29 seconds",
+    C: "30-45 seconds",
+    D: "45+ seconds",
+  };
+
   // Group results by division
   const resultsByDivision = groupBy(results, (result) => result.calculatedDivision || "Unknown");
-  
+
   // Get all division names and sort them
   const divisionNames = Object.keys(resultsByDivision);
   const sortedDivisions = [
-    ...divisionOrder.filter(div => divisionNames.includes(div)),
-    ...divisionNames.filter(div => !divisionOrder.includes(div)).sort()
+    ...divisionOrder.filter((div) => divisionNames.includes(div)),
+    ...divisionNames.filter((div) => !divisionOrder.includes(div)).sort(),
   ];
-  
+
   // Return array of division objects
-  return sortedDivisions.map(division => ({
+  return sortedDivisions.map((division) => ({
     name: division,
-    results: resultsByDivision[division]
+    time: divisionTime[division] || "Unknown",
+    results: resultsByDivision[division],
   }));
 }

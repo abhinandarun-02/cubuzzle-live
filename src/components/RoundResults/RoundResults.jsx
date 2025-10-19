@@ -7,37 +7,20 @@ import { splitResultsByDivision } from "../../lib/utils";
 
 const DEFAULT_VISIBLE_RESULTS = 100;
 
-function RoundResults({
-  results,
-  format,
-  eventId,
-  forecastView,
-  advancementCondition,
-}) {
+function RoundResults({ results, format, eventId, forecastView, advancementCondition }) {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   const [selectedResult, setSelectedResult] = useState(null);
-  const [showAll, setShowAll] = useState(
-    results.length <= DEFAULT_VISIBLE_RESULTS,
-  );
+  const [showAll, setShowAll] = useState(results.length <= DEFAULT_VISIBLE_RESULTS);
 
   const handleResultClick = useCallback((result) => {
     setSelectedResult(result);
   }, []);
 
   const viewResults = useMemo(
-    () =>
-      resultsForView(
-        results,
-        eventId,
-        format,
-        forecastView,
-        advancementCondition,
-      ),
-    [results, eventId, format, forecastView, advancementCondition],
+    () => resultsForView(results, eventId, format, forecastView, advancementCondition),
+    [results, eventId, format, forecastView, advancementCondition]
   );
-
-
 
   // Filter to only show scored results
   const scoredResults = useMemo(() => {
@@ -52,10 +35,12 @@ function RoundResults({
       return splitResultsByDivision(scoredResults);
     } else {
       // Show all results together in a single group
-      return [{
-        name: "All",
-        results: scoredResults
-      }];
+      return [
+        {
+          name: "All",
+          results: scoredResults,
+        },
+      ];
     }
   }, [scoredResults, isDivisionBased]);
 
@@ -69,21 +54,21 @@ function RoundResults({
     } else {
       let currentCount = 0;
       const visibleDivisions = [];
-      
+
       for (const division of divisionResults) {
         const remainingLimit = DEFAULT_VISIBLE_RESULTS - currentCount;
         if (remainingLimit <= 0) break;
-        
+
         const visibleResults = division.results.slice(0, remainingLimit);
         visibleDivisions.push({
           ...division,
-          results: visibleResults
+          results: visibleResults,
         });
         currentCount += visibleResults.length;
-        
+
         if (currentCount >= DEFAULT_VISIBLE_RESULTS) break;
       }
-      
+
       return visibleDivisions;
     }
   }, [divisionResults, showAll]);
@@ -91,34 +76,37 @@ function RoundResults({
   return (
     <>
       <Grid container direction="column" alignItems="center" spacing={2}>
-        {visibleDivisionResults.map((division) => (
-          <Grid item key={division.name} style={{ width: "100%" }}>
-            {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" component="h3" >
-                  {division.name === "Unknown" ? "DNF/DNS" : `Division ${division.name}`}
-                </Typography>
-              </Box>
-            )}
-            <RoundResultsTable
-              results={division.results}
-              format={format}
-              eventId={eventId}
-              onResultClick={handleResultClick}
-              forecastView={forecastView}
-              advancementCondition={advancementCondition}
-              isDivisionBased={isDivisionBased}
-            />
-          </Grid>
-        ))}
+        {visibleDivisionResults.map((division) => {
+          const divisionIsUnknown = division.name === "Unknown";
+          const divisionLabel = divisionIsUnknown ? "DNF/DNS" : `Division ${division.name}`;
+          const timeLabel = !divisionIsUnknown && division.time ? ` (${division.time})` : "";
+          return (
+            <Grid item key={division.name} style={{ width: "100%" }}>
+              {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h6" component="h3">
+                    {divisionLabel}
+                    <Typography variant="subtitle1" color="textSecondary" component="span">
+                      {timeLabel}
+                    </Typography>
+                  </Typography>
+                </Box>
+              )}
+              <RoundResultsTable
+                results={division.results}
+                format={format}
+                eventId={eventId}
+                onResultClick={handleResultClick}
+                forecastView={forecastView}
+                advancementCondition={advancementCondition}
+                isDivisionBased={isDivisionBased}
+              />
+            </Grid>
+          );
+        })}
         {!showAll && totalResultsCount > DEFAULT_VISIBLE_RESULTS && (
           <Grid item>
-            <Button
-              variant="contained"
-              disableElevation
-              size="small"
-              onClick={() => setShowAll(true)}
-            >
+            <Button variant="contained" disableElevation size="small" onClick={() => setShowAll(true)}>
               {totalResultsCount - DEFAULT_VISIBLE_RESULTS} more
             </Button>
           </Grid>
