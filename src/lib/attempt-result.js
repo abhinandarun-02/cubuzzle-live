@@ -545,3 +545,28 @@ function checkForDnsFollowedByValidResult(attemptResults) {
       index > dnsIndex && attempt !== SKIPPED_VALUE && attempt !== DNS_VALUE,
   );
 }
+
+
+export function formatCellValue(value) {
+  if (value === DNF_VALUE) {
+    return "DNF";
+  } else if (value === DNS_VALUE) {
+    return "DNS";
+  } else if (value === SKIPPED_VALUE) {
+    return "";
+  } else {
+    return formatTime(value);
+  }
+}
+
+function formatTime(input) {
+  const number = input || 0;
+  if (number === 0) return "";
+
+  const str = number.toString().padStart(10, "0");
+  const [, hh, mm, ss, cc] = str.match(/(\d\d)(\d\d)(\d\d)(\d\d)$/) || [];
+
+  const time = `${hh}:${mm}:${ss}.${cc}`;
+
+  return time.replace(/^[0:]*(?!\.)/g, "");
+}

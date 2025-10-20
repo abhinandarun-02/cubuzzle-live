@@ -22,7 +22,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CloseIcon from "@mui/icons-material/Close";
 import { times } from "../../lib/utils";
 import { withImageWidth } from "../../lib/utils";
-import { formatAttemptResult } from "../../lib/attempt-result";
+import { formatCellValue } from "../../lib/attempt-result";
 import { resultsForView, orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 import ResultStat from "../ResultStat/ResultStat";
@@ -239,7 +239,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
 
                   {paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
                     <TableCell key={index} align="right" sx={styles.cell}>
-                      {formatAttemptResult(attemptResult, eventId)}
+                      {formatCellValue(attemptResult, eventId)}
                     </TableCell>
                   ))}
                   {stats.map(({ name, field, recordTagField }, index) => (

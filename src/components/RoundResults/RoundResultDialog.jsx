@@ -9,7 +9,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { formatAttemptResult } from "../../lib/attempt-result";
+import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats } from "../../lib/result";
 import { withImageWidth } from "../../lib/utils";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
@@ -67,7 +67,7 @@ function RoundResultDialog({
                   <Grid item>
                     <Typography variant="subtitle2">Attempts</Typography>
                     <Typography variant="body2">
-                      {result.attempts.map((attempt) => formatAttemptResult(attempt.result, eventId)).join(", ")}
+                      {result.attempts.map((attempt) => formatCellValue(attempt.result, eventId)).join(", ")}
                     </Typography>
                   </Grid>
                   {stats.map(({ name, field, recordTagField }) => (

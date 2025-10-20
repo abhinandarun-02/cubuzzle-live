@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, useMediaQuery, Typography } from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
-import { formatAttemptResult } from "../../lib/attempt-result";
+import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import ResultStat from "../ResultStat/ResultStat";
 
@@ -47,7 +47,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
   );
 
   // Calculate total number of columns for the empty state colspan
-  const totalColumns = 2 + // # and Name columns
+  const totalColumns =
+    2 + // # and Name columns
     (smScreen ? 1 : 0) + // Category column
     (smScreen && isDivisionBased ? 1 : 0) + // Division column
     (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
@@ -78,15 +79,15 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
           </TableRow>
         </TableHead>
         <TableBody>
-          {(!results || results.length === 0) ? (
+          {!results || results.length === 0 ? (
             <TableRow>
-              <TableCell 
-                colSpan={totalColumns} 
-                align="center" 
-                sx={{ 
+              <TableCell
+                colSpan={totalColumns}
+                align="center"
+                sx={{
                   py: 4,
                   color: "text.secondary",
-                  fontStyle: "italic"
+                  fontStyle: "italic",
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
@@ -96,53 +97,55 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             </TableRow>
           ) : (
             results.map((result, index) => (
-            <TableRow
-              key={result.id}
-              hover
-              sx={{
-                whiteSpace: "nowrap",
-                "&:last-child td": { border: 0 },
-              }}
-              onClick={() => onResultClick && onResultClick(result)}
-            >
-              <TableCell
-                align="right"
+              <TableRow
+                key={result.id}
+                hover
                 sx={{
-                  ...styles.cell,
-                  ...styles.ranking,
-                  ...(result.advancing ? styles.advancing : {}),
-                  ...(result.advancingQuestionable ? styles.advancingQuestionable : {}),
+                  whiteSpace: "nowrap",
+                  "&:last-child td": { border: 0 },
                 }}
+                onClick={() => onResultClick && onResultClick(result)}
               >
-                {result.ranking === UNRANKED_POSITION
-                  ? ""
-                  : typeof result.ranking === "number"
-                    ? result.ranking
-                    : index + 1}
-              </TableCell>
-              <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
-              {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
-              {smScreen && isDivisionBased && <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>}
-              {smScreen &&
-                paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
-                  <TableCell key={index} align="right" sx={styles.cell}>
-                    {formatAttemptResult(attemptResult, eventId)}
-                  </TableCell>
-                ))}
-              {stats.map(({ name, field }, index) => (
                 <TableCell
-                  key={name}
                   align="right"
                   sx={{
                     ...styles.cell,
-                    fontWeight: index === 0 ? 600 : 400,
+                    ...styles.ranking,
+                    ...(result.advancing ? styles.advancing : {}),
+                    ...(result.advancingQuestionable ? styles.advancingQuestionable : {}),
                   }}
                 >
-                  <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
+                  {result.ranking === UNRANKED_POSITION
+                    ? ""
+                    : typeof result.ranking === "number"
+                      ? result.ranking
+                      : index + 1}
                 </TableCell>
-              ))}
-            </TableRow>
-          ))
+                <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
+                {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
+                {smScreen && isDivisionBased && (
+                  <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>
+                )}
+                {smScreen &&
+                  paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
+                    <TableCell key={index} align="right" sx={styles.cell}>
+                      {formatCellValue(attemptResult, eventId)}
+                    </TableCell>
+                  ))}
+                {stats.map(({ name, field }, index) => (
+                  <TableCell
+                    key={name}
+                    align="right"
+                    sx={{
+                      ...styles.cell,
+                      fontWeight: index === 0 ? 600 : 400,
+                    }}
+                  >
+                    <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
           )}
         </TableBody>
       </Table>
