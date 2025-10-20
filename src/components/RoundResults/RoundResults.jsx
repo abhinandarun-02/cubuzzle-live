@@ -1,17 +1,14 @@
 import { useState, useCallback, useMemo } from "react";
-import { Button, Grid, useMediaQuery, Typography, Box } from "@mui/material";
+import { Grid, useMediaQuery, Typography, Box } from "@mui/material";
 import RoundResultsTable from "./RoundResultsTable";
 import RoundResultDialog from "./RoundResultDialog";
 import { resultsForView } from "../../lib/result";
 import { splitResultsByDivision } from "../../lib/utils";
 
-const DEFAULT_VISIBLE_RESULTS = 100;
-
 function RoundResults({ results, format, eventId, forecastView, advancementCondition }) {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   const [selectedResult, setSelectedResult] = useState(null);
-  const [showAll, setShowAll] = useState(results.length <= DEFAULT_VISIBLE_RESULTS);
 
   const handleResultClick = useCallback((result) => {
     setSelectedResult(result);
@@ -44,39 +41,10 @@ function RoundResults({ results, format, eventId, forecastView, advancementCondi
     }
   }, [scoredResults, isDivisionBased]);
 
-  const totalResultsCount = useMemo(() => {
-    return divisionResults.reduce((total, division) => total + division.results.length, 0);
-  }, [divisionResults]);
-
-  const visibleDivisionResults = useMemo(() => {
-    if (showAll) {
-      return divisionResults;
-    } else {
-      let currentCount = 0;
-      const visibleDivisions = [];
-
-      for (const division of divisionResults) {
-        const remainingLimit = DEFAULT_VISIBLE_RESULTS - currentCount;
-        if (remainingLimit <= 0) break;
-
-        const visibleResults = division.results.slice(0, remainingLimit);
-        visibleDivisions.push({
-          ...division,
-          results: visibleResults,
-        });
-        currentCount += visibleResults.length;
-
-        if (currentCount >= DEFAULT_VISIBLE_RESULTS) break;
-      }
-
-      return visibleDivisions;
-    }
-  }, [divisionResults, showAll]);
-
   return (
     <>
       <Grid container direction="column" alignItems="center" spacing={2}>
-        {visibleDivisionResults.map((division) => {
+        {divisionResults.map((division) => {
           const divisionIsUnknown = division.name === "Unknown";
           const divisionLabel = divisionIsUnknown ? "DNF/DNS" : `Division ${division.name}`;
           const timeLabel = !divisionIsUnknown && division.time ? ` (${division.time})` : "";
@@ -104,14 +72,8 @@ function RoundResults({ results, format, eventId, forecastView, advancementCondi
             </Grid>
           );
         })}
-        {!showAll && totalResultsCount > DEFAULT_VISIBLE_RESULTS && (
-          <Grid item>
-            <Button variant="contained" disableElevation size="small" onClick={() => setShowAll(true)}>
-              {totalResultsCount - DEFAULT_VISIBLE_RESULTS} more
-            </Button>
-          </Grid>
-        )}
       </Grid>
+
       {!smScreen && (
         <RoundResultDialog
           result={selectedResult}
