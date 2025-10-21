@@ -1,10 +1,21 @@
 import { memo } from "react";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, useMediaQuery, Typography } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  useMediaQuery,
+  Typography,
+  Avatar,
+} from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
 import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import ResultStat from "../ResultStat/ResultStat";
+import { withImageWidth } from "../../lib/utils";
 
 const UNRANKED_POSITION = 1000000;
 
@@ -15,6 +26,10 @@ const styles = {
     "&:last-child": {
       pr: 2,
     },
+  },
+  image: {
+    width: 32,
+    p: 0.5,
   },
   ranking: {
     pr: { xs: 1, md: 2 },
@@ -35,6 +50,10 @@ const styles = {
     width: { xs: "100%", md: 350 },
     maxWidth: { xs: 150, md: 350 },
   },
+  country: {
+    width: { xs: 120, md: 200 },
+    maxWidth: { xs: 120, md: 200 },
+  },
 };
 
 const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView, isDivisionBased = false }) => {
@@ -49,6 +68,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
   // Calculate total number of columns for the empty state colspan
   const totalColumns =
     2 + // # and Name columns
+    (smScreen ? 1 : 0) + // Image column
+    (smScreen ? 1 : 0) + // Country column
     (smScreen ? 1 : 0) + // Category column
     (smScreen && isDivisionBased ? 1 : 0) + // Division column
     (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
@@ -62,7 +83,9 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="right">
               #
             </TableCell>
+            {smScreen && <TableCell sx={{ ...styles.image }}> </TableCell>}
             <TableCell sx={styles.cell}>Name</TableCell>
+            {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
             {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
             {smScreen && isDivisionBased && <TableCell sx={styles.cell}>Division</TableCell>}
             {smScreen &&
@@ -121,7 +144,20 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                       ? result.ranking
                       : index + 1}
                 </TableCell>
+                {smScreen && (
+                  <TableCell sx={{ ...styles.image }}>
+                    <Avatar
+                      src={withImageWidth(result.imageUrl, 96)}
+                      alt={result.name}
+                      sx={{ width: 32, height: 32, fontSize: "2.25rem" }}
+                    />
+                  </TableCell>
+                )}
+
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
+                {smScreen && (
+                  <TableCell sx={{ ...styles.cell, ...styles.country }}>{result.country?.name ?? "—"}</TableCell>
+                )}
                 {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
                 {smScreen && isDivisionBased && (
                   <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>

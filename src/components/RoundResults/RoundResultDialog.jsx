@@ -14,6 +14,7 @@ import { orderedResultStats } from "../../lib/result";
 import { withImageWidth } from "../../lib/utils";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
 import ResultStat from "../ResultStat/ResultStat";
+import FlagIcon from "../FlagIcon/FlagIcon";
 
 function RoundResultDialog({
   result,
@@ -50,6 +51,17 @@ function RoundResultDialog({
               <Grid item>
                 <Typography variant="subtitle2">Name</Typography>
                 <Typography variant="body2">{result.name}</Typography>
+              </Grid>
+
+              <Grid item>
+                <Typography variant="subtitle2">Country</Typography>
+
+                <Box display="flex" alignItems="center" gap={1}>
+                  <FlagIcon code={result.country?.code?.toLowerCase()} />
+                  <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
+                    {result.country?.name ?? "—"}
+                  </Typography>
+                </Box>
               </Grid>
 
               <Grid item>

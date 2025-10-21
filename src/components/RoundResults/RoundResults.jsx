@@ -1,13 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
-import { Grid, useMediaQuery, Typography, Box } from "@mui/material";
+import { Grid, Typography, Box } from "@mui/material";
 import RoundResultsTable from "./RoundResultsTable";
 import RoundResultDialog from "./RoundResultDialog";
 import { resultsForView } from "../../lib/result";
 import { splitResultsByDivision } from "../../lib/utils";
 
 function RoundResults({ results, format, eventId, forecastView, advancementCondition }) {
-  const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
-
   const [selectedResult, setSelectedResult] = useState(null);
 
   const handleResultClick = useCallback((result) => {
@@ -74,17 +72,15 @@ function RoundResults({ results, format, eventId, forecastView, advancementCondi
         })}
       </Grid>
 
-      {!smScreen && (
-        <RoundResultDialog
-          result={selectedResult}
-          format={format}
-          eventId={eventId}
-          forecastView={forecastView}
-          advancementCondition={advancementCondition}
-          isDivisionBased={isDivisionBased}
-          onClose={() => setSelectedResult(null)}
-        />
-      )}
+      <RoundResultDialog
+        result={selectedResult}
+        format={format}
+        eventId={eventId}
+        forecastView={forecastView}
+        advancementCondition={advancementCondition}
+        isDivisionBased={isDivisionBased}
+        onClose={() => setSelectedResult(null)}
+      />
     </>
   );
 }
