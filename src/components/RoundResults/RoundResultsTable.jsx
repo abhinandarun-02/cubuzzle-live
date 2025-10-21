@@ -30,6 +30,8 @@ const styles = {
   image: {
     width: 32,
     p: 0.5,
+    pr: { xs: 1, md: 2 },
+    pl: { xs: 1, md: 2 },
   },
   ranking: {
     pr: { xs: 1, md: 2 },
@@ -67,8 +69,8 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
 
   // Calculate total number of columns for the empty state colspan
   const totalColumns =
-    2 + // # and Name columns
-    (smScreen ? 1 : 0) + // Image column
+    3 + // #, Image and Name columns
+    (isDivisionBased ? 1 : 0) + // Div Rank column
     (smScreen ? 1 : 0) + // Country column
     (smScreen ? 1 : 0) + // Category column
     (smScreen && isDivisionBased ? 1 : 0) + // Division column
@@ -83,7 +85,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="right">
               #
             </TableCell>
-            {smScreen && <TableCell sx={{ ...styles.image }}> </TableCell>}
+            <TableCell sx={{ ...styles.image }}> </TableCell>
             <TableCell sx={styles.cell}>Name</TableCell>
             {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
             {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
@@ -99,6 +101,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 {name}
               </TableCell>
             ))}
+            {isDivisionBased && <TableCell sx={{ ...styles.cell, whiteSpace: "nowrap" }}>{smScreen ? "Div Rank" : "Div #"}</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -144,15 +147,14 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                       ? result.ranking
                       : index + 1}
                 </TableCell>
-                {smScreen && (
-                  <TableCell sx={{ ...styles.image }}>
-                    <Avatar
-                      src={withImageWidth(result.imageUrl, 96)}
-                      alt={result.name}
-                      sx={{ width: 32, height: 32, fontSize: "2.25rem" }}
-                    />
-                  </TableCell>
-                )}
+
+                <TableCell sx={{ ...styles.image }}>
+                  <Avatar
+                    src={withImageWidth(result.imageUrl, 96)}
+                    alt={result.name}
+                    sx={{ width: 32, height: 32, fontSize: "2.25rem" }}
+                  />
+                </TableCell>
 
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
                 {smScreen && (
@@ -180,6 +182,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                     <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
                   </TableCell>
                 ))}
+                {isDivisionBased && <TableCell sx={{ ...styles.cell }} align="right">{index + 1}</TableCell>}
               </TableRow>
             ))
           )}
