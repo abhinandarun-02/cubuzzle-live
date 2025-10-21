@@ -49,9 +49,15 @@ function RoundResultDialog({
                 </Grid>
               )}
               <Grid item>
+                <Typography variant="subtitle2">ID</Typography>
+                <Typography variant="body2">{result.id}</Typography>
+              </Grid>
+              
+              <Grid item>
                 <Typography variant="subtitle2">Name</Typography>
                 <Typography variant="body2">{result.name}</Typography>
               </Grid>
+
 
               <Grid item>
                 <Typography variant="subtitle2">Country</Typography>

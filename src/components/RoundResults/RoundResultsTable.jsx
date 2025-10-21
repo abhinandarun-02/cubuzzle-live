@@ -9,6 +9,7 @@ import {
   useMediaQuery,
   Typography,
   Avatar,
+  Box,
 } from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
@@ -16,6 +17,7 @@ import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import ResultStat from "../ResultStat/ResultStat";
 import { withImageWidth } from "../../lib/utils";
+import FlagIcon from "../FlagIcon/FlagIcon";
 
 const UNRANKED_POSITION = 1000000;
 
@@ -36,6 +38,14 @@ const styles = {
   ranking: {
     pr: { xs: 1, md: 2 },
     width: { xs: 40, md: 50 },
+  },
+  divRank: {
+    pl: { xs: 1, md: 4 },
+    width: { xs: 50, md: 100 },
+    whiteSpace: "nowrap",
+  },
+  division: {
+    width: { md: 84 },
   },
   advancing: {
     color: (theme) => theme.palette.getContrastText(green["A400"]),
@@ -82,7 +92,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="right">
+            <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="center">
               #
             </TableCell>
             <TableCell sx={{ ...styles.image }}> </TableCell>
@@ -101,7 +111,9 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 {name}
               </TableCell>
             ))}
-            {isDivisionBased && <TableCell sx={{ ...styles.cell, whiteSpace: "nowrap" }}>{smScreen ? "Div Rank" : "Div #"}</TableCell>}
+            {isDivisionBased && (
+              <TableCell sx={{ ...styles.cell, ...styles.divRank }}>{smScreen ? "Div Rank" : "Div #"}</TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -133,7 +145,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 onClick={() => onResultClick && onResultClick(result)}
               >
                 <TableCell
-                  align="right"
+                  align="center"
                   sx={{
                     ...styles.cell,
                     ...styles.ranking,
@@ -158,11 +170,18 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
 
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
                 {smScreen && (
-                  <TableCell sx={{ ...styles.cell, ...styles.country }}>{result.country?.name ?? "—"}</TableCell>
+                  <TableCell sx={{ ...styles.cell, ...styles.country }}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <FlagIcon code={result.country?.code?.toLowerCase()} />
+                      <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
+                        {result.country?.name ?? "—"}
+                      </Typography>
+                    </Box>
+                  </TableCell>
                 )}
                 {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
                 {smScreen && isDivisionBased && (
-                  <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision}</TableCell>
+                  <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision || "N/A"}</TableCell>
                 )}
                 {smScreen &&
                   paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
@@ -182,7 +201,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                     <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
                   </TableCell>
                 ))}
-                {isDivisionBased && <TableCell sx={{ ...styles.cell }} align="right">{index + 1}</TableCell>}
+                {isDivisionBased && (
+                  <TableCell align="center" sx={{ ...styles.cell, ...styles.divRank }}>
+                    {index + 1}
+                  </TableCell>
+                )}
               </TableRow>
             ))
           )}
