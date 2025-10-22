@@ -11,12 +11,14 @@ import {
   Chip,
   Stack,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { withImageWidth } from "../../lib/utils";
 
 function CompetitorDialog({ competitor, onClose }) {
   const imageUrlWithWidth = withImageWidth(competitor?.imageUrl, 100);
+  const navigate = useNavigate();
 
   const getEventDisplayName = (eventId) => {
     const eventMap = {
@@ -160,6 +162,17 @@ function CompetitorDialog({ competitor, onClose }) {
           <DialogActions>
             <Button color="primary" onClick={onClose}>
               Close
+            </Button>
+            <Button
+              color="primary"
+              onClick={() => {
+                if (competitor?.id) {
+                  onClose?.();
+                  navigate(`/competitor/${competitor.id}`);
+                }
+              }}
+            >
+              View Results
             </Button>
           </DialogActions>
         </>

@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
   Typography,
   Avatar,
   Box,
+  Link,
 } from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
@@ -168,7 +170,15 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                   />
                 </TableCell>
 
-                <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
+                <TableCell sx={{ ...styles.cell, ...styles.name }}>
+                  {smScreen ? (
+                    <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
+                      {result.name}
+                    </Link>
+                  ) : (
+                    result.name
+                  )}
+                </TableCell>
                 {smScreen && (
                   <TableCell sx={{ ...styles.cell, ...styles.country }}>
                     <Box display="flex" alignItems="center" gap={1}>

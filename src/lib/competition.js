@@ -34,9 +34,7 @@ export function isInProgress(competition) {
 export function competitionCountries(competition) {
   const countries = competition.venues.map((venue) => venue.country);
   const iso2s = uniq(countries.map((country) => country.iso2));
-  return iso2s.map((iso2) =>
-    countries.find((country) => country.iso2 === iso2),
-  );
+  return iso2s.map((iso2) => countries.find((country) => country.iso2 === iso2));
 }
 
 /**
@@ -44,13 +42,9 @@ export function competitionCountries(competition) {
  */
 export function eventRoundForActivityCode(competitionEvents, activityCode) {
   const { eventId, roundNumber } = parseActivityCode(activityCode);
-  const competitionEvent = competitionEvents.find(
-    ({ event }) => event.id === eventId,
-  );
+  const competitionEvent = competitionEvents.find(({ event }) => event.id === eventId);
   if (!competitionEvent) return null;
-  const round = competitionEvent.rounds.find(
-    (round) => round.number === roundNumber,
-  );
+  const round = competitionEvent.rounds.find((round) => round.number === roundNumber);
   if (!round) return null;
   return { event: competitionEvent.event, round };
 }
@@ -63,8 +57,36 @@ export async function nearestCompetition(competitions) {
 
   return minBy(competitions, (competition) => {
     const distances = competition.venues.map((venue) =>
-      distanceKm(latitude, longitude, venue.latitude, venue.longitude),
+      distanceKm(latitude, longitude, venue.latitude, venue.longitude)
     );
     return Math.min(...distances);
   });
+}
+
+/**
+ * Returns event name for the given competition event ID.
+ */
+export function getEventDisplayName(eventId, variant = "short") {
+  const eventMap =
+    variant === "short"
+      ? {
+          222: "2x2x2",
+          333: "3x3x3",
+          pyram: "Pyraminx",
+        }
+      : {
+          222: "2x2x2 Cube",
+          333: "3x3x3 Cube",
+          pyram: "Pyraminx",
+        };
+  return eventMap[eventId] || String(eventId).toUpperCase();
+}
+
+export function getRoundDisplayName(roundId) {
+  const roundMap = {
+    "round-1": "First Round",
+    "round-2": "Second Round",
+    final: "Final Round",
+  };
+  return roundMap[roundId] || String(roundId).toUpperCase();
 }

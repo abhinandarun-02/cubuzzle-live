@@ -4,6 +4,7 @@ import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
 
 import CompetitionLayout from "./CompetitionLayout";
+import CompetitorPage from "../Competitor/CompetitorPage";
 import { useQuery } from "@tanstack/react-query";
 import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
 import Loading from "../Loading/Loading";
@@ -34,6 +35,7 @@ function CompetitionNavigation() {
         <Route path="" element={<CompetitionHome />} />
         <Route path="events/:eventId/rounds/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
+        <Route path="competitor/:competitorId" element={<CompetitorPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </CompetitionLayout>

@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, collectionGroup, doc, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
 
 export const getAllCompetitions = async () => {
   try {
@@ -85,6 +85,57 @@ export const getCompetitorsByCompetition = async (competitionId) => {
     return competitors;
   } catch (error) {
     console.error("Error getting all competitors: ", error);
+    throw error;
+  }
+};
+
+// Fetch competitor document and all results across events/rounds for that competitor
+export const getCompetitorWithResults = async (competitionId, competitorId) => {
+  try {
+    // competitor document
+    const competitorRef = doc(db, "competitions", competitionId, "competitors", competitorId);
+    const competitorSnap = await getDoc(competitorRef);
+    if (!competitorSnap.exists()) {
+      throw new Error("Competitor not found");
+    }
+    const competitor = { id: competitorSnap.id, ...competitorSnap.data() };
+
+    // Use collectionGroup to fetch all result documents matching the competitorId
+    const resultsGroupRef = collectionGroup(db, "results");
+    const resultsQuery = query(
+      resultsGroupRef,
+      where("id", "==", competitorId),
+      where("scored", "==", true),
+      where("compId", "==", competitionId)
+    );
+    const resSnap = await getDocs(resultsQuery);
+
+    const results = resSnap.docs.map((r) => {
+      // Attempt to retrieve eventId from parent chain: .../events/{eventId}/rounds/{roundId}/results/{resultId}
+      let eventId = null;
+      try {
+        // r.ref -> results doc
+        // r.ref.parent -> results collection
+        // r.ref.parent.parent -> round doc
+        // r.ref.parent.parent.parent.parent -> event doc
+        const maybeEventDoc = r.ref.parent?.parent?.parent?.parent;
+        if (maybeEventDoc?.id) {
+          eventId = maybeEventDoc.id;
+        }
+      } catch (e) {
+        // ignore if structure unexpected
+      }
+
+      return { id: r.id, eventId, ...r.data() };
+    });
+
+    // Attach a deduplicated list of eventIds the competitor appears in
+    const events = Array.from(new Set(results.map((res) => res.eventId).filter(Boolean)));
+    const competitorWithEvents = { ...competitor, events };
+
+    return { competitor: competitorWithEvents, results };
+  } catch (error) {
+    console.error("Error getting competitor with results: ", error);
     throw error;
   }
 };

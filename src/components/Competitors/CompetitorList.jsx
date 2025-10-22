@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Grid,
   IconButton,
@@ -17,7 +18,7 @@ import { withImageWidth } from "../../lib/utils";
 import SearchIcon from "@mui/icons-material/Search";
 import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
-import CompetitorDialog from "./CompetitorDialog";
+import { getEventDisplayName } from "../../lib/competition";
 
 const styles = {
   searchPaper: {
@@ -110,18 +111,9 @@ function searchCompetitors(competitors, search) {
 
 function CompetitorList({ competitors }) {
   const [search, setSearch] = useState("");
-  const [selectedCompetitor, setSelectedCompetitor] = useState(null);
+  const navigate = useNavigate();
 
   const filteredCompetitors = searchCompetitors(competitors, search).sort((a, b) => a.name.localeCompare(b.name));
-
-  const getEventDisplayName = (eventId) => {
-    const eventMap = {
-      222: "2x2x2",
-      333: "3x3x3",
-      pyram: "Pyraminx",
-    };
-    return eventMap[eventId] || eventId.toUpperCase();
-  };
 
   return (
     <Grid container direction="column" alignItems="center" spacing={1}>
@@ -144,7 +136,7 @@ function CompetitorList({ competitors }) {
             <ListItemButton
               key={competitor.id}
               sx={styles.listItemButton}
-              onClick={() => setSelectedCompetitor(competitor)}
+              onClick={() => navigate(`/competitor/${competitor.id}`)}
             >
               {/* Profile picture */}
               <ListItemIcon sx={styles.listItemIcon}>
@@ -210,7 +202,6 @@ function CompetitorList({ competitors }) {
             </ListItemButton>
           ))}
         </List>
-        <CompetitorDialog competitor={selectedCompetitor} onClose={() => setSelectedCompetitor(null)} />
       </Grid>
     </Grid>
   );
