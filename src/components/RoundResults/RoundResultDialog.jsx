@@ -81,7 +81,7 @@ function RoundResultDialog({
               {isDivisionBased && (
                 <Grid item>
                   <Typography variant="subtitle2">Division</Typography>
-                  <Typography variant="body2">{result.calculatedDivision}</Typography>
+                  <Typography variant="body2">{result.calculatedDivision || "N/A"}</Typography>
                 </Grid>
               )}
               {result.ranking && (
