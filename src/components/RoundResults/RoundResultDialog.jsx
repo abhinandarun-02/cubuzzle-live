@@ -1,3 +1,4 @@
+import { Link as RouterLink } from "react-router-dom";
 import {
   Avatar,
   Button,
@@ -8,6 +9,7 @@ import {
   Grid,
   Typography,
   Box,
+  Link,
 } from "@mui/material";
 import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats } from "../../lib/result";
@@ -52,12 +54,14 @@ function RoundResultDialog({
                 <Typography variant="subtitle2">ID</Typography>
                 <Typography variant="body2">{result.id}</Typography>
               </Grid>
-              
+
               <Grid item>
                 <Typography variant="subtitle2">Name</Typography>
                 <Typography variant="body2">{result.name}</Typography>
+                <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
+                  All results
+                </Link>
               </Grid>
-
 
               <Grid item>
                 <Typography variant="subtitle2">Country</Typography>
