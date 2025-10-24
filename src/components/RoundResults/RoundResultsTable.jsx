@@ -13,7 +13,8 @@ import {
   Box,
   Link,
 } from "@mui/material";
-import { yellow, green } from "@mui/material/colors";
+import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import { yellow, green, red } from "@mui/material/colors";
 import { times } from "../../lib/utils";
 import { formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
@@ -68,6 +69,44 @@ const styles = {
     width: { xs: 120, md: 200 },
     maxWidth: { xs: 120, md: 200 },
   },
+  divisionChangeIcon: {
+    fontSize: "1rem",
+    ml: 0.5,
+    verticalAlign: "middle",
+  },
+  promoted: {
+    color: green[600],
+  },
+  demoted: {
+    color: red[600],
+  },
+};
+
+const renderDivisionChangeIcon = (divisionChange) => {
+  if (!divisionChange?.status) return null;
+  if (divisionChange.status === "promoted") {
+    return (
+      <ArrowUpward
+        sx={{
+          ...styles.divisionChangeIcon,
+          ...styles.promoted,
+        }}
+        titleAccess={`Promoted from ${divisionChange.from} to ${divisionChange.to}`}
+      />
+    );
+  }
+  if (divisionChange.status === "demoted") {
+    return (
+      <ArrowDownward
+        sx={{
+          ...styles.divisionChangeIcon,
+          ...styles.demoted,
+        }}
+        titleAccess={`Demoted from ${divisionChange.from} to ${divisionChange.to}`}
+      />
+    );
+  }
+  return null;
 };
 
 const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView, isDivisionBased = false }) => {
@@ -171,13 +210,16 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 </TableCell>
 
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                  {smScreen ? (
-                    <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
-                      {result.name}
-                    </Link>
-                  ) : (
-                    result.name
-                  )}
+                  <Box display="flex" alignItems="center">
+                    {smScreen ? (
+                      <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
+                        {result.name}
+                      </Link>
+                    ) : (
+                      result.name
+                    )}
+                    {renderDivisionChangeIcon(result.divisionChange)}
+                  </Box>
                 </TableCell>
                 {smScreen && (
                   <TableCell sx={{ ...styles.cell, ...styles.country }}>
