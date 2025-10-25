@@ -3,7 +3,11 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Link, 
 import { formatAttemptResult, formatCellValue } from "../../lib/attempt-result";
 import { getEventDisplayName, getRoundDisplayName } from "../../lib/competition";
 
-function CompetitorResultDialog({ result, onClose }) {
+function is333(eventId) {
+  return String(eventId) === "333";
+}
+
+function CompetitorResultDialog({ eventId, result, onClose }) {
   return (
     <Dialog open={!!result} fullWidth={true} onClose={onClose}>
       {!!result && (
@@ -22,6 +26,14 @@ function CompetitorResultDialog({ result, onClose }) {
                   All results
                 </Link>
               </Grid>
+
+              {is333(eventId) && (
+                <Grid item>
+                  <Typography variant="subtitle2">Division</Typography>
+                  <Typography variant="body2">{result.calculatedDivision ?? "N/A"}</Typography>
+                </Grid>
+              )}
+
               {result.ranking !== 1000000 && (
                 <>
                   <Grid item>

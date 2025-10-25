@@ -22,9 +22,16 @@ const styles = {
   roundName: {
     width: { xs: 150, lg: 200 },
   },
+  division: {
+    width: { xs: 70, md: 80 },
+  },
 };
 
-function CompetitorResultsTable({ results, onResultClick }) {
+function is333(eventId) {
+  return String(eventId) === "333";
+}
+
+function CompetitorResultsTable({ eventId, results, onResultClick }) {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
   const numberOfAttempts = 3;
 
@@ -37,6 +44,11 @@ function CompetitorResultsTable({ results, onResultClick }) {
               #
             </TableCell>
             <TableCell sx={styles.roundName}>Round</TableCell>
+            {smScreen && (
+              <TableCell sx={styles.division}>
+                {is333(eventId) ? "Division" : "\u00A0"}
+              </TableCell>
+            )}
             {smScreen &&
               times(numberOfAttempts, (index) => (
                 <TableCell key={index} align="right">
@@ -79,6 +91,11 @@ function CompetitorResultsTable({ results, onResultClick }) {
                   getRoundDisplayName(result.roundId)
                 )}
               </TableCell>
+              {smScreen && (
+              <TableCell>
+                {is333(eventId) ? (result.calculatedDivision ?? "N/A") : "\u00A0"}
+              </TableCell>
+              )}
               {smScreen &&
                 paddedAttemptResults(result, numberOfAttempts).map((attemptResult, index) => (
                   <TableCell key={index} align="right">

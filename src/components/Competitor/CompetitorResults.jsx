@@ -26,11 +26,17 @@ function CompetitorResults({ results }) {
             <Typography variant="subtitle1" gutterBottom>
               {getEventDisplayName(eventId, "long")}
             </Typography>
-            <CompetitorResultsTable results={grouped[eventId]} onResultClick={(result) => setSelectedResult(result)} />
+            <CompetitorResultsTable eventId={eventId} results={grouped[eventId]} onResultClick={(result) => setSelectedResult(result)} />
           </Grid>
         ))}
       </Grid>
-      {!smScreen && <CompetitorResultDialog result={selectedResult} onClose={() => setSelectedResult(null)} />}
+      {!smScreen && (
+        <CompetitorResultDialog
+          eventId={selectedResult?.eventId}
+          result={selectedResult}
+          onClose={() => setSelectedResult(null)}
+        />
+      )}
     </>
   );
 }
