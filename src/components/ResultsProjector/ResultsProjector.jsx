@@ -16,7 +16,8 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { yellow, green } from "@mui/material/colors";
+import { yellow, green, red } from "@mui/material/colors";
+import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CloseIcon from "@mui/icons-material/Close";
@@ -55,6 +56,17 @@ const styles = {
   country: {
     width: 70,
   },
+  divisionChangeIcon: {
+    fontSize: "1.5rem",
+    ml: 0.5,
+    verticalAlign: "middle",
+  },
+  promoted: {
+    color: green[600],
+  },
+  demoted: {
+    color: red[600],
+  },
 };
 
 const STATUS = {
@@ -71,6 +83,61 @@ const DURATION = {
   FORECAST_SHOWN: 20 * 1000,
   SHOWING: 1000,
   HIDING: 1000,
+};
+
+const renderDivisionChangeIcon = (divisionChange) => {
+  if (!divisionChange?.status) return null;
+  if (divisionChange.status === "promoted") {
+    return (
+      <Box
+        component="span"
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          backgroundColor: green[600],
+          ml: 1,
+        }}
+        title={`Promoted from ${divisionChange.from} to ${divisionChange.to}`}
+      >
+        <ArrowUpward
+          sx={{
+            fontSize: "1.25rem",
+            color: "white",
+          }}
+        />
+      </Box>
+    );
+  }
+  if (divisionChange.status === "demoted") {
+    return (
+      <Box
+        component="span"
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          backgroundColor: red[600],
+          ml: 1,
+        }}
+        title={`Demoted from ${divisionChange.from} to ${divisionChange.to}`}
+      >
+        <ArrowDownward
+          sx={{
+            fontSize: "1.25rem",
+            color: "white",
+          }}
+        />
+      </Box>
+    );
+  }
+  return null;
 };
 
 /* (window height - app bar - table header) / row height */
@@ -234,7 +301,14 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                     />
                   </TableCell>
                   <TableCell sx={{ ...styles.cell, ...styles.name }}>{result.name}</TableCell>
-                  {isDivisionBased && <TableCell sx={styles.cell}>{result.calculatedDivision}</TableCell>}
+                  {isDivisionBased && (
+                    <TableCell sx={styles.cell}>
+                      <Box component="span" display="inline-flex" alignItems="center">
+                        {result.calculatedDivision}
+                        {renderDivisionChangeIcon(result.divisionChange)}
+                      </Box>
+                    </TableCell>
+                  )}
                   <TableCell sx={styles.cell}>{result.category}</TableCell>
 
                   {paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (

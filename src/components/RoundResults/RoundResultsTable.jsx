@@ -48,7 +48,7 @@ const styles = {
     whiteSpace: "nowrap",
   },
   division: {
-    width: { md: 84 },
+    width: { md: 140 },
   },
   advancing: {
     color: (theme) => theme.palette.getContrastText(green["A400"]),
@@ -86,24 +86,52 @@ const renderDivisionChangeIcon = (divisionChange) => {
   if (!divisionChange?.status) return null;
   if (divisionChange.status === "promoted") {
     return (
-      <ArrowUpward
+      <Box
+        component="span"
         sx={{
-          ...styles.divisionChangeIcon,
-          ...styles.promoted,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 20,
+          height: 20,
+          borderRadius: "50%",
+          backgroundColor: green[600],
+          ml: 0.5,
         }}
-        titleAccess={`Promoted from ${divisionChange.from} to ${divisionChange.to}`}
-      />
+        title={`Promoted from ${divisionChange.from} to ${divisionChange.to}`}
+      >
+        <ArrowUpward
+          sx={{
+            fontSize: "0.875rem",
+            color: "white",
+          }}
+        />
+      </Box>
     );
   }
   if (divisionChange.status === "demoted") {
     return (
-      <ArrowDownward
+      <Box
+        component="span"
         sx={{
-          ...styles.divisionChangeIcon,
-          ...styles.demoted,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 20,
+          height: 20,
+          borderRadius: "50%",
+          backgroundColor: red[600],
+          ml: 0.5,
         }}
-        titleAccess={`Demoted from ${divisionChange.from} to ${divisionChange.to}`}
-      />
+        title={`Demoted from ${divisionChange.from} to ${divisionChange.to}`}
+      >
+        <ArrowDownward
+          sx={{
+            fontSize: "0.875rem",
+            color: "white",
+          }}
+        />
+      </Box>
     );
   }
   return null;
@@ -140,7 +168,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
             <TableCell sx={styles.cell}>Name</TableCell>
             {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
             {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
-            {smScreen && isDivisionBased && <TableCell sx={styles.cell}>Division</TableCell>}
+            {smScreen && isDivisionBased && <TableCell sx={{ ...styles.cell, ...styles.division }}>Division</TableCell>}
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -210,16 +238,13 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 </TableCell>
 
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                  <Box display="flex" alignItems="center">
-                    {smScreen ? (
-                      <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
-                        {result.name}
-                      </Link>
-                    ) : (
-                      result.name
-                    )}
-                    {renderDivisionChangeIcon(result.divisionChange)}
-                  </Box>
+                  {smScreen ? (
+                    <Link component={RouterLink} to={`/competitor/${result.id}`} underline="hover">
+                      {result.name}
+                    </Link>
+                  ) : (
+                    result.name
+                  )}
                 </TableCell>
                 {smScreen && (
                   <TableCell sx={{ ...styles.cell, ...styles.country }}>
@@ -233,7 +258,12 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 )}
                 {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
                 {smScreen && isDivisionBased && (
-                  <TableCell sx={{ ...styles.cell }}>{result.calculatedDivision || "N/A"}</TableCell>
+                  <TableCell sx={{ ...styles.cell }}>
+                    <Box display="flex" alignItems="center">
+                      {result.calculatedDivision || "N/A"}
+                      {renderDivisionChangeIcon(result.divisionChange)}
+                    </Box>
+                  </TableCell>
                 )}
                 {smScreen &&
                   paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
