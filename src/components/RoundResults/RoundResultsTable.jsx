@@ -161,11 +161,12 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
   // Calculate total number of columns for the empty state colspan
   const totalColumns =
     3 + // #, Image and Name columns
-    (isDivisionBased ? 1 : 0) + // Div Rank column
+    (isDivisionBased ? 1 : 0) + // Division column
     (smScreen ? 1 : 0) + // Country column
     (smScreen ? 1 : 0) + // Category column
     (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
-    stats.length; // Stat columns
+    stats.length + // Stat columns
+    (isDivisionBased ? 1 : 0); // Div Rank column
 
   return (
     <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
