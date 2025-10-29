@@ -243,7 +243,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
         >
           <TableHead>
             <TableRow>
-              <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="right">
+              <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="center">
                 #
               </TableCell>
               <TableCell sx={{ ...styles.cell, ...styles.country }}></TableCell>
@@ -283,7 +283,7 @@ function ResultsProjector({ results, format, eventId, title, exitUrl, forecastVi
                   }}
                 >
                   <TableCell
-                    align="right"
+                    align="center"
                     sx={{
                       ...styles.cell,
                       ...styles.ranking,
