@@ -41,36 +41,38 @@ function RoundResults({ results, format, eventId, forecastView, advancementCondi
 
   return (
     <>
-      <Grid container direction="column" alignItems="center" spacing={2}>
-        {divisionResults.map((division) => {
-          const divisionIsUnknown = division.name === "Unknown";
-          const divisionLabel = divisionIsUnknown ? "DNF/DNS" : `Division ${division.name}`;
-          const timeLabel = !divisionIsUnknown && division.time ? ` (${division.time})` : "";
-          return (
-            <Grid item key={division.name} style={{ width: "100%" }}>
-              {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="h6" component="h3">
-                    {divisionLabel}
-                    <Typography variant="subtitle1" color="textSecondary" component="span">
-                      {timeLabel}
+      <Box sx={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
+        <Grid container direction="column" alignItems="center" spacing={2}>
+          {divisionResults.map((division) => {
+            const divisionIsUnknown = division.name === "Unknown";
+            const divisionLabel = divisionIsUnknown ? "DNF/DNS" : `Division ${division.name}`;
+            const timeLabel = !divisionIsUnknown && division.time ? ` (${division.time})` : "";
+            return (
+              <Grid item key={division.name} sx={{ width: "100%", maxWidth: "100%" }}>
+                {isDivisionBased && divisionResults.length > 1 && division.name !== "All" && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h6" component="h3">
+                      {divisionLabel}
+                      <Typography variant="subtitle1" color="textSecondary" component="span">
+                        {timeLabel}
+                      </Typography>
                     </Typography>
-                  </Typography>
-                </Box>
-              )}
-              <RoundResultsTable
-                results={division.results}
-                format={format}
-                eventId={eventId}
-                onResultClick={handleResultClick}
-                forecastView={forecastView}
-                advancementCondition={advancementCondition}
-                isDivisionBased={isDivisionBased}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
+                  </Box>
+                )}
+                <RoundResultsTable
+                  results={division.results}
+                  format={format}
+                  eventId={eventId}
+                  onResultClick={handleResultClick}
+                  forecastView={forecastView}
+                  advancementCondition={advancementCondition}
+                  isDivisionBased={isDivisionBased}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Box>
 
       <RoundResultDialog
         result={selectedResult}

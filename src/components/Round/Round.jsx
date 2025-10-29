@@ -25,45 +25,43 @@ function Round() {
 
   if (error) return <Error error={error} />;
 
-  
-
   return (
-    <Grid container direction="column" spacing={1}>
-      <Grid item>
-          <RoundToolbar round={round} />
-        </Grid>
-      <Grid item>
-          <Routes>
-            <Route
-              path="projector"
-              element={
-                <ResultsProjector
-                  results={round.results}
-                  format={round.format}
-                  eventId={round.competitionEvent.id}
-                  title={`${round.competitionEvent.name} - ${round.name}`}
-                  exitUrl={`/events/${eventId}/rounds/${roundId}`}
-                  advancementCondition={round.advancementCondition}
-                  isDivisionBased={round.format?.divisionBased === true}
-                />
-              }
-            />
-            <Route
-              path=""
-              element={
-                <RoundResults
-                  // We use key to reset component state on round change
-                  key={round.id}
-                  results={round.results}
-                  format={round.format}
-                  eventId={round.competitionEvent.id}
-                  advancementCondition={round.advancementCondition}
-                />
-              }
-            />
-            <Route path="*" element={<Navigate to={`/events/${eventId}/rounds/${roundId}`} />} />
-          </Routes>
-        </Grid>
+    <Grid container direction="column" spacing={1} sx={{ width: "100%", maxWidth: "100%" }}>
+      <Grid item sx={{ width: "100%" }}>
+        <RoundToolbar round={round} />
+      </Grid>
+      <Grid item sx={{ width: "100%", maxWidth: "100%", overflow: "hidden" }}>
+        <Routes>
+          <Route
+            path="projector"
+            element={
+              <ResultsProjector
+                results={round.results}
+                format={round.format}
+                eventId={round.competitionEvent.id}
+                title={`${round.competitionEvent.name} - ${round.name}`}
+                exitUrl={`/events/${eventId}/rounds/${roundId}`}
+                advancementCondition={round.advancementCondition}
+                isDivisionBased={round.format?.divisionBased === true}
+              />
+            }
+          />
+          <Route
+            path=""
+            element={
+              <RoundResults
+                // We use key to reset component state on round change
+                key={round.id}
+                results={round.results}
+                format={round.format}
+                eventId={round.competitionEvent.id}
+                advancementCondition={round.advancementCondition}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to={`/events/${eventId}/rounds/${roundId}`} />} />
+        </Routes>
+      </Grid>
     </Grid>
   );
 }

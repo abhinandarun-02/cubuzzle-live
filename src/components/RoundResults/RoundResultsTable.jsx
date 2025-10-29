@@ -12,6 +12,7 @@ import {
   Avatar,
   Box,
   Link,
+  TableContainer,
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { yellow, green, red } from "@mui/material/colors";
@@ -50,6 +51,13 @@ const styles = {
   division: {
     width: { md: 140 },
   },
+  category: {
+    width: 150,
+  },
+  result: {
+    width: { xl: 100 },
+    maxWidth: { xl: 100 },
+  },
   advancing: {
     color: (theme) => theme.palette.getContrastText(green["A400"]),
     backgroundColor: green["A400"],
@@ -61,13 +69,17 @@ const styles = {
   name: {
     textOverflow: "ellipsis",
     overflow: "hidden",
-    pr: 0,
-    width: { xs: "100%", md: 350 },
-    maxWidth: { xs: 150, md: 350 },
+    pr: 1,
+    minWidth: { md: 250 },
+    width: { xl: "20%" },
+    maxWidth: { xs: 180, md: 250, xl: 300 },
   },
   country: {
     width: { xs: 120, md: 200 },
+    minWidth: { md: 200 },
     maxWidth: { xs: 120, md: 200 },
+    textOverflow: "ellipsis",
+    overflow: "hidden",
   },
   divisionChangeIcon: {
     fontSize: "1rem",
@@ -152,12 +164,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
     (isDivisionBased ? 1 : 0) + // Div Rank column
     (smScreen ? 1 : 0) + // Country column
     (smScreen ? 1 : 0) + // Category column
-    (smScreen && isDivisionBased ? 1 : 0) + // Division column
     (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
     stats.length; // Stat columns
 
   return (
-    <Paper>
+    <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -165,10 +176,10 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               #
             </TableCell>
             <TableCell sx={{ ...styles.image }}> </TableCell>
-            <TableCell sx={styles.cell}>Name</TableCell>
+            <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
             {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
             {smScreen && <TableCell sx={styles.cell}>Category</TableCell>}
-            {smScreen && isDivisionBased && <TableCell sx={{ ...styles.cell, ...styles.division }}>Division</TableCell>}
+            {isDivisionBased && <TableCell sx={{ ...styles.cell, ...styles.division }}>Division</TableCell>}
             {smScreen &&
               times(format.numberOfAttempts, (index) => (
                 <TableCell key={index} sx={styles.cell} align="right">
@@ -181,7 +192,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
               </TableCell>
             ))}
             {isDivisionBased && (
-              <TableCell sx={{ ...styles.cell, ...styles.divRank }}>{smScreen ? "Div Rank" : "Div #"}</TableCell>
+              <TableCell sx={{ ...styles.cell, ...styles.divRank }} align="center">{smScreen ? "Div Rank" : "Div #"}</TableCell>
             )}
           </TableRow>
         </TableHead>
@@ -256,9 +267,9 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                     </Box>
                   </TableCell>
                 )}
-                {smScreen && <TableCell sx={{ ...styles.cell }}>{result.category}</TableCell>}
-                {smScreen && isDivisionBased && (
-                  <TableCell sx={{ ...styles.cell }}>
+                {smScreen && <TableCell sx={{ ...styles.cell, ...styles.category }}>{result.category}</TableCell>}
+                {isDivisionBased && (
+                  <TableCell sx={{ ...styles.cell, ...styles.division }}>
                     <Box display="flex" alignItems="center">
                       {result.calculatedDivision || "N/A"}
                       {renderDivisionChangeIcon(result.divisionChange)}
@@ -267,7 +278,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 )}
                 {smScreen &&
                   paddedAttemptResults(result, format.numberOfAttempts).map((attemptResult, index) => (
-                    <TableCell key={index} align="right" sx={styles.cell}>
+                    <TableCell
+                      key={index}
+                      align="right"
+                      sx={{ ...styles.cell, ...styles.result }}
+                    >
                       {formatCellValue(attemptResult, eventId)}
                     </TableCell>
                   ))}
@@ -278,6 +293,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                     sx={{
                       ...styles.cell,
                       fontWeight: index === 0 ? 600 : 400,
+                      ...styles.result,
                     }}
                   >
                     <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
@@ -293,7 +309,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
           )}
         </TableBody>
       </Table>
-    </Paper>
+    </TableContainer>
   );
 });
 
