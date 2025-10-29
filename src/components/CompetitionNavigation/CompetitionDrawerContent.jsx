@@ -3,6 +3,7 @@ import { Divider, IconButton, Toolbar, Tooltip } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import HomeIcon from "@mui/icons-material/Home";
 import CompetitionEventList from "./CompetitionEventList";
+import YoungestCuber from "./YoungestCuber";
 
 function CompetitionDrawerContent({ competition }) {
   return (
@@ -29,6 +30,8 @@ function CompetitionDrawerContent({ competition }) {
       </Toolbar>
       <Divider />
       <CompetitionEventList competitionEvents={competition.competitionEvents} />
+      <Divider sx={{ mt: 2 }} />
+      <YoungestCuber />
     </>
   );
 }
