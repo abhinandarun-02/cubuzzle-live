@@ -6,6 +6,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TableContainer,
   Paper,
   useMediaQuery,
   Typography,
@@ -157,7 +158,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
     stats.length; // Stat columns
 
   return (
-    <Paper>
+    <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -293,7 +294,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
           )}
         </TableBody>
       </Table>
-    </Paper>
+    </TableContainer>
   );
 });
 
