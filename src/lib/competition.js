@@ -86,7 +86,7 @@ export function getRoundDisplayName(roundId) {
   const roundMap = {
     "round-1": "First Round",
     "round-2": "Second Round",
-    final: "Final Round",
+    "round-3": "Final Round",
   };
   return roundMap[roundId] || String(roundId).toUpperCase();
 }
