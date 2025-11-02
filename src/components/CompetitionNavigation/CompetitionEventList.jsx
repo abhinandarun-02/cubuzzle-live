@@ -20,7 +20,6 @@ function CompetitionEventList({ competitionEvents }) {
         <Fragment key={competitionEvent.id}>
           <ListItemButton
             onClick={(event) => handleCompetitionEventClick(event, competitionEvent)}
-            disabled={!competitionEvent.rounds.some((round) => !round.finished && !round.active)}
           >
             <ListItemIcon>
               <CubingIcon eventId={competitionEvent.id} />
