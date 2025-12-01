@@ -174,7 +174,7 @@ function CompetitionHome() {
   const rounds = [
     { name: "Round 1", dates: "17-19 Oct", status: "completed" },
     { name: "Semi-Finals", dates: "24-26 Oct", status: "completed" },
-    { name: "Finals", dates: "31 Oct - 2 Nov", status: "live" },
+    { name: "Finals", dates: "31 Oct - 2 Nov", status: "completed" },
   ];
 
   return (
