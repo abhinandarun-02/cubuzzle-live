@@ -176,3 +176,21 @@ export const getRoundResults = async (competitionId, eventId, roundId, roundQuer
     throw error;
   }
 };
+
+export const getUnifiedLeaderboard = async () => {
+  try {
+    const leaderboardRef = collection(db, "leaderboard");
+    const q = query(leaderboardRef, orderBy("leaderboardRanking", "asc"));
+    const leaderboardSnapshot = await getDocs(q);
+    const leaderboardEntries = leaderboardSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+
+    return leaderboardEntries;
+  } catch (error) {
+    console.error("Error getting unified leaderboard: ", error);
+    throw error;
+  }
+};

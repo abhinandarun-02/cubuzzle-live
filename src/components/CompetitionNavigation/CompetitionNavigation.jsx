@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import CompetitionHome from "../CompetitionHome/CompetitionHome";
 import Round from "../Round/Round";
 import Competitors from "../Competitors/Competitors";
+import Leaderboard from "../Leaderboard/Leaderboard";
 
 import CompetitionLayout from "./CompetitionLayout";
 import CompetitorPage from "../Competitor/CompetitorPage";
@@ -36,6 +37,7 @@ function CompetitionNavigation() {
         <Route path="events/:eventId/rounds/:roundId/*" element={<Round />} />
         <Route path="competitors" element={<Competitors />} />
         <Route path="competitor/:competitorId" element={<CompetitorPage />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </CompetitionLayout>

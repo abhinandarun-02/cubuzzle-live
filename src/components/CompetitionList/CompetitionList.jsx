@@ -2,12 +2,10 @@ import { Link } from "react-router-dom";
 import {
   List,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   ListSubheader,
 } from "@mui/material";
 import VirtualList from "../VirtualList/VirtualList";
-import CompetitionFlagIcon from "../CompetitionFlagIcon/CompetitionFlagIcon";
 import { formatDateRange } from "../../lib/date";
 
 function CompetitionList({ title, competitions }) {
@@ -26,11 +24,7 @@ function CompetitionList({ title, competitions }) {
               component={Link}
               to="/"
             >
-              <ListItemIcon>
-                <ListItemIcon>
-                  <CompetitionFlagIcon competition={competition} />
-                </ListItemIcon>
-              </ListItemIcon>
+          
               <ListItemText
                 primary={competition.name}
                 secondary={formatDateRange(
