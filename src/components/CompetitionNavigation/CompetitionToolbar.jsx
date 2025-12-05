@@ -1,12 +1,11 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Box, IconButton, Toolbar, Typography } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
 import useToggleTheme from "../ThemeProvider/useToggleTheme";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 
-function CompetitionToolbar({ competition, onMenuClick }) {
+function CompetitionToolbar() {
   const theme = useTheme();
   const toggleTheme = useToggleTheme();
 
@@ -16,20 +15,7 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         bgcolor: theme.palette.mode === "light" ? "background.paper" : "transparent",
       }}
     >
-      <IconButton
-    
-        sx={{
-          ml: "-12px",
-          display: {
-            lg: "none",
-          },
-        }}
-        onClick={onMenuClick}
-        aria-label="Menu"
-        size="large"
-      >
-        <MenuIcon />
-      </IconButton>
+  
       <Box
         component={RouterLink}
         to="/"
@@ -63,7 +49,7 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         component={RouterLink}
         to="/"
       >
-        {competition.name}
+        Cubuzzle Champion League
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
 

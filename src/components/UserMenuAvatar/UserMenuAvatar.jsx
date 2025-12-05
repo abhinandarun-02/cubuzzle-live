@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import SignOutMenuItem from "./SignOutMenuItem";
 import PersonIcon from "@mui/icons-material/Person";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
 function UserMenuAvatar({ user }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,12 +41,6 @@ function UserMenuAvatar({ user }) {
             <PersonIcon />
           </ListItemIcon>
           Account
-        </MenuItem>
-        <MenuItem component={RouterLink} to="/my-competitions">
-          <ListItemIcon>
-            <AssignmentIndIcon />
-          </ListItemIcon>
-          My competitions
         </MenuItem>
         <Divider sx={{ my: 1 }} />
         <SignOutMenuItem />

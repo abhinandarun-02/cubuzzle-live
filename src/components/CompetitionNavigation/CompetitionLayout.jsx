@@ -1,87 +1,25 @@
-import { useState } from "react";
-import {
-  AppBar,
-  Box,
-  Drawer,
-  SwipeableDrawer,
-  useMediaQuery,
-} from "@mui/material";
-import CompetitionDrawerContent from "./CompetitionDrawerContent";
+import { AppBar, Box } from "@mui/material";
 import CompetitionToolbar from "./CompetitionToolbar";
 import Footer from "../Footer/Footer";
 
-const DRAWER_WIDTH = 250;
-
-const styles = {
-  appBarShift: {
-    width: { lg: `calc(100% - ${DRAWER_WIDTH}px)` },
-    ml: { lg: `${DRAWER_WIDTH}px` },
-  },
-};
-
-function CompetitionLayout({ competition, children }) {
-  const lgScreen = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  // See https://mui.com/material-ui/react-drawer/#swipeable
-  const iOS =
-    typeof navigator !== "undefined" &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent);
-
+function CompetitionLayout({ children }) {
   return (
     <>
-      <AppBar position="sticky" sx={styles.appBarShift}>
-        {competition && (
-          <CompetitionToolbar
-            competition={competition}
-            onMenuClick={() => setMobileOpen(true)}
-          />
-        )}
+      <AppBar position="sticky">
+        <CompetitionToolbar />
       </AppBar>
-      {lgScreen ? (
-        <Drawer
-          variant="permanent"
-          sx={{
-            "& .MuiDrawer-paper": { width: { lg: DRAWER_WIDTH } },
-          }}
-        >
-          {competition && (
-            <CompetitionDrawerContent competition={competition} />
-          )}
-        </Drawer>
-      ) : (
-        <SwipeableDrawer
-          open={mobileOpen}
-          onOpen={() => setMobileOpen(true)}
-          onClose={() => setMobileOpen(false)}
-          onClick={() => setMobileOpen(false)}
-          sx={{
-            "& .MuiDrawer-paper": { width: { lg: DRAWER_WIDTH } },
-          }}
-          disableBackdropTransition={!iOS}
-          disableDiscovery={iOS}
-        >
-          {competition && (
-            <CompetitionDrawerContent competition={competition} />
-          )}
-        </SwipeableDrawer>
-      )}
       <Box
         sx={{
-          position: "relative", // For LinearProgress
+          position: "relative",
           overflowY: "auto",
           py: { xs: 2, md: 3 },
           px: { xs: 1, md: 3 },
-          ...styles.appBarShift,
           display: "flex",
           flexDirection: "column",
-          minHeight: "calc(100vh - 64px)", // Account for AppBar height
+          minHeight: "calc(100vh - 64px)",
         }}
       >
-        <Box sx={{ flexGrow: 1 }}>
-          {children}
-        </Box>
+        <Box sx={{ flexGrow: 1 }}>{children}</Box>
         <Footer />
       </Box>
     </>
