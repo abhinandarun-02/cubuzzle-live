@@ -49,7 +49,7 @@ function CompetitionToolbar() {
         component={RouterLink}
         to="/"
       >
-        Cubuzzle Champion League
+        Cubuzzle Champion League - Unified Leaderboard
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
 
