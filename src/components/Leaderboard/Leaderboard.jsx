@@ -12,6 +12,8 @@ import {
   Chip,
   Stack,
   Grid,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
@@ -20,6 +22,8 @@ import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import useDebounce from "../../hooks/useDebounce";
 import { getDivisionLabel, getDivisonTimeLabel } from "../../lib/utils";
+import { getEventDisplayName } from "../../lib/competition";
+import CubingIcon from "../CubingIcon/CubingIcon";
 
 const styles = {
   header: {
@@ -60,11 +64,24 @@ const styles = {
   filterSection: {
     mb: 3,
   },
+  eventTabs: {
+    mb: 3,
+    borderBottom: 1,
+    borderColor: "divider",
+  },
+  eventTab: {
+    textTransform: "none",
+    minHeight: 48,
+    fontWeight: 500,
+  },
 };
+
+const EVENTS = ["333", "222", "pyram"];
 
 function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [selectedEvent, setSelectedEvent] = useState("333");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const {
@@ -72,10 +89,15 @@ function Leaderboard() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["unified-leaderboard"],
-    queryFn: getUnifiedLeaderboard,
+    queryKey: ["unified-leaderboard", selectedEvent],
+    queryFn: () => getUnifiedLeaderboard(selectedEvent),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  const handleEventChange = (event, newValue) => {
+    setSelectedEvent(newValue);
+    setCategoryFilter("all");
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -147,6 +169,26 @@ function Leaderboard() {
             </Typography>
           </Box>
         </Box>
+
+        {/* Event Tabs */}
+        <Tabs
+          value={selectedEvent}
+          onChange={handleEventChange}
+          sx={styles.eventTabs}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {EVENTS.map((eventId) => (
+            <Tab
+              key={eventId}
+              value={eventId}
+              label={getEventDisplayName(eventId)}
+              icon={<CubingIcon eventId={eventId} small />}
+              iconPosition="start"
+              sx={styles.eventTab}
+            />
+          ))}
+        </Tabs>
 
         {/* Stats */}
         <Box sx={styles.statsBox}>
@@ -246,7 +288,7 @@ function Leaderboard() {
       ) : (
         <Grid container direction="column" spacing={3}>
           {Object.keys(groupedByDivision).map((division) => (
-            <Grid item key={division}>
+            <Grid item key={division} sx={{ width: "100%", maxWidth: "100%" }}>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="h6" component="h3">
                   {getDivisionLabel(division)}
@@ -255,7 +297,7 @@ function Leaderboard() {
                   </Typography>
                 </Typography>
               </Box>
-              <LeaderboardTable entries={groupedByDivision[division]} eventId="333" />
+              <LeaderboardTable entries={groupedByDivision[division]} eventId={selectedEvent} />
             </Grid>
           ))}
         </Grid>

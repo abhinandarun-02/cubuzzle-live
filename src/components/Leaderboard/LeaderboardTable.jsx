@@ -24,12 +24,13 @@ const styles = {
     "&:last-child": {
       pr: 2,
     },
+    whiteSpace: "nowrap",
   },
   image: {
     width: 32,
     p: 0.5,
-    pr: { xs: 1, md: 2 },
     pl: { xs: 1, md: 2 },
+    textwrap: "nowrap",
   },
   ranking: {
     pr: { xs: 1, md: 2 },
@@ -40,6 +41,7 @@ const styles = {
     textOverflow: "ellipsis",
     overflow: "hidden",
     pr: 1,
+    pl: 1,
     minWidth: { md: 250 },
     width: { xl: "25%" },
     maxWidth: { xs: 200, md: 300, xl: 350 },
@@ -69,50 +71,35 @@ const styles = {
 };
 
 const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
-  
-
   return (
-    <TableContainer component={Paper} elevation={2}>
-      <Table size="small">
+    <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto" }}>
+      <Table size="medium">
         <TableHead>
           <TableRow>
             <TableCell sx={styles.ranking}>Rank</TableCell>
             <TableCell sx={styles.image} />
             <TableCell sx={styles.name}>Name</TableCell>
+            <TableCell sx={styles.cell}>Cubuzzle ID</TableCell>
             <TableCell sx={styles.country}>Country</TableCell>
             <TableCell sx={styles.result} align="right">
               Average
             </TableCell>
-           
-            <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>
-              Division
-            </TableCell>
-            <TableCell sx={{ ...styles.category, display: { xs: "none", lg: "table-cell" } }}>
-              Category
-            </TableCell>
-           
+
+            <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>Division</TableCell>
+            <TableCell sx={{ ...styles.category, display: { xs: "none", lg: "table-cell" } }}>Category</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {entries.map((entry) => {
             const advancing = entry.status?.advancing;
             const advancingQuestionable = entry.status?.advancingQuestionable;
-            const rowSx = advancing
-              ? styles.advancing
-              : advancingQuestionable
-              ? styles.advancingQuestionable
-              : {};
+            const rowSx = advancing ? styles.advancing : advancingQuestionable ? styles.advancingQuestionable : {};
 
             return (
               <TableRow key={entry.id} hover sx={rowSx}>
-                <TableCell sx={styles.ranking}>
-                  {entry.leaderboardRanking || "-"}
-                </TableCell>
+                <TableCell sx={styles.ranking}>{entry.leaderboardRanking || "-"}</TableCell>
                 <TableCell sx={styles.image}>
-                  <Avatar
-                    src={withImageWidth(entry.profile?.imageUrl, 80)}
-                    sx={{ width: 32, height: 32 }}
-                  />
+                  <Avatar src={withImageWidth(entry.profile?.imageUrl, 80)} sx={{ width: 32, height: 32 }} />
                 </TableCell>
                 <TableCell sx={styles.name}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -125,24 +112,17 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
                         "&:hover": { textDecoration: "underline" },
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        noWrap
-                        sx={{ fontWeight: 500 }}
-                      >
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
                         {entry.name}
                       </Typography>
                     </Link>
                   </Box>
                 </TableCell>
+                <TableCell sx={styles.cell}>{entry.id}</TableCell>
                 <TableCell sx={styles.country}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <FlagIcon code={entry.profile?.country.code} />
-                    <Typography
-                      variant="body2"
-                      noWrap
-                      sx={{ display: { xs: "none", sm: "block" } }}
-                    >
+                    <FlagIcon code={entry.profile?.country.code.toLowerCase()} />
+                    <Typography variant="body2" noWrap sx={{ display: { xs: "none", sm: "block" } }}>
                       {entry.profile?.country.name}
                     </Typography>
                   </Box>
@@ -152,8 +132,7 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
                     {formatCellValue(entry.average, eventId)}
                   </Typography>
                 </TableCell>
-                
-              
+
                 <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>
                   <Typography variant="body2" noWrap>
                     {entry.division || "-"}

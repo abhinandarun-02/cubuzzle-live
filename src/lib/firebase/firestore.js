@@ -179,9 +179,9 @@ export const getRoundResults = async (competitionId, eventId, roundId, roundQuer
   }
 };
 
-export const getUnifiedLeaderboard = async () => {
+export const getUnifiedLeaderboard = async (eventId = "333") => {
   try {
-    const leaderboardRef = collection(db, "leaderboards", "333", "competitors");
+    const leaderboardRef = collection(db, "leaderboards", eventId, "competitors");
     const q = query(leaderboardRef, orderBy("leaderboardRanking", "asc"));
     const leaderboardSnapshot = await getDocs(q);
     const leaderboardEntries = leaderboardSnapshot.docs.map((doc) => ({
