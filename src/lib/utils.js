@@ -160,13 +160,14 @@ export function getDivisionLabel(division) {
 
 export function getDivisonTimeLabel(division) {
   const divisionTime = {
-    "A+": "Sub 10 seconds",
-    A: "10-19 seconds",
-    B: "20-29 seconds",
-    C: "30-45 seconds",
-    D: "45+ seconds",
+    "A+": "(Sub 10 seconds)",
+    A: "(10-19 seconds)",
+    B: "(20-29 seconds)",
+    C: "(30-45 seconds)",
+    D: "(45+ seconds)",
+    Unknown: "",
   };
-  return ` (${divisionTime[division]})` || " (Unknown)";
+  return ` ${divisionTime[division]}` || " Unknown";
 }
 
 export function getCompetitionDisplayName(competitionId) {
