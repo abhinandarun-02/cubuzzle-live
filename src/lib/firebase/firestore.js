@@ -91,33 +91,36 @@ export const getCompetitorsByCompetition = async (competitionId) => {
 
 // Fetch competitor document and all results across events/rounds for that competitor
 export const getCompetitorWithResults = async (competitionId, competitorId) => {
+
   try {
-    // competitor document
-    const competitorRef = doc(db, "competitions", competitionId, "competitors", competitorId);
+    // Use collectionGroup to fetch all result documents matching the competitorId across all competitions
+    const resultsGroupRef = collectionGroup(db, "results");
+    const resultsQuery = query(
+      resultsGroupRef,
+      where("id", "==", competitorId),
+      where("scored", "==", true)
+    );
+    const resSnap = await getDocs(resultsQuery);
+
+    // If no results, throw error
+    if (resSnap.empty) {
+      throw new Error("Competitor not found in any competition");
+    }
+
+   
+// competitor document
+    const competitorRef = doc(db, "users", competitorId);
     const competitorSnap = await getDoc(competitorRef);
     if (!competitorSnap.exists()) {
       throw new Error("Competitor not found");
     }
     const competitor = { id: competitorSnap.id, ...competitorSnap.data() };
 
-    // Use collectionGroup to fetch all result documents matching the competitorId
-    const resultsGroupRef = collectionGroup(db, "results");
-    const resultsQuery = query(
-      resultsGroupRef,
-      where("id", "==", competitorId),
-      where("scored", "==", true),
-      where("compId", "==", competitionId)
-    );
-    const resSnap = await getDocs(resultsQuery);
 
+    // Map results and attach eventId
     const results = resSnap.docs.map((r) => {
-      // Attempt to retrieve eventId from parent chain: .../events/{eventId}/rounds/{roundId}/results/{resultId}
       let eventId = null;
       try {
-        // r.ref -> results doc
-        // r.ref.parent -> results collection
-        // r.ref.parent.parent -> round doc
-        // r.ref.parent.parent.parent.parent -> event doc
         const maybeEventDoc = r.ref.parent?.parent?.parent?.parent;
         if (maybeEventDoc?.id) {
           eventId = maybeEventDoc.id;
@@ -125,15 +128,14 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
       } catch (e) {
         // ignore if structure unexpected
       }
-
       return { id: r.id, eventId, ...r.data() };
     });
 
     // Attach a deduplicated list of eventIds the competitor appears in
     const events = Array.from(new Set(results.map((res) => res.eventId).filter(Boolean)));
-    const competitorWithEvents = { ...competitor, events };
 
-    return { competitor: competitorWithEvents, results };
+    // Return all competitor docs and results
+    return { competitor, events, results };
   } catch (error) {
     console.error("Error getting competitor with results: ", error);
     throw error;
@@ -186,8 +188,6 @@ export const getUnifiedLeaderboard = async () => {
       id: doc.id,
       ...doc.data(),
     }));
-
-    console.log("Fetched unified leaderboard entries: ", leaderboardEntries.length);
 
     return leaderboardEntries;
   } catch (error) {

@@ -169,3 +169,10 @@ export function getDivisonTimeLabel(division) {
   return ` (${divisionTime[division]})` || " (Unknown)";
 }
 
+export function getCompetitionDisplayName(competitionId) {
+  const competitionNames = {
+    cubuzzle2024: "Season 1",
+    cubuzzle2025: "Season 2",
+  };
+  return competitionNames[competitionId] || competitionId;
+}
