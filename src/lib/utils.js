@@ -149,3 +149,23 @@ export function splitResultsByDivision(results) {
     results: resultsByDivision[division],
   }));
 }
+
+export function getDivisionLabel(division) {
+
+  if (!division || division === "Unknown") {
+    return "DNF/DNS";
+  }
+  return `Division ${division}`;
+}
+
+export function getDivisonTimeLabel(division) {
+  const divisionTime = {
+    "A+": "Sub 10 seconds",
+    A: "10-19 seconds",
+    B: "20-29 seconds",
+    C: "30-45 seconds",
+    D: "45+ seconds",
+  };
+  return ` (${divisionTime[division]})` || " (Unknown)";
+}
+

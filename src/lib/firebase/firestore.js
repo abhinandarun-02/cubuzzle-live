@@ -179,7 +179,7 @@ export const getRoundResults = async (competitionId, eventId, roundId, roundQuer
 
 export const getUnifiedLeaderboard = async () => {
   try {
-    const leaderboardRef = collection(db, "leaderboard");
+    const leaderboardRef = collection(db, "leaderboards", "333", "competitors");
     const q = query(leaderboardRef, orderBy("leaderboardRanking", "asc"));
     const leaderboardSnapshot = await getDocs(q);
     const leaderboardEntries = leaderboardSnapshot.docs.map((doc) => ({
@@ -187,6 +187,7 @@ export const getUnifiedLeaderboard = async () => {
       ...doc.data(),
     }));
 
+    console.log("Fetched unified leaderboard entries: ", leaderboardEntries.length);
 
     return leaderboardEntries;
   } catch (error) {

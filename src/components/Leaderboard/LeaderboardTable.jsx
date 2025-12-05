@@ -156,7 +156,7 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
               
                 <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>
                   <Typography variant="body2" noWrap>
-                    {entry.division?.calculated || "-"}
+                    {entry.division || "-"}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...styles.category, display: { xs: "none", lg: "table-cell" } }}>

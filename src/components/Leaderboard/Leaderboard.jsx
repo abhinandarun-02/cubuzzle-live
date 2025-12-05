@@ -11,6 +11,7 @@ import {
   Alert,
   Chip,
   Stack,
+  Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
@@ -18,6 +19,7 @@ import LeaderboardTable from "./LeaderboardTable";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import useDebounce from "../../hooks/useDebounce";
+import { getDivisionLabel, getDivisonTimeLabel } from "../../lib/utils";
 
 const styles = {
   header: {
@@ -62,7 +64,6 @@ const styles = {
 
 function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [divisionFilter, setDivisionFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -92,29 +93,22 @@ function Leaderboard() {
       entry.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
       entry.profile?.country?.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
 
-    // Division filter
-    const matchesDivision =
-      divisionFilter === "all" ||
-      entry.division?.calculated === divisionFilter ||
-      entry.division?.registered === divisionFilter;
-
     // Category filter
     const matchesCategory =
       categoryFilter === "all" || entry.profile?.category === categoryFilter;
 
-    return matchesSearch && matchesDivision && matchesCategory;
+    return matchesSearch && matchesCategory;
   }) || [];
 
-  // Get unique divisions and categories for filters
-  const divisions = [
-    "all",
-    ...new Set(
-      leaderboardData
-        ?.map((e) => e.division?.calculated)
-        .filter(Boolean)
-    ),
-  ];
+  // Group by division
+  const groupedByDivision = filteredEntries.reduce((acc, entry) => {
+    const division = entry.division || "Unknown";
+    acc[division] = acc[division] || [];
+    acc[division].push(entry);
+    return acc;
+  }, {});
 
+  // Get unique categories for filters
   const categories = [
     "all",
     ...new Set(
@@ -197,37 +191,6 @@ function Leaderboard() {
         {/* Filters */}
         <Box sx={styles.filterSection}>
           <Stack spacing={2}>
-            {/* Division Filter */}
-            {divisions.length > 1 && (
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ mb: 1, display: "block", fontWeight: 600 }}
-                >
-                  Division
-                </Typography>
-                <ToggleButtonGroup
-                  value={divisionFilter}
-                  exclusive
-                  onChange={(e, newValue) => {
-                    if (newValue !== null) setDivisionFilter(newValue);
-                  }}
-                  size="small"
-                  sx={{ flexWrap: "wrap" }}
-                >
-                  {divisions.map((division) => (
-                    <ToggleButton
-                      key={division}
-                      value={division}
-                      sx={{ textTransform: "none", px: 2 }}
-                    >
-                      {division === "all" ? "All" : division}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-              </Box>
-            )}
-
             {/* Category Filter */}
             {categories.length > 1 && (
               <Box>
@@ -262,26 +225,15 @@ function Leaderboard() {
         </Box>
 
         {/* Active Filters Display */}
-        {(divisionFilter !== "all" || categoryFilter !== "all") && (
+        {categoryFilter !== "all" && (
           <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: "wrap", gap: 1 }}>
-            {divisionFilter !== "all" && (
-              <Chip
-                label={`Division: ${divisionFilter}`}
-                onDelete={() => setDivisionFilter("all")}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            )}
-            {categoryFilter !== "all" && (
-              <Chip
-                label={`Category: ${categoryFilter}`}
-                onDelete={() => setCategoryFilter("all")}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            )}
+            <Chip
+              label={`Category: ${categoryFilter}`}
+              onDelete={() => setCategoryFilter("all")}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
           </Stack>
         )}
       </Box>
@@ -292,7 +244,21 @@ function Leaderboard() {
           No competitors found matching your filters. Try adjusting your search or filter criteria.
         </Alert>
       ) : (
-        <LeaderboardTable entries={filteredEntries} eventId="333" />
+        <Grid container direction="column" spacing={3}>
+          {Object.keys(groupedByDivision).map((division) => (
+            <Grid item key={division}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" component="h3">
+                  {getDivisionLabel(division)}
+                  <Typography variant="subtitle1" color="textSecondary" component="span">
+                    {getDivisonTimeLabel(division)}
+                  </Typography>
+                </Typography>
+              </Box>
+              <LeaderboardTable entries={groupedByDivision[division]} eventId="333" />
+            </Grid>
+          ))}
+        </Grid>
       )}
     </Container>
   );
