@@ -11,17 +11,15 @@ import {
   Alert,
   Chip,
   Stack,
-  Grid,
   Tabs,
   Tab,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
-import LeaderboardTable from "./LeaderboardTable";
+import LazyDivisionSection from "./LazyDivisionSection";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import useDebounce from "../../hooks/useDebounce";
-import { getDivisionLabel, getDivisonTimeLabel } from "../../lib/utils";
 import { getEventDisplayName } from "../../lib/competition";
 import CubingIcon from "../CubingIcon/CubingIcon";
 
@@ -290,21 +288,16 @@ function Leaderboard() {
           No competitors found matching your filters. Try adjusting your search or filter criteria.
         </Alert>
       ) : (
-        <Grid container direction="column" spacing={3}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {Object.keys(groupedByDivision).map((division) => (
-            <Grid item key={division} sx={{ width: "100%", maxWidth: "100%" }}>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" component="h3">
-                  {getDivisionLabel(division)}
-                  <Typography variant="subtitle1" color="textSecondary" component="span">
-                    {getDivisonTimeLabel(division)}
-                  </Typography>
-                </Typography>
-              </Box>
-              <LeaderboardTable entries={groupedByDivision[division]} eventId={selectedEvent} />
-            </Grid>
+            <LazyDivisionSection
+              key={division}
+              division={division}
+              entries={groupedByDivision[division]}
+              eventId={selectedEvent}
+            />
           ))}
-        </Grid>
+        </Box>
       )}
     </Container>
   );
