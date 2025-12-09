@@ -51,8 +51,7 @@ const styles = {
     mb: 3,
     p: 2,
     borderRadius: 2,
-    backgroundColor: (theme) =>
-      theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)",
+    backgroundColor: (theme) => (theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)"),
   },
   statItem: {
     display: "flex",
@@ -110,19 +109,19 @@ function Leaderboard() {
   }
 
   // Filter logic
-  const filteredEntries = leaderboardData?.filter((entry) => {
-    // Search filter
-    const matchesSearch =
-      !debouncedSearchQuery ||
-      entry.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      entry.profile?.country?.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+  const filteredEntries =
+    leaderboardData?.filter((entry) => {
+      // Search filter
+      const matchesSearch =
+        !debouncedSearchQuery ||
+        entry.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        entry.profile?.country?.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
 
-    // Category filter
-    const matchesCategory =
-      categoryFilter === "all" || entry.profile?.category === categoryFilter;
+      // Category filter
+      const matchesCategory = categoryFilter === "all" || entry.profile?.category === categoryFilter;
 
-    return matchesSearch && matchesCategory;
-  }) || [];
+      return matchesSearch && matchesCategory;
+    }) || [];
 
   // Group by division
   const groupedByDivision = filteredEntries.reduce((acc, entry) => {
@@ -133,14 +132,7 @@ function Leaderboard() {
   }, {});
 
   // Get unique categories for filters
-  const categories = [
-    "all",
-    ...new Set(
-      leaderboardData
-        ?.map((e) => e.profile?.category)
-        .filter(Boolean)
-    ),
-  ];
+  const categories = ["all", ...new Set(leaderboardData?.map((e) => e.profile?.category).filter(Boolean))];
 
   // Calculate stats
   const stats = {
@@ -164,10 +156,10 @@ function Leaderboard() {
                 fontSize: { xs: "1.75rem", md: "2.125rem" },
               }}
             >
-              Leaderboard
+              Cubuzzle Legacy Board
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Combined rankings from multiple competitions
+              Your rank. Your legacy. Every season counts.
             </Typography>
           </Box>
         </Box>
@@ -238,11 +230,8 @@ function Leaderboard() {
             {/* Category Filter */}
             {categories.length > 1 && (
               <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ mb: 1, display: "block", fontWeight: 600 }}
-                >
-                  Category
+                <Typography variant="caption" sx={{ mb: 1, display: "block", fontWeight: 600 }}>
+                  Age Category
                 </Typography>
                 <ToggleButtonGroup
                   value={categoryFilter}
@@ -254,11 +243,7 @@ function Leaderboard() {
                   sx={{ flexWrap: "wrap" }}
                 >
                   {categories.map((category) => (
-                    <ToggleButton
-                      key={category}
-                      value={category}
-                      sx={{ textTransform: "none", px: 2 }}
-                    >
+                    <ToggleButton key={category} value={category} sx={{ textTransform: "none", px: 2 }}>
                       {category === "all" ? "All" : category}
                     </ToggleButton>
                   ))}
