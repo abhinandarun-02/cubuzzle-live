@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import {
   Box,
   Container,
@@ -84,15 +84,19 @@ function Leaderboard() {
   const [selectedEvent, setSelectedEvent] = useState("333");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const {
-    data: leaderboardData,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["unified-leaderboard", selectedEvent],
-    queryFn: () => getUnifiedLeaderboard(selectedEvent),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+  // Preload all events in parallel
+  const leaderboardQueries = useQueries({
+    queries: EVENTS.map((eventId) => ({
+      queryKey: ["unified-leaderboard", eventId],
+      queryFn: () => getUnifiedLeaderboard(eventId),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    })),
   });
+
+  // Get the current event's query result
+  const currentEventIndex = EVENTS.indexOf(selectedEvent);
+  const currentQuery = leaderboardQueries[currentEventIndex];
+  const { data: leaderboardData, isLoading, isError } = currentQuery || {};
 
   const handleEventChange = (event, newValue) => {
     setSelectedEvent(newValue);
