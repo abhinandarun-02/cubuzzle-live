@@ -92,10 +92,20 @@ const styles = {
     textTransform: "none",
     color: "text.primary",
     borderColor: "divider",
+    fontSize: "1.25rem",
+    padding: "12px 24px",
     "&:hover": {
       borderColor: "text.secondary",
       backgroundColor: "action.hover",
     },
+  },
+  menuPaper: {
+    fontSize: "1.25rem",
+    padding: "12px 0",
+  },
+  menuItem: {
+    fontSize: "1.15rem",
+    padding: "14px 32px",
   },
 };
 
@@ -198,10 +208,10 @@ function Leaderboard() {
         {/* Title and Menu Row */}
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            justifyContent: 'space-between',
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "flex-start", sm: "center" },
+            justifyContent: "space-between",
             gap: 2,
             mb: 2,
           }}
@@ -212,24 +222,28 @@ function Leaderboard() {
               component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: "1.75rem", md: "2.125rem" },
+                fontSize: { xs: "2rem", md: "3rem" },
               }}
             >
               Cubuzzle Legacy Board
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 0.5, fontSize: { xs: "0.875rem", md: "1rem" }, ml: 0.5 }}
+            >
               Your rank. Your legacy. Every season counts.
             </Typography>
           </Box>
           <Box sx={{ mt: { xs: 2, sm: 0 } }}>
             <Button
               variant="outlined"
-              size="small"
+
               endIcon={<KeyboardArrowDownIcon />}
               onClick={handleMenuOpen}
               sx={styles.externalMenuButton}
             >
-              Other Leaderboards
+              Season-wise Leaderboards
             </Button>
             <Menu
               anchorEl={anchorEl}
@@ -237,12 +251,13 @@ function Leaderboard() {
               onClose={handleMenuClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
+              PaperProps={{ sx: styles.menuPaper }}
             >
               {EXTERNAL_LEADERBOARDS.map((board) => (
-                <MenuItem key={board.name} onClick={() => handleExternalLink(board.url)}>
+                <MenuItem key={board.name} onClick={() => handleExternalLink(board.url)} sx={styles.menuItem}>
                   <ListItemText>{board.name}</ListItemText>
                   <ListItemIcon sx={{ minWidth: "auto", ml: 1 }}>
-                    <OpenInNewIcon fontSize="small" />
+                    <OpenInNewIcon fontSize="medium" />
                   </ListItemIcon>
                 </MenuItem>
               ))}
@@ -370,7 +385,11 @@ function Leaderboard() {
           ))}
         </Box>
       ) : (
-        <LeaderboardTable entries={filteredEntries} eventId={selectedEvent} isDivisionBased={currentEvent?.divisionBased} />
+        <LeaderboardTable
+          entries={filteredEntries}
+          eventId={selectedEvent}
+          isDivisionBased={currentEvent?.divisionBased}
+        />
       )}
     </Container>
   );
