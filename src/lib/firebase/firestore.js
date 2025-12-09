@@ -93,6 +93,14 @@ export const getCompetitorsByCompetition = async (competitionId) => {
 export const getCompetitorWithResults = async (competitionId, competitorId) => {
 
   try {
+    // competitor document
+    const competitorRef = doc(db, "users", competitorId);
+    const competitorSnap = await getDoc(competitorRef);
+    if (!competitorSnap.exists()) {
+      throw new Error("Competitor not found");
+    }
+    const competitor = { id: competitorSnap.id, ...competitorSnap.data() };
+
     // Use collectionGroup to fetch all result documents matching the competitorId across all competitions
     const resultsGroupRef = collectionGroup(db, "results");
     const resultsQuery = query(
@@ -101,20 +109,6 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
       where("scored", "==", true)
     );
     const resSnap = await getDocs(resultsQuery);
-
-    // If no results, throw error
-    if (resSnap.empty) {
-      throw new Error("Competitor not found in any competition");
-    }
-
-   
-// competitor document
-    const competitorRef = doc(db, "users", competitorId);
-    const competitorSnap = await getDoc(competitorRef);
-    if (!competitorSnap.exists()) {
-      throw new Error("Competitor not found");
-    }
-    const competitor = { id: competitorSnap.id, ...competitorSnap.data() };
 
 
     // Map results and attach eventId
