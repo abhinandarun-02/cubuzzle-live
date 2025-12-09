@@ -17,6 +17,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
 import LazyDivisionSection from "./LazyDivisionSection";
+import LeaderboardTable from "./LeaderboardTable";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import useDebounce from "../../hooks/useDebounce";
@@ -73,25 +74,30 @@ const styles = {
   },
 };
 
-const EVENTS = ["333", "222", "pyram"];
+const EVENTS = [
+  { id: "333", name: "3x3x3 Cube", divisionBased: true },
+  { id: "222", name: "2x2x2 Cube", divisionBased: false },
+  { id: "pyram", name: "Pyraminx", divisionBased: false },
+];
 
 function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [selectedEvent, setSelectedEvent] = useState("333");
+  const [selectedEvent, setSelectedEvent] = useState(EVENTS[0].id);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Preload all events in parallel
   const leaderboardQueries = useQueries({
-    queries: EVENTS.map((eventId) => ({
-      queryKey: ["unified-leaderboard", eventId],
-      queryFn: () => getUnifiedLeaderboard(eventId),
+    queries: EVENTS.map((event) => ({
+      queryKey: ["unified-leaderboard", event.id],
+      queryFn: () => getUnifiedLeaderboard(event.id),
       staleTime: 1000 * 60 * 5, // 5 minutes
     })),
   });
 
   // Get the current event's query result
-  const currentEventIndex = EVENTS.indexOf(selectedEvent);
+  const currentEventIndex = EVENTS.findIndex((e) => e.id === selectedEvent);
+  const currentEvent = EVENTS[currentEventIndex];
   const currentQuery = leaderboardQueries[currentEventIndex];
   const { data: leaderboardData, isLoading, isError } = currentQuery || {};
 
@@ -172,12 +178,12 @@ function Leaderboard() {
           variant="scrollable"
           scrollButtons="auto"
         >
-          {EVENTS.map((eventId) => (
+          {EVENTS.map((event) => (
             <Tab
-              key={eventId}
-              value={eventId}
-              label={getEventDisplayName(eventId)}
-              icon={<CubingIcon eventId={eventId} small />}
+              key={event.id}
+              value={event.id}
+              label={getEventDisplayName(event.id)}
+              icon={<CubingIcon eventId={event.id} small />}
               iconPosition="start"
               sx={styles.eventTab}
             />
@@ -272,7 +278,7 @@ function Leaderboard() {
         <Alert severity="info" sx={{ mt: 2 }}>
           No competitors found matching your filters. Try adjusting your search or filter criteria.
         </Alert>
-      ) : (
+      ) : currentEvent?.divisionBased ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {Object.keys(groupedByDivision).map((division) => (
             <LazyDivisionSection
@@ -283,6 +289,8 @@ function Leaderboard() {
             />
           ))}
         </Box>
+      ) : (
+        <LeaderboardTable entries={filteredEntries} eventId={selectedEvent} />
       )}
     </Container>
   );
