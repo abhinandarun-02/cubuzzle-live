@@ -13,8 +13,15 @@ import {
   Stack,
   Tabs,
   Tab,
+  Button,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
 import LazyDivisionSection from "./LazyDivisionSection";
 import LeaderboardTable from "./LeaderboardTable";
@@ -66,11 +73,29 @@ const styles = {
     mb: 3,
     borderBottom: 1,
     borderColor: "divider",
+    "& .MuiTab-root": {
+      color: "text.secondary",
+      "&.Mui-selected": {
+        color: "text.primary",
+      },
+    },
+    "& .MuiTabs-indicator": {
+      backgroundColor: "text.primary",
+    },
   },
   eventTab: {
     textTransform: "none",
     minHeight: 48,
     fontWeight: 500,
+  },
+  externalMenuButton: {
+    textTransform: "none",
+    color: "text.primary",
+    borderColor: "divider",
+    "&:hover": {
+      borderColor: "text.secondary",
+      backgroundColor: "action.hover",
+    },
   },
 };
 
@@ -80,11 +105,30 @@ const EVENTS = [
   { id: "pyram", name: "Pyraminx", divisionBased: false },
 ];
 
+const EXTERNAL_LEADERBOARDS = [
+  { name: "Cubuzzle Champion League - Season 1", url: "https://ccl-season1-live.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 2", url: "https://cubuzzle-leaderboard.vercel.app/" },
+];
+
 function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState(EVENTS[0].id);
+  const [anchorEl, setAnchorEl] = useState(null);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleExternalLink = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+    handleMenuClose();
+  };
 
   // Preload all events in parallel
   const leaderboardQueries = useQueries({
@@ -151,8 +195,17 @@ function Leaderboard() {
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
       <Box sx={styles.header}>
-        {/* Title */}
-        <Box sx={styles.titleBox}>
+        {/* Title and Menu Row */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: 2,
+            mb: 2,
+          }}
+        >
           <Box>
             <Typography
               variant="h4"
@@ -167,6 +220,33 @@ function Leaderboard() {
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               Your rank. Your legacy. Every season counts.
             </Typography>
+          </Box>
+          <Box sx={{ mt: { xs: 2, sm: 0 } }}>
+            <Button
+              variant="outlined"
+              size="small"
+              endIcon={<KeyboardArrowDownIcon />}
+              onClick={handleMenuOpen}
+              sx={styles.externalMenuButton}
+            >
+              Other Leaderboards
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              {EXTERNAL_LEADERBOARDS.map((board) => (
+                <MenuItem key={board.name} onClick={() => handleExternalLink(board.url)}>
+                  <ListItemText>{board.name}</ListItemText>
+                  <ListItemIcon sx={{ minWidth: "auto", ml: 1 }}>
+                    <OpenInNewIcon fontSize="small" />
+                  </ListItemIcon>
+                </MenuItem>
+              ))}
+            </Menu>
           </Box>
         </Box>
 
