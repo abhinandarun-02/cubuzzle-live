@@ -44,7 +44,7 @@ const styles = {
   country: {
     width: { xs: 120, md: 200 },
     minWidth: { md: 180 },
-    maxWidth: { xs: 120, md: 200 },
+    maxWidth: { xs: 180, md: 280 },
     textOverflow: "ellipsis",
     overflow: "hidden",
   },
@@ -78,8 +78,8 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
               Average
             </TableCell>
 
-            <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>Division</TableCell>
-            <TableCell sx={{ ...styles.category, display: { xs: "none", lg: "table-cell" } }}>Category</TableCell>
+            <TableCell sx={styles.division}>Division</TableCell>
+            <TableCell sx={styles.category}>Category</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -117,7 +117,7 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
                 <TableCell sx={styles.country}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <FlagIcon code={entry.profile?.country.code.toLowerCase()} />
-                    <Typography variant="body2" noWrap sx={{ display: { xs: "none", sm: "block" } }}>
+                    <Typography variant="body2" noWrap>
                       {entry.profile?.country.name}
                     </Typography>
                   </Box>
@@ -128,12 +128,12 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
                   </Typography>
                 </TableCell>
 
-                <TableCell sx={{ ...styles.division, display: { xs: "none", lg: "table-cell" } }}>
+                <TableCell sx={{ ...styles.division }}>
                   <Typography variant="body2" noWrap>
                     {entry.division || "-"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ ...styles.category, display: { xs: "none", lg: "table-cell" } }}>
+                <TableCell sx={{ ...styles.category }}>
                   <Typography variant="body2" noWrap>
                     {entry.profile?.category || "-"}
                   </Typography>
