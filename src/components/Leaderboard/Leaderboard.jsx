@@ -370,7 +370,7 @@ function Leaderboard() {
           ))}
         </Box>
       ) : (
-        <LeaderboardTable entries={filteredEntries} eventId={selectedEvent} />
+        <LeaderboardTable entries={filteredEntries} eventId={selectedEvent} isDivisionBased={currentEvent?.divisionBased} />
       )}
     </Container>
   );

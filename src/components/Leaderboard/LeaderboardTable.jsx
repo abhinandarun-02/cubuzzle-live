@@ -15,49 +15,48 @@ import {
 } from "@mui/material";
 import { withImageWidth } from "../../lib/utils";
 import FlagIcon from "../FlagIcon/FlagIcon";
-import { formatCellValue } from "../../lib/attempt-result";
+import { formatAttemptResult } from "../../lib/attempt-result";
 
 const styles = {
   cell: {
-    pr: { xs: "8px", md: "16px" },
-    pl: { xs: "12px", md: "16px" },
+    px: { xs: 1.5, md: 2 },
     "&:last-child": {
-      pr: 2,
+      pr: 3,
+    },
+    "&:first-of-type": {
+      pl: 3,
     },
     whiteSpace: "nowrap",
   },
 
   ranking: {
-    pr: { xs: 1, md: 2 },
-    width: { xs: 40, md: 60 },
+    width: { xs: 60, md: 80 },
     fontWeight: 600,
+    textAlign: "center",
   },
   name: {
     textOverflow: "ellipsis",
     overflow: "hidden",
-    pr: 1,
-    pl: { xs: 1, md: 2 },
-    minWidth: { md: 280 },
-    width: { xl: "25%" },
-    maxWidth: { xs: 220, md: 350, xl: 400 },
+    minWidth: { xs: 250, md: 250 },
+    maxWidth: { xs: 250, md: 320 },
   },
   country: {
-    width: { xs: 120, md: 200 },
-    minWidth: { md: 180 },
-    maxWidth: { xs: 180, md: 280 },
+    minWidth: { xs: 100, md: 160 },
+    maxWidth: { xs: 160, md: 240 },
     textOverflow: "ellipsis",
     overflow: "hidden",
   },
   result: {
-    width: { xs: 80, md: 100, xl: 120 },
-    maxWidth: { xs: 80, md: 100, xl: 120 },
+    width: { xs: 80, md: 100 },
     fontWeight: 500,
   },
   division: {
-    width: { md: 120 },
+    width: { xs: 60, md: 80 },
+    textAlign: "center",
   },
   category: {
-    width: { md: 140 },
+    width: { xs: 60, md: 100 },
+    textAlign: "center",
   },
   sourceChip: {
     fontSize: "0.7rem",
@@ -65,21 +64,30 @@ const styles = {
   },
 };
 
-const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
+const LeaderboardTable = memo(({ entries, eventId = "333", isDivisionBased=true }) => {
+
   return (
     <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto" }}>
       <Table size="medium">
         <TableHead>
           <TableRow>
-            <TableCell sx={styles.ranking}>Rank</TableCell>
+            <TableCell sx={styles.ranking} align="center">
+              Rank
+            </TableCell>
             <TableCell sx={styles.name}>Name</TableCell>
             <TableCell sx={styles.country}>Country</TableCell>
             <TableCell sx={styles.result} align="right">
               Average
             </TableCell>
 
-            <TableCell sx={styles.division}>Division</TableCell>
-            <TableCell sx={styles.category}>Category</TableCell>
+            {isDivisionBased && (
+              <TableCell sx={styles.division} align="center">
+                Division
+              </TableCell>
+            )}
+            <TableCell sx={styles.category} align="center">
+              Category
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -90,7 +98,9 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
 
             return (
               <TableRow key={entry.id} hover sx={rowSx}>
-                <TableCell sx={styles.ranking}>{entry.leaderboardRanking || "-"}</TableCell>
+                <TableCell sx={styles.ranking} align="center">
+                  {entry.leaderboardRanking || "-"}
+                </TableCell>
                 <TableCell sx={styles.name}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Avatar src={withImageWidth(entry.profile?.imageUrl, 80)} sx={{ width: 40, height: 40 }} />
@@ -124,16 +134,18 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
                 </TableCell>
                 <TableCell sx={styles.result} align="right">
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {formatCellValue(entry.average, eventId)}
+                    {formatAttemptResult(entry.average, eventId)}
                   </Typography>
                 </TableCell>
 
-                <TableCell sx={{ ...styles.division }}>
-                  <Typography variant="body2" noWrap>
-                    {entry.division || "-"}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...styles.category }}>
+                {isDivisionBased && (
+                  <TableCell sx={styles.division} align="center">
+                    <Typography variant="body2" noWrap>
+                      {entry.division || "-"}
+                    </Typography>
+                  </TableCell>
+                )}
+                <TableCell sx={styles.category} align="center">
                   <Typography variant="body2" noWrap>
                     {entry.profile?.category || "-"}
                   </Typography>
