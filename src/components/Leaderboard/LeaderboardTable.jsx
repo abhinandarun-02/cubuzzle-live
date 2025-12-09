@@ -26,12 +26,7 @@ const styles = {
     },
     whiteSpace: "nowrap",
   },
-  image: {
-    width: 32,
-    p: 0.5,
-    pl: { xs: 1, md: 2 },
-    textwrap: "nowrap",
-  },
+
   ranking: {
     pr: { xs: 1, md: 2 },
     width: { xs: 40, md: 60 },
@@ -41,10 +36,10 @@ const styles = {
     textOverflow: "ellipsis",
     overflow: "hidden",
     pr: 1,
-    pl: 1,
-    minWidth: { md: 250 },
+    pl: { xs: 1, md: 2 },
+    minWidth: { md: 280 },
     width: { xl: "25%" },
-    maxWidth: { xs: 200, md: 300, xl: 350 },
+    maxWidth: { xs: 220, md: 350, xl: 400 },
   },
   country: {
     width: { xs: 120, md: 200 },
@@ -77,9 +72,7 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
         <TableHead>
           <TableRow>
             <TableCell sx={styles.ranking}>Rank</TableCell>
-            <TableCell sx={styles.image} />
             <TableCell sx={styles.name}>Name</TableCell>
-            <TableCell sx={styles.cell}>Cubuzzle ID</TableCell>
             <TableCell sx={styles.country}>Country</TableCell>
             <TableCell sx={styles.result} align="right">
               Average
@@ -98,27 +91,29 @@ const LeaderboardTable = memo(({ entries, eventId = "333" }) => {
             return (
               <TableRow key={entry.id} hover sx={rowSx}>
                 <TableCell sx={styles.ranking}>{entry.leaderboardRanking || "-"}</TableCell>
-                <TableCell sx={styles.image}>
-                  <Avatar src={withImageWidth(entry.profile?.imageUrl, 80)} sx={{ width: 32, height: 32 }} />
-                </TableCell>
                 <TableCell sx={styles.name}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Link
-                      component={RouterLink}
-                      to={`/competitor/${entry.id}`}
-                      sx={{
-                        textDecoration: "none",
-                        color: "inherit",
-                        "&:hover": { textDecoration: "underline" },
-                      }}
-                    >
-                      <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                        {entry.name}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Avatar src={withImageWidth(entry.profile?.imageUrl, 80)} sx={{ width: 40, height: 40 }} />
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Link
+                        component={RouterLink}
+                        to={`/competitor/${entry.id}`}
+                        sx={{
+                          textDecoration: "none",
+                          color: "inherit",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                          {entry.name}
+                        </Typography>
+                      </Link>
+                      <Typography variant="caption" noWrap sx={{ color: "text.secondary" }}>
+                        {entry.id}
                       </Typography>
-                    </Link>
+                    </Box>
                   </Box>
                 </TableCell>
-                <TableCell sx={styles.cell}>{entry.id}</TableCell>
                 <TableCell sx={styles.country}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <FlagIcon code={entry.profile?.country.code.toLowerCase()} />
