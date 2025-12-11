@@ -1,4 +1,4 @@
-import { Box, Typography, Link } from "@mui/material";
+import { Box, Typography, Link, alpha } from "@mui/material";
 import logo from "../DefaultNavigation/logo.png";
 import yjLogo from "/yj-logo.png";
 
@@ -7,45 +7,67 @@ function Footer() {
     <Box
       component="footer"
       sx={{
-        py: 1.5,
+        py: 2.5,
+        px: 2,
         textAlign: "center",
         mt: "auto",
+        borderTop: (theme) => `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.2)} 0%, transparent 100%)`
+            : `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.02)} 0%, transparent 100%)`,
       }}
     >
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{
-          fontSize: "0.65rem",
-          opacity: 0.9,
-          fontStyle: "italic",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 0.5,
-        }}
-      >
-        Gifts for participants and prizes for winners sponsored by
-        <img
-          src={yjLogo}
-          alt="YJ logo"
-          style={{
-            height: "14px",
-            width: "auto",
-            marginLeft: "2px",
-          }}
-        />
-      </Typography>
+      {/* Sponsor Section */}
       <Box
         sx={{
-          fontSize: "0.7rem",
-          opacity: 0.8,
-          fontWeight: 400,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 1,
-          mt: 0.5,
+          gap: 0.75,
+          mb: 1.5,
+          flexWrap: "wrap",
+        }}
+      >
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            fontSize: "0.7rem",
+            opacity: 0.75,
+            fontStyle: "italic",
+          }}
+        >
+          Gifts for participants and prizes for winners sponsored by
+        </Typography>
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            py: 0.25,
+            borderRadius: 1,
+           
+          }}
+        >
+          <img
+            src={yjLogo}
+            alt="YJ logo"
+            style={{
+              height: "16px",
+              width: "auto",
+            }}
+          />
+        </Box>
+      </Box>
+
+      {/* Credits Section */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1.5,
+          flexWrap: "wrap",
         }}
       >
         <Link
@@ -54,16 +76,21 @@ function Footer() {
           rel="noopener noreferrer"
           sx={{
             color: "text.secondary",
-            textDecoration: "underline",
+            textDecoration: "none",
             display: "flex",
             alignItems: "center",
-            gap: 0.5,
-            fontSize: "0.7rem",
-            cursor: "pointer",
-            opacity: 0.8,
+            gap: 0.75,
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1.5,
+            bgcolor: (theme) => alpha(theme.palette.text.primary, 0.04),
+            transition: "all 0.2s ease-in-out",
             "&:hover": {
-              opacity: 1,
-              textDecoration: "underline",
+              bgcolor: (theme) => alpha(theme.palette.text.primary, 0.08),
+              color: "text.primary",
+              transform: "translateY(-1px)",
             },
           }}
         >
@@ -71,22 +98,42 @@ function Footer() {
             src={logo}
             alt="cubuzzle logo"
             style={{
-              height: "16px",
+              height: "18px",
               width: "auto",
-              opacity: 0.8,
             }}
           />
           cubuzzle.com
         </Link>
+
         <Typography
-          variant="caption"
-          color="text.secondary"
+          component="span"
           sx={{
             fontSize: "0.7rem",
-            opacity: 0.8,
+            color: "text.disabled",
           }}
         >
-          • Powered by Hariology
+          •
+        </Typography>
+
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "0.72rem",
+            color: "text.secondary",
+            opacity: 0.8,
+            fontWeight: 400,
+          }}
+        >
+          Powered by{" "}
+          <Box
+            component="span"
+            sx={{
+              fontWeight: 600,
+              opacity: 1,
+            }}
+          >
+            Hariology
+          </Box>
         </Typography>
       </Box>
     </Box>

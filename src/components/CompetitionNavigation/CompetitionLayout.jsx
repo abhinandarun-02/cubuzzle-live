@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  AppBar,
-  Box,
-  Drawer,
-  SwipeableDrawer,
-  useMediaQuery,
-} from "@mui/material";
+import { AppBar, Box, Drawer, SwipeableDrawer, useMediaQuery } from "@mui/material";
 import CompetitionDrawerContent from "./CompetitionDrawerContent";
 import CompetitionToolbar from "./CompetitionToolbar";
 import Footer from "../Footer/Footer";
@@ -25,19 +19,12 @@ function CompetitionLayout({ competition, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // See https://mui.com/material-ui/react-drawer/#swipeable
-  const iOS =
-    typeof navigator !== "undefined" &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const iOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   return (
     <>
       <AppBar position="sticky" sx={styles.appBarShift}>
-        {competition && (
-          <CompetitionToolbar
-            competition={competition}
-            onMenuClick={() => setMobileOpen(true)}
-          />
-        )}
+        {competition && <CompetitionToolbar competition={competition} onMenuClick={() => setMobileOpen(true)} />}
       </AppBar>
       {lgScreen ? (
         <Drawer
@@ -46,9 +33,7 @@ function CompetitionLayout({ competition, children }) {
             "& .MuiDrawer-paper": { width: { lg: DRAWER_WIDTH } },
           }}
         >
-          {competition && (
-            <CompetitionDrawerContent competition={competition} />
-          )}
+          {competition && <CompetitionDrawerContent competition={competition} />}
         </Drawer>
       ) : (
         <SwipeableDrawer
@@ -57,13 +42,24 @@ function CompetitionLayout({ competition, children }) {
           onClose={() => setMobileOpen(false)}
           onClick={() => setMobileOpen(false)}
           sx={{
-            "& .MuiDrawer-paper": { width: { lg: DRAWER_WIDTH } },
+            "& .MuiDrawer-paper": {
+              width: { xs: DRAWER_WIDTH },
+              boxSizing: "border-box",
+            },
           }}
           disableBackdropTransition={!iOS}
           disableDiscovery={iOS}
         >
           {competition && (
-            <CompetitionDrawerContent competition={competition} />
+            <Box
+              sx={{
+                backgroundColor:  (theme) =>
+                  theme.palette.mode === "light" ? "#fff" : "#121212",
+                height: "100%",
+              }}
+            >
+              <CompetitionDrawerContent competition={competition} />
+            </Box>
           )}
         </SwipeableDrawer>
       )}
@@ -77,11 +73,11 @@ function CompetitionLayout({ competition, children }) {
           display: "flex",
           flexDirection: "column",
           minHeight: "calc(100vh - 64px)", // Account for AppBar height
+          backgroundColor: (theme) =>
+            theme.palette.mode === "light" ? "#fff" : "#121212",
         }}
       >
-        <Box sx={{ flexGrow: 1 }}>
-          {children}
-        </Box>
+        <Box sx={{ flexGrow: 1 }}>{children}</Box>
         <Footer />
       </Box>
     </>

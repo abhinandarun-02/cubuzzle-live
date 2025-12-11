@@ -1,209 +1,192 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Grid,
+  Box,
   IconButton,
   InputBase,
   List,
-  ListItemIcon,
-  Paper,
-  Avatar,
   ListItemButton,
-  Box,
-  Chip,
+  ListItemAvatar,
+  Avatar,
+  Paper,
   Typography,
-  Stack,
+  Chip,
+  useTheme,
+  alpha,
+  Divider,
 } from "@mui/material";
-import { withImageWidth } from "../../lib/utils";
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import { withImageWidth } from "../../lib/utils";
 import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { getEventDisplayName } from "../../lib/competition";
 
-const styles = {
-  searchPaper: {
-    p: "2px 2px 2px 16px",
-    display: "inline-block",
-  },
-  fullWidth: {
-    width: "100%",
-  },
-  listItemButton: {
-    py: 1.5,
-  },
-  listItemIcon: {
-    minWidth: { xs: 40, md: 48 },
-  },
-  avatar: {
-    width: { xs: 32, md: 40 },
-    height: { xs: 32, md: 40 },
-  },
-  mainContent: {
-    flex: 1,
-    minWidth: 0,
-  },
-  topRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    mb: { xs: 0.5, md: 0 },
-  },
-  competitorName: {
-    flex: 1,
-    mr: 1,
-    minWidth: 0, // allow flex item to shrink and enable text truncation
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  countryContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: 0.5,
-    flexShrink: 0,
-  },
-  nameContainer: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 1,
-    minWidth: 0,
-  },
-  countryName: {
-    display: { xs: "none", sm: "block" },
-    fontSize: { sm: "0.75rem", md: "0.875rem" },
-  },
-  bottomRow: {
-    display: "flex",
-    alignItems: "center",
-    mt: { xs: 0.5, md: 0 },
-  },
-  eventsStack: {
-    flexWrap: "wrap",
-    gap: 0.3,
-    maxWidth: "100%",
-  },
-  eventChip: {
-    fontSize: { xs: "0.65rem", md: "0.7rem" },
-    height: { xs: 18, md: 20 },
-    "& .MuiChip-icon": {
-      fontSize: { xs: 10, md: 12 },
-    },
-    "& .MuiChip-label": {
-      px: { xs: 0.5, md: 1 },
-    },
-  },
-  moreEventsChip: {
-    fontSize: { xs: "0.65rem", md: "0.7rem" },
-    height: { xs: 18, md: 20 },
-    "& .MuiChip-label": {
-      px: { xs: 0.5, md: 1 },
-    },
-  },
-  noEventsText: {
-    fontSize: { xs: "0.75rem", md: "0.875rem" },
-  },
-};
+const EVENT_LIMIT = 5;
 
 function searchCompetitors(competitors, search) {
+  if (!search) return competitors;
   const searchParts = search.toLowerCase().split(/\s+/);
-  return competitors.filter((competitor) => searchParts.every((part) => competitor.name.toLowerCase().includes(part)));
+  return competitors.filter((competitor) =>
+    searchParts.every((part) => competitor.name.toLowerCase().includes(part))
+  );
 }
 
 function CompetitorList({ competitors }) {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const theme = useTheme();
 
-  const filteredCompetitors = searchCompetitors(competitors, search).sort((a, b) => a.name.localeCompare(b.name));
+  const filteredCompetitors = useMemo(() => 
+    searchCompetitors(competitors, search).sort((a, b) => a.name.localeCompare(b.name)),
+    [competitors, search]
+  );
+
+  const handleClearSearch = () => setSearch("");
 
   return (
-    <Grid container direction="column" alignItems="center" spacing={1}>
-      <Grid item>
-        <Paper sx={styles.searchPaper}>
-          <InputBase
-            autoFocus
-            value={search}
-            placeholder="Search competitor"
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          <IconButton disabled size="large">
-            <SearchIcon />
+    <Box sx={{ width: "100%", maxWidth: 800, mx: "auto", p: { xs: 1, sm: 2 } }}>
+      {/* Search Bar */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: "2px 4px",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          mb: 3,
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 3,
+          transition: "box-shadow 0.3s ease",
+          background: theme.palette.background.paper,
+          "&:focus-within": {
+            boxShadow: `0 0 0 2px ${alpha(theme.palette.grey[700], 0.25)}`,
+            borderColor: alpha(theme.palette.grey[700], 0.5),
+          },
+        }}
+      >
+        <IconButton sx={{ p: "10px" }} aria-label="search" disabled>
+          <SearchIcon color="action" />
+        </IconButton>
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Search competitors..."
+          inputProps={{ "aria-label": "search competitors" }}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <IconButton sx={{ p: "10px" }} aria-label="clear" onClick={handleClearSearch}>
+            <ClearIcon fontSize="small" />
           </IconButton>
-        </Paper>
-      </Grid>
-      <Grid item sx={styles.fullWidth}>
-        <List>
-          {filteredCompetitors.map((competitor) => (
-            <ListItemButton
-              key={competitor.id}
-              sx={styles.listItemButton}
-              onClick={() => navigate(`/competitor/${competitor.id}`)}
-            >
-              {/* Profile picture */}
-              <ListItemIcon sx={styles.listItemIcon}>
-                <Avatar src={withImageWidth(competitor.imageUrl, 40)} alt={competitor.name} sx={styles.avatar} />
-              </ListItemIcon>
+        )}
+      </Paper>
 
-              {/* Main content - responsive layout */}
-              <Box sx={styles.mainContent}>
-                {/* Top row: Name and Country */}
-                <Box sx={styles.topRow}>
-                  <Box sx={styles.competitorName}>
-                    <Box sx={styles.nameContainer}>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="medium"
-                        noWrap
-                        sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                      >
+      {/* Competitor List */}
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          borderRadius: 3, 
+          overflow: 'hidden', 
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: 'background.paper'
+        }}
+      >
+        {filteredCompetitors.length > 0 ? (
+          <List disablePadding>
+            {filteredCompetitors.map((competitor, index) => (
+              <Box key={competitor.id}>
+                <ListItemButton
+                  onClick={() => navigate(`/competitor/${competitor.id}`)}
+                  sx={{
+                    py: 2,
+                    px: { xs: 2, sm: 3 },
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.04),
+                    },
+                  }}
+                >
+                  <ListItemAvatar sx={{ minWidth: { xs: 48, sm: 56 } }}>
+                    <Avatar
+                      src={withImageWidth(competitor.imageUrl, 80)}
+                      alt={competitor.name}
+                      sx={{ 
+                        width: { xs: 40, sm: 48 }, 
+                        height: { xs: 40, sm: 48 },
+                        border: `2px solid ${theme.palette.background.paper}`,
+                        boxShadow: theme.shadows[1]
+                      }}
+                    />
+                  </ListItemAvatar>
+
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                      <Typography variant="subtitle1" fontWeight="600" noWrap sx={{ mr: 1, fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                         {competitor.name}
                       </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, opacity: 0.8, flexShrink: 0 }}>
+                        <FlagIcon code={competitor.country?.code?.toLowerCase()} />
+                        <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                          {competitor.country?.name}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                      {competitor.events && competitor.events.length > 0 ? (
+                        <>
+                          {competitor.events.slice(0, EVENT_LIMIT).map((eventId) => (
+                            <Chip
+                              key={eventId}
+                              icon={<CubingIcon eventId={eventId} small style={{ opacity: 0.7 }} />}
+                              label={getEventDisplayName(eventId)}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                borderColor: alpha(theme.palette.divider, 0.8),
+                                '& .MuiChip-icon': { ml: 0.5, width: 14, height: 14 },
+                                '& .MuiChip-label': { px: 0.8 },
+                              }}
+                            />
+                          ))}
+                          {competitor.events.length > EVENT_LIMIT && (
+                            <Chip
+                              label={`+${competitor.events.length - EVENT_LIMIT}`}
+                              size="small"
+                              sx={{ 
+                                height: 20, 
+                                fontSize: '0.7rem',
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                color: theme.palette.primary.main,
+                                fontWeight: 'bold'
+                              }}
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <Typography variant="caption" color="text.secondary" fontStyle="italic">
+                          No events registered
+                        </Typography>
+                      )}
                     </Box>
                   </Box>
-
-                  {/* Country - always visible but responsive */}
-                  <Box sx={styles.countryContainer}>
-                    <FlagIcon code={competitor.country?.code?.toLowerCase()} />
-                    <Typography variant="body2" color="text.secondary" sx={styles.countryName} noWrap>
-                      {competitor.country?.name ?? ""}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Bottom row: Events - mobile optimized */}
-                <Box sx={styles.bottomRow}>
-                  {competitor.events && competitor.events.length > 0 ? (
-                    <Stack direction="row" spacing={0.3} sx={styles.eventsStack}>
-                      {competitor.events.map((eventId) => (
-                        <Chip
-                          key={eventId}
-                          icon={<CubingIcon eventId={eventId} small />}
-                          label={getEventDisplayName(eventId)}
-                          size="small"
-                          variant="outlined"
-                          sx={styles.eventChip}
-                        />
-                      ))}
-                      {competitor.events.length > 4 && (
-                        <Chip
-                          label={`+${competitor.events.length - 4}`}
-                          size="small"
-                          variant="outlined"
-                          sx={styles.moreEventsChip}
-                        />
-                      )}
-                    </Stack>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary" sx={styles.noEventsText}>
-                      No events
-                    </Typography>
-                  )}
-                </Box>
+                </ListItemButton>
+                {index < filteredCompetitors.length - 1 && <Divider component="li" />}
               </Box>
-            </ListItemButton>
-          ))}
-        </List>
-      </Grid>
-    </Grid>
+            ))}
+          </List>
+        ) : (
+          <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary' }}>
+            <SearchIcon sx={{ fontSize: 48, mb: 1, opacity: 0.2 }} />
+            <Typography variant="body1">
+              No competitors found matching "{search}"
+            </Typography>
+          </Box>
+        )}
+      </Paper>
+    </Box>
   );
 }
 
