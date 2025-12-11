@@ -6,11 +6,12 @@ import { getCompetitorWithResults } from "../../lib/firebase/firestore";
 import CompetitorResults from "./CompetitorResults";
 import { Box } from "@mui/material";
 import CompetitorInfo from "./CompetitorInfo";
+import { COMPETITION_ID } from "../../config";
 
 export default function CompetitorPage() {
   const { competitorId } = useParams();
 
-  const competitionId = "cubuzzle-s3"; // assumption: single competition id used elsewhere
+  const competitionId = COMPETITION_ID;
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["competitor", competitionId, competitorId, "withResults"],

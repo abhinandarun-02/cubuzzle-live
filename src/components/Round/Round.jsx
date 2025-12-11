@@ -7,9 +7,10 @@ import RoundResults from "../RoundResults/RoundResults";
 import RoundToolbar from "./RoundToolbar";
 import { useQuery } from "@tanstack/react-query";
 import { getRoundResults } from "../../lib/firebase/firestore";
+import { COMPETITION_ID } from "../../config";
 
 function Round() {
-  const competitionId = "cubuzzle-s3";
+  const competitionId = COMPETITION_ID;
   const { eventId, roundId } = useParams();
 
   const {

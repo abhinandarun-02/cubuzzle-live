@@ -3,9 +3,10 @@ import CompetitorList from "./CompetitorList";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import { getCompetitorsByCompetition } from "../../lib/firebase/firestore";
+import { COMPETITION_ID } from "../../config";
 
 function Competitors() {
-  const competitionId = "cubuzzle-s3";
+  const competitionId = COMPETITION_ID;
 
   const {
     data: competitors,

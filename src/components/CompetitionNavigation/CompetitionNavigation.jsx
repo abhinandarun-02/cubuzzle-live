@@ -9,9 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
 import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
+import { COMPETITION_ID } from "../../config";
 
 function CompetitionNavigation() {
-  const competitionId = "cubuzzle-s3";
+  const competitionId = COMPETITION_ID;
 
   const {
     data: competition,
