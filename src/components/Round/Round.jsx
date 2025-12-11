@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getRoundResults } from "../../lib/firebase/firestore";
 
 function Round() {
-  const competitionId = "cubuzzle2025";
+  const competitionId = "cubuzzle-s3";
   const { eventId, roundId } = useParams();
 
   const {
