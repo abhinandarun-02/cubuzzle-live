@@ -172,9 +172,8 @@ function CompetitionHome() {
 
   // Competition information
   const rounds = [
-    { name: "Round 1", dates: "17-19 Oct", status: "completed" },
-    { name: "Semi-Finals", dates: "24-26 Oct", status: "completed" },
-    { name: "Finals", dates: "31 Oct - 2 Nov", status: "completed" },
+    { name: "Round 1", dates: "12-13 Dec", status: "live" },
+    { name: "Finals", dates: "14 Dec", status: "upcoming" },
   ];
 
   return (
@@ -200,10 +199,10 @@ function CompetitionHome() {
           />
         </Box>
         <Typography variant="h4" component="h1" gutterBottom>
-          Cubuzzle Champion League - Season 2
+          Cubuzzle Champion League
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
-          October Challenge 2025 • Live Results & Rankings
+          Season 3 - 2025 Showdown • Live Results & Rankings
         </Typography>
       </Box>
 
@@ -219,7 +218,11 @@ function CompetitionHome() {
               <Grid item xs={12} sm={4} key={index}>
                 <Card
                   variant="outlined"
-                  onClick={round.status === "live" || round.status === "completed" ? () => scrollToSection(round.status) : undefined}
+                  onClick={
+                    round.status === "live" || round.status === "completed"
+                      ? () => scrollToSection(round.status)
+                      : undefined
+                  }
                   sx={{
                     ...styles.roundCard,
                     bgcolor:
@@ -272,10 +275,10 @@ function CompetitionHome() {
               <Chip label="2x2x2" variant="outlined" />
             </Grid>
             <Grid item>
-              <Chip label="3x3x3" variant="outlined" />
+              <Chip label="4x4x4" variant="outlined" />
             </Grid>
             <Grid item>
-              <Chip label="Pyraminx" variant="outlined" />
+              <Chip label="Skewb" variant="outlined" />
             </Grid>
           </Grid>
         </CardContent>
