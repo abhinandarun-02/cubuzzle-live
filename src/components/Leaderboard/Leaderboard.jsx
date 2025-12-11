@@ -22,6 +22,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { getUnifiedLeaderboard } from "../../lib/firebase/firestore";
 import LazyDivisionSection from "./LazyDivisionSection";
 import LeaderboardTable from "./LeaderboardTable";
@@ -29,6 +30,7 @@ import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 import useDebounce from "../../hooks/useDebounce";
 import { getEventDisplayName } from "../../lib/competition";
+import { formatAttemptResult } from "../../lib/attempt-result";
 import CubingIcon from "../CubingIcon/CubingIcon";
 
 const styles = {
@@ -107,6 +109,15 @@ const styles = {
     fontSize: "1.15rem",
     padding: "14px 32px",
   },
+  exportButton: {
+    textTransform: "none",
+    color: "text.primary",
+    borderColor: "divider",
+    "&:hover": {
+      borderColor: "text.secondary",
+      backgroundColor: "action.hover",
+    },
+  },
 };
 
 const EVENTS = [
@@ -126,6 +137,43 @@ function Leaderboard() {
   const [selectedEvent, setSelectedEvent] = useState(EVENTS[0].id);
   const [anchorEl, setAnchorEl] = useState(null);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Export to CSV function
+  const exportToCSV = (entries, eventId, isDivisionBased) => {
+    const headers = isDivisionBased
+      ? ["Rank", "Name", "Cubuzzle ID", "Country", "Average", "Division", "Category"]
+      : ["Rank", "Name", "Cubuzzle ID", "Country", "Average", "Category"];
+
+    const rows = entries.map((entry) => {
+      const baseRow = [
+        entry.leaderboardRanking || "-",
+        entry.name || "-",
+        entry.id || "-",
+        entry.profile?.country?.name || "-",
+        formatAttemptResult(entry.average, eventId),
+      ];
+      if (isDivisionBased) {
+        baseRow.push(entry.division || "-");
+      }
+      baseRow.push(entry.profile?.category || "-");
+      return baseRow;
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `leaderboard_${eventId}_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -238,7 +286,6 @@ function Leaderboard() {
           <Box sx={{ mt: { xs: 2, sm: 0 } }}>
             <Button
               variant="outlined"
-
               endIcon={<KeyboardArrowDownIcon />}
               onClick={handleMenuOpen}
               sx={styles.externalMenuButton}
@@ -327,7 +374,7 @@ function Leaderboard() {
 
         {/* Filters */}
         <Box sx={styles.filterSection}>
-          <Stack spacing={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "flex-start", sm: "center" }} justifyContent="space-between">
             {/* Category Filter */}
             {categories.length > 1 && (
               <Box>
@@ -351,6 +398,22 @@ function Leaderboard() {
                 </ToggleButtonGroup>
               </Box>
             )}
+            
+            {/* Export Button */}
+            <Box>
+              <Typography variant="caption" sx={{ mb: 1, display: "block", fontWeight: 600 }}>
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<FileDownloadIcon />}
+                onClick={() => exportToCSV(filteredEntries, selectedEvent, currentEvent?.divisionBased)}
+                sx={styles.exportButton}
+                disabled={filteredEntries.length === 0}
+              >
+                Export CSV
+              </Button>
+            </Box>
           </Stack>
         </Box>
 
