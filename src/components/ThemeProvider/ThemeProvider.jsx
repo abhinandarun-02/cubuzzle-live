@@ -3,7 +3,7 @@ import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
-import { blue, grey, pink } from "@mui/material/colors";
+import { grey, cyan } from "@mui/material/colors";
 
 import { ToggleThemeContext } from "./useToggleTheme";
 
@@ -11,10 +11,14 @@ const themes = {
   light: createTheme({
     palette: {
       primary: {
-        main: blue[700],
+        main: grey[800],
       },
       secondary: {
-        main: grey[900],
+        main: cyan[500],
+      },
+      background: {
+        default: "#fafafa",
+        paper: "#ffffff",
       },
     },
   }),
@@ -22,18 +26,22 @@ const themes = {
     palette: {
       mode: "dark",
       primary: {
-        main: blue[200],
+        main: grey[300],
       },
       secondary: {
-        main: pink["A400"],
+        main: cyan[300],
+      },
+      background: {
+        default: "#121212",
+        paper: "#121212",
       },
     },
   }),
 };
 
 const themeColor = {
-  light: blue["700"],
-  dark: grey["900"],
+  light: grey["800"],
+  dark: "#121212",
 };
 
 function getStoredThemeType() {
