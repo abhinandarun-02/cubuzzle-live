@@ -396,7 +396,7 @@ function CompetitionHome() {
 
   // Events data
   const events = [
-    { id: "222", name: "2x2x2", icon: "222" },
+    { id: "333", name: "3x3x3", icon: "333" },
     { id: "444", name: "4x4x4", icon: "444" },
     { id: "skewb", name: "Skewb", icon: "skewb" },
   ];
@@ -568,7 +568,7 @@ function CompetitionHome() {
                 Events
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Compete in these puzzle categories
+                Compete in these categories
               </Typography>
             </Box>
           </Box>
