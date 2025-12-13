@@ -390,8 +390,8 @@ function CompetitionHome() {
 
   // Competition information
   const rounds = [
-    { name: "Round 1", dates: "12-13 Dec", status: "live" },
-    { name: "Finals", dates: "14 Dec", status: "upcoming" },
+    { name: "Round 1", dates: "12-13 Dec", status: "completed" },
+    { name: "Finals", dates: "14 Dec", status: "live" },
   ];
 
   // Events data
