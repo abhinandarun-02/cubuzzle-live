@@ -123,12 +123,15 @@ const styles = {
 const EVENTS = [
   { id: "333", name: "3x3x3 Cube", divisionBased: true },
   { id: "222", name: "2x2x2 Cube", divisionBased: false },
+  { id: "444", name: "4x4x4 Cube", divisionBased: false },
   { id: "pyram", name: "Pyraminx", divisionBased: false },
+  { id: "skewb", name: "Skewb", divisionBased: false },
 ];
 
 const EXTERNAL_LEADERBOARDS = [
   { name: "Cubuzzle Champion League - Season 1", url: "https://ccl-season1-live.vercel.app/" },
   { name: "Cubuzzle Champion League - Season 2", url: "https://cubuzzle-leaderboard.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 3", url: "https://cubuzzle-live-season-3.vercel.app/" },
 ];
 
 function Leaderboard() {
