@@ -22,10 +22,17 @@ function CompetitorResults({ results }) {
     return acc;
   }, {});
 
+  // Sort competition IDs in descending order by their display name
+  const sortedCompIds = Object.keys(groupedByComp).sort((a, b) => {
+    const nameA = getCompetitionDisplayName(a).toLowerCase();
+    const nameB = getCompetitionDisplayName(b).toLowerCase();
+    return nameB.localeCompare(nameA);
+  });
+
   return (
     <>
       <Grid container direction="column" spacing={2}>
-        {Object.keys(groupedByComp).map((compId) => (
+        {sortedCompIds.map((compId) => (
           <Grid item key={compId}>
             <Typography variant="h6" gutterBottom>
               {getCompetitionDisplayName(compId)}
