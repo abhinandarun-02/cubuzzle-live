@@ -10,7 +10,7 @@ import CompetitorInfo from "./CompetitorInfo";
 export default function CompetitorPage() {
   const { competitorId } = useParams();
 
-  const competitionId = "cubuzzle2025"; // assumption: single competition id used elsewhere
+  const competitionId = "cubuzzle-s4"; // assumption: single competition id used elsewhere
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["competitor", competitionId, competitorId, "withResults"],

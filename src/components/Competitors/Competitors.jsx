@@ -5,7 +5,7 @@ import Error from "../Error/Error";
 import { getCompetitorsByCompetition } from "../../lib/firebase/firestore";
 
 function Competitors() {
-  const competitionId = "cubuzzle2025";
+  const competitionId = "cubuzzle-s4";
 
   const {
     data: competitors,

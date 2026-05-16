@@ -112,7 +112,7 @@ const styles = {
 };
 
 function CompetitionHome() {
-  const competitionId = "cubuzzle2025";
+  const competitionId = "cubuzzle-s4";
 
   const liveSectionRef = useRef(null);
   const resultsSectionRef = useRef(null);
