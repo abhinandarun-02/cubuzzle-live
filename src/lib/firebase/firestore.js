@@ -176,3 +176,36 @@ export const getRoundResults = async (competitionId, eventId, roundId, roundQuer
     throw error;
   }
 };
+
+export const getEventLeaderboard = async (competitionId, eventId) => {
+  try {
+    const eventRef = doc(db, "competitions", competitionId, "events", eventId);
+    const eventSnap = await getDoc(eventRef);
+    if (!eventSnap.exists()) {
+      throw new Error("Event not found");
+    }
+
+    const roundsSnap = await getDocs(collection(eventRef, "rounds"));
+    const rounds = roundsSnap.docs.map((roundDoc) => ({
+      id: roundDoc.id,
+      ...roundDoc.data(),
+    }));
+
+    const leaderboardRef = collection(db, "competitions", competitionId, "events", eventId, "leaderboard");
+    const leaderboardSnap = await getDocs(leaderboardRef);
+    const leaderboard = leaderboardSnap.docs.map((leaderboardDoc) => ({
+      id: leaderboardDoc.id,
+      ...leaderboardDoc.data(),
+    }));
+
+    return {
+      id: eventSnap.id,
+      ...eventSnap.data(),
+      rounds,
+      leaderboard,
+    };
+  } catch (error) {
+    console.error("Error getting event leaderboard: ", error);
+    throw error;
+  }
+};

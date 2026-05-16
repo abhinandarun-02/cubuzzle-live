@@ -39,6 +39,12 @@ function CompetitionEventList({ competitionEvents }) {
             }}
           >
             <List dense={true}>
+              <ListItemButton
+                component={RouterLink}
+                to={`/events/${competitionEvent.id}/leaderboard`}
+              >
+                <ListItemText primary="Leaderboard" />
+              </ListItemButton>
               {competitionEvent.rounds.map((round) => (
                 <ListItemButton
                   key={round.id}
