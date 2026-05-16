@@ -1,12 +1,15 @@
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Avatar,
   Box,
+  ButtonBase,
   Chip,
+  Divider,
   Grid,
   Link,
   Paper,
+  Popover,
   Table,
   TableBody,
   TableCell,
@@ -71,6 +74,17 @@ function scoreValue(value, eventId) {
   return formatAttemptResult(value, eventId);
 }
 
+function cumulativeRoundScore(roundScore) {
+  if (!roundScore) return 0;
+  return roundScore.cumulativeScore !== undefined
+    ? roundScore.cumulativeScore
+    : (roundScore.average ?? 0);
+}
+
+function roundScoreText(value, eventId) {
+  return value === 0 ? "-" : formatAttemptResult(value, eventId);
+}
+
 function sortRounds(rounds) {
   return [...rounds].sort((roundA, roundB) => {
     const orderA = roundA.number ?? roundA.roundNumber ?? Number.MAX_SAFE_INTEGER;
@@ -94,12 +108,158 @@ function sortLeaderboard(leaderboard) {
   });
 }
 
+function CumulativeScoreCell({ entry, eventId, rounds }) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const popoverId = open
+    ? `score-breakdown-${entry.userId || entry.id}`
+    : undefined;
+
+  const handleOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <ButtonBase
+        aria-describedby={popoverId}
+        aria-label={`Show score breakdown for ${entry.name}`}
+        onClick={handleOpen}
+        sx={{
+          borderRadius: 1,
+          color: "inherit",
+          display: "inline-flex",
+          font: "inherit",
+          fontWeight: 600,
+          justifyContent: "flex-end",
+          minHeight: 28,
+          px: 0.75,
+          textAlign: "right",
+          "&:hover": {
+            bgcolor: "action.hover",
+          },
+        }}
+      >
+        {scoreValue(entry.overallCumulativeScore, eventId)}
+      </ButtonBase>
+
+      <Popover
+        id={popoverId}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "center", horizontal: "left" }}
+        transformOrigin={{ vertical: "center", horizontal: "right" }}
+        PaperProps={{
+          sx: {
+            borderRadius: 1.5,
+            boxShadow: 3,
+            minWidth: 224,
+            p: 1.5,
+          },
+        }}
+      >
+        <Box sx={{ display: "grid", gap: 1 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 700,
+              letterSpacing: 0.4,
+            }}
+          >
+            SCORE BREAKDOWN
+          </Typography>
+
+          <Divider />
+
+          <Box sx={{ display: "grid", gap: 0.75 }}>
+            {rounds.map((round) => {
+              const roundScore = entry.roundScores?.[round.id];
+              const value = cumulativeRoundScore(roundScore);
+              const muted = !roundScore || value === 0;
+              const dnf = value === -1;
+
+              return (
+                <Box
+                  key={round.id}
+                  sx={{
+                    alignItems: "center",
+                    display: "flex",
+                    gap: 2,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary" }}
+                  >
+                    {round.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: muted
+                        ? "text.secondary"
+                        : dnf
+                          ? "error.main"
+                          : "text.primary",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {roundScoreText(value, eventId)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+
+          <Divider />
+
+          {entry.overallCumulativeScore === -1 ? (
+            <Typography variant="caption" sx={{ color: "error.main" }}>
+              DNF - at least one round has all-invalid attempts
+            </Typography>
+          ) : entry.overallCumulativeScore === 0 ? (
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              No scored attempts yet
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                alignItems: "center",
+                display: "flex",
+                gap: 2,
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                Mean of {entry.roundsAttempted} round
+                {entry.roundsAttempted !== 1 ? "s" : ""}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "primary.main", fontWeight: 700 }}
+              >
+                {formatAttemptResult(entry.overallCumulativeScore, eventId)}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Popover>
+    </>
+  );
+}
+
 function EventLeaderboard() {
   const competitionId = "cubuzzle-s4";
   const { eventId } = useParams();
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
   const mdScreen = useMediaQuery((theme) => theme.breakpoints.up("md"));
-
   const {
     data: event,
     isLoading,
@@ -118,8 +278,8 @@ function EventLeaderboard() {
   const visibleRounds = mdScreen ? rounds : [];
   const totalColumns =
     3 + // rank, avatar, name
-    (smScreen ? 1 : 0) + // country
-    2; // best average, cumulative score
+    (smScreen ? 2 : 0) + // country, division
+    3; // rounds, best average, cumulative score
 
   return (
     <Grid container direction="column" spacing={2} sx={{ width: "100%", maxWidth: "100%" }}>
@@ -214,8 +374,15 @@ function EventLeaderboard() {
                     <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                       {scoreValue(entry.bestAverage, event.id)}
                     </TableCell>
-                    <TableCell sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }} align="right">
-                      {scoreValue(entry.overallCumulativeScore, event.id)}
+                    <TableCell
+                      sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }}
+                      align="right"
+                    >
+                      <CumulativeScoreCell
+                        entry={entry}
+                        eventId={event.id}
+                        rounds={rounds}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
