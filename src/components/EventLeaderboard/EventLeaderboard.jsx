@@ -1,14 +1,12 @@
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Avatar,
   Box,
-  ButtonBase,
-  Divider,
+  Chip,
   Grid,
   Link,
   Paper,
-  Popover,
   Table,
   TableBody,
   TableCell,
@@ -65,9 +63,7 @@ const styles = {
 };
 
 function rankValue(entry) {
-  return typeof entry.cumulativeRanking === "number"
-    ? entry.cumulativeRanking
-    : Number.MAX_SAFE_INTEGER;
+  return typeof entry.cumulativeRanking === "number" ? entry.cumulativeRanking : Number.MAX_SAFE_INTEGER;
 }
 
 function scoreValue(value, eventId) {
@@ -77,10 +73,8 @@ function scoreValue(value, eventId) {
 
 function sortRounds(rounds) {
   return [...rounds].sort((roundA, roundB) => {
-    const orderA =
-      roundA.number ?? roundA.roundNumber ?? Number.MAX_SAFE_INTEGER;
-    const orderB =
-      roundB.number ?? roundB.roundNumber ?? Number.MAX_SAFE_INTEGER;
+    const orderA = roundA.number ?? roundA.roundNumber ?? Number.MAX_SAFE_INTEGER;
+    const orderB = roundB.number ?? roundB.roundNumber ?? Number.MAX_SAFE_INTEGER;
 
     if (orderA !== orderB) return orderA - orderB;
     return String(roundA.id).localeCompare(String(roundB.id));
@@ -92,146 +86,12 @@ function sortLeaderboard(leaderboard) {
     const rankDiff = rankValue(entryA) - rankValue(entryB);
     if (rankDiff !== 0) return rankDiff;
 
-    const scoreA =
-      entryA.overallCumulativeScore === -1
-        ? Number.MAX_SAFE_INTEGER
-        : entryA.overallCumulativeScore;
-    const scoreB =
-      entryB.overallCumulativeScore === -1
-        ? Number.MAX_SAFE_INTEGER
-        : entryB.overallCumulativeScore;
+    const scoreA = entryA.overallCumulativeScore === -1 ? Number.MAX_SAFE_INTEGER : entryA.overallCumulativeScore;
+    const scoreB = entryB.overallCumulativeScore === -1 ? Number.MAX_SAFE_INTEGER : entryB.overallCumulativeScore;
     if (scoreA !== scoreB) return scoreA - scoreB;
 
     return String(entryA.name).localeCompare(String(entryB.name));
   });
-}
-
-function CumulativeScoreCell({ entry, eventId, rounds }) {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  return (
-    <>
-      <ButtonBase
-        onClick={handleOpen}
-        sx={{
-          borderRadius: 0.5,
-          color: "inherit",
-          font: "inherit",
-          fontWeight: 600,
-          px: 0.5,
-          py: 0.25,
-          textAlign: "right",
-          "&:hover": {
-            bgcolor: "action.hover",
-          },
-        }}
-      >
-        {scoreValue(entry.overallCumulativeScore, eventId)}
-      </ButtonBase>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "center", horizontal: "left" }}
-        transformOrigin={{ vertical: "center", horizontal: "right" }}
-        PaperProps={{
-          sx: {
-            p: 1.5,
-            width: 224,
-          },
-        }}
-      >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Typography
-            variant="caption"
-            fontWeight={700}
-            sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}
-          >
-            Score Breakdown
-          </Typography>
-
-          <Divider />
-
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-            {rounds.map((round) => {
-              const roundScore = entry.roundScores?.[round.id];
-              const hasCumulative =
-                roundScore && roundScore.cumulativeScore !== undefined;
-              const cumulativeScore = hasCumulative
-                ? roundScore.cumulativeScore
-                : (roundScore?.average ?? 0);
-              const isMissing = !roundScore || cumulativeScore === 0;
-              const isDnf = cumulativeScore === -1;
-
-              return (
-                <Box
-                  key={round.id}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 1,
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary" noWrap>
-                    {round.name}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color={
-                      isMissing
-                        ? "text.secondary"
-                        : isDnf
-                          ? "error"
-                          : "text.primary"
-                    }
-                    sx={{ flexShrink: 0 }}
-                  >
-                    {isMissing
-                      ? "-"
-                      : formatAttemptResult(cumulativeScore, eventId)}
-                  </Typography>
-                </Box>
-              );
-            })}
-          </Box>
-
-          <Divider />
-
-          {entry.overallCumulativeScore === -1 ? (
-            <Typography variant="caption" color="error">
-              DNF - at least one round has all-invalid attempts
-            </Typography>
-          ) : entry.overallCumulativeScore === 0 ? (
-            <Typography variant="caption" color="text.secondary">
-              No scored attempts yet
-            </Typography>
-          ) : (
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}
-            >
-              <Typography variant="caption" fontWeight={700}>
-                Mean of {entry.roundsAttempted} round
-                {entry.roundsAttempted !== 1 ? "s" : ""}
-              </Typography>
-              <Typography variant="caption" fontWeight={700} color="primary">
-                {formatAttemptResult(entry.overallCumulativeScore, eventId)}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Popover>
-    </>
-  );
 }
 
 function EventLeaderboard() {
@@ -249,14 +109,8 @@ function EventLeaderboard() {
     queryFn: async () => getEventLeaderboard(competitionId, eventId),
   });
 
-  const rounds = useMemo(
-    () => sortRounds(event?.rounds ?? []),
-    [event?.rounds],
-  );
-  const leaderboard = useMemo(
-    () => sortLeaderboard(event?.leaderboard ?? []),
-    [event?.leaderboard],
-  );
+  const rounds = useMemo(() => sortRounds(event?.rounds ?? []), [event?.rounds]);
+  const leaderboard = useMemo(() => sortLeaderboard(event?.leaderboard ?? []), [event?.leaderboard]);
 
   if (isLoading) return <Loading />;
   if (error) return <Error error={error} />;
@@ -265,16 +119,10 @@ function EventLeaderboard() {
   const totalColumns =
     3 + // rank, avatar, name
     (smScreen ? 1 : 0) + // country
-    visibleRounds.length +
     2; // best average, cumulative score
 
   return (
-    <Grid
-      container
-      direction="column"
-      spacing={2}
-      sx={{ width: "100%", maxWidth: "100%" }}
-    >
+    <Grid container direction="column" spacing={2} sx={{ width: "100%", maxWidth: "100%" }}>
       <Grid item container alignItems="center" spacing={1}>
         <Grid item>
           <CubingIcon eventId={event.id} />
@@ -289,40 +137,20 @@ function EventLeaderboard() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{ ...styles.cell, ...styles.ranking }}
-                  align="center"
-                >
+                <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="center">
                   #
                 </TableCell>
                 <TableCell sx={styles.image}> </TableCell>
-                <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                  Name
+                <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
+                {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
+                {smScreen && <TableCell sx={styles.cell}>Division</TableCell>}
+                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                  Rounds
                 </TableCell>
-                {smScreen && (
-                  <TableCell sx={{ ...styles.cell, ...styles.country }}>
-                    Country
-                  </TableCell>
-                )}
-                {visibleRounds.map((round) => (
-                  <TableCell
-                    key={round.id}
-                    sx={{ ...styles.cell, ...styles.roundScore }}
-                    align="right"
-                  >
-                    {round.name}
-                  </TableCell>
-                ))}
-                <TableCell
-                  sx={{ ...styles.cell, ...styles.stat }}
-                  align="right"
-                >
+                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                   Best Avg
                 </TableCell>
-                <TableCell
-                  sx={{ ...styles.cell, ...styles.stat }}
-                  align="right"
-                >
+                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                   Cumulative
                 </TableCell>
               </TableRow>
@@ -330,11 +158,7 @@ function EventLeaderboard() {
             <TableBody>
               {leaderboard.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={totalColumns}
-                    align="center"
-                    sx={{ py: 4 }}
-                  >
+                  <TableCell colSpan={totalColumns} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       No leaderboard entries available
                     </Typography>
@@ -350,13 +174,8 @@ function EventLeaderboard() {
                       "&:last-child td": { border: 0 },
                     }}
                   >
-                    <TableCell
-                      align="center"
-                      sx={{ ...styles.cell, ...styles.ranking }}
-                    >
-                      {typeof entry.cumulativeRanking === "number"
-                        ? entry.cumulativeRanking
-                        : index + 1}
+                    <TableCell align="center" sx={{ ...styles.cell, ...styles.ranking }}>
+                      {typeof entry.cumulativeRanking === "number" ? entry.cumulativeRanking : index + 1}
                     </TableCell>
                     <TableCell sx={styles.image}>
                       <Avatar
@@ -367,11 +186,7 @@ function EventLeaderboard() {
                     </TableCell>
                     <TableCell sx={{ ...styles.cell, ...styles.name }}>
                       {smScreen ? (
-                        <Link
-                          component={RouterLink}
-                          to={`/competitor/${entry.userId}`}
-                          underline="hover"
-                        >
+                        <Link component={RouterLink} to={`/competitor/${entry.userId}`} underline="hover">
                           {entry.name}
                         </Link>
                       ) : (
@@ -382,59 +197,25 @@ function EventLeaderboard() {
                       <TableCell sx={{ ...styles.cell, ...styles.country }}>
                         <Box display="flex" alignItems="center" gap={1}>
                           <FlagIcon code={entry.country?.code?.toLowerCase()} />
-                          <Typography
-                            variant="body2"
-                            sx={{ color: "text.primary" }}
-                            noWrap
-                          >
+                          <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
                             {entry.country?.name ?? "-"}
                           </Typography>
                         </Box>
                       </TableCell>
                     )}
-                    {visibleRounds.map((round) => {
-                      const roundScore = entry.roundScores?.[round.id];
-                      return (
-                        <TableCell
-                          key={round.id}
-                          sx={{ ...styles.cell, ...styles.roundScore }}
-                          align="right"
-                        >
-                          <Typography
-                            variant="body2"
-                            component="span"
-                            fontWeight={600}
-                          >
-                            {scoreValue(roundScore?.cumulativeScore, event.id)}
-                          </Typography>
-                          {typeof roundScore?.ranking === "number" && (
-                            <Typography
-                              variant="caption"
-                              component="span"
-                              color="text.secondary"
-                              sx={{ ml: 0.75 }}
-                            >
-                              #{roundScore.ranking}
-                            </Typography>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                    <TableCell
-                      sx={{ ...styles.cell, ...styles.stat }}
-                      align="right"
-                    >
+                    {smScreen && (
+                      <TableCell sx={styles.cell}>
+                        {entry.registeredDivision ? <Chip label={entry.registeredDivision} size="small" /> : "-"}
+                      </TableCell>
+                    )}
+                    <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                      <Chip label={` ${entry.roundsAttempted}/3`} size="small" />
+                    </TableCell>
+                    <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                       {scoreValue(entry.bestAverage, event.id)}
                     </TableCell>
-                    <TableCell
-                      sx={{ ...styles.cell, ...styles.stat }}
-                      align="right"
-                    >
-                      <CumulativeScoreCell
-                        entry={entry}
-                        eventId={event.id}
-                        rounds={rounds}
-                      />
+                    <TableCell sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }} align="right">
+                      {scoreValue(entry.overallCumulativeScore, event.id)}
                     </TableCell>
                   </TableRow>
                 ))
