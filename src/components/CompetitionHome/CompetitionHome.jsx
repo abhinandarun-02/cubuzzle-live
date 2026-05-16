@@ -1,16 +1,35 @@
-import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import { Card, CardActionArea, CardContent, CardHeader, Grid, Typography, Box, Chip, Container } from "@mui/material";
-import { CalendarToday as CalendarIcon, EmojiEvents as TrophyIcon } from "@mui/icons-material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  Chip,
+  Container,
+  Grid,
+  Stack,
+  Typography,
+} from "@mui/material";
+import {
+  CalendarToday as CalendarIcon,
+  EmojiEvents as TrophyIcon,
+  Groups as GroupsIcon,
+  LiveTv as LiveTvIcon,
+  Public as PublicIcon,
+  Videocam as VideocamIcon,
+  WorkspacePremium as MedalIcon,
+} from "@mui/icons-material";
 import { keyframes } from "@mui/system";
-import CubingIcon from "../CubingIcon/CubingIcon";
-import { flatMap } from "../../lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
-import Loading from "../Loading/Loading";
-import Error from "../Error/Error";
 
-// Define pulse animation
+import CubingIcon from "../CubingIcon/CubingIcon";
+import Error from "../Error/Error";
+import Loading from "../Loading/Loading";
+import { getCompetitionDetailsById } from "../../lib/firebase/firestore";
+import { flatMap } from "../../lib/utils";
+
 const pulse = keyframes`
   0% {
     opacity: 1;
@@ -31,6 +50,11 @@ const styles = {
     mb: 4,
     textAlign: "center",
   },
+  logoWrap: {
+    display: "flex",
+    justifyContent: "center",
+    mb: 3,
+  },
   card: {
     mb: 3,
   },
@@ -42,14 +66,18 @@ const styles = {
   roundCard: {
     position: "relative",
     overflow: "hidden",
-    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.900" : "grey.50"),
-    borderColor: (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.300"),
-    borderWidth: 2,
+    height: "100%",
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.900" : "grey.50",
+    borderColor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.700" : "grey.300",
     transition: "all 0.2s ease-in-out",
     "&:hover": {
       transform: "translateY(-2px)",
       boxShadow: (theme) =>
-        theme.palette.mode === "dark" ? "0 4px 12px rgba(255, 255, 255, 0.1)" : "0 4px 12px rgba(0, 0, 0, 0.1)",
+        theme.palette.mode === "dark"
+          ? "0 4px 12px rgba(255, 255, 255, 0.1)"
+          : "0 4px 12px rgba(0, 0, 0, 0.1)",
     },
   },
   roundCardContent: {
@@ -62,7 +90,8 @@ const styles = {
     left: 0,
     right: 0,
     height: 3,
-    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.400" : "grey.600",
   },
   liveIndicatorDot: {
     position: "absolute",
@@ -71,30 +100,27 @@ const styles = {
     width: 8,
     height: 8,
     borderRadius: "50%",
-    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.400" : "grey.600",
     animation: `${pulse} 2s ease-in-out infinite`,
   },
   liveDotHeader: {
     width: 8,
     height: 8,
     borderRadius: "50%",
-    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.400" : "grey.600"),
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.400" : "grey.600",
     animation: `${pulse} 2s ease-in-out infinite`,
   },
-  roundTitle: {
-    mb: 1,
-  },
-  roundDates: (isLive) => ({
-    fontWeight: isLive ? 500 : 400,
-  }),
   liveChip: {
-    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.200"),
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.700" : "grey.200",
     color: (theme) => (theme.palette.mode === "dark" ? "grey.300" : "grey.700"),
     fontWeight: "medium",
     border: "none",
     mt: 2,
   },
-  upcomingChip: {
+  statusChip: {
     mt: 2,
     borderColor: "divider",
     color: "text.secondary",
@@ -111,6 +137,10 @@ const styles = {
   },
 };
 
+const events = ["3x3x3", "3x3x3 One-Handed", "Megaminx"];
+const divisions = ["A+", "A", "B", "C", "D"];
+const platforms = ["Zoom", "Google Meet", "Instagram Live"];
+
 function CompetitionHome() {
   const competitionId = "cubuzzle-s4";
 
@@ -120,7 +150,6 @@ function CompetitionHome() {
   const location = useLocation();
 
   const scrollToSection = (status) => {
-    // Only scroll on large screens (sm breakpoint is 600px)
     if (window.innerWidth >= 600) {
       return;
     }
@@ -131,16 +160,15 @@ function CompetitionHome() {
     try {
       navigate(`${location.pathname}#${hashName}`);
     } catch (e) {
-      // fallback
       window.location.hash = hashName;
     }
 
     if (targetRef.current) {
       const el = targetRef.current;
-      const APP_BAR_OFFSET = 64;
+      const appBarOffset = 64;
       const rect = el.getBoundingClientRect();
       const absoluteTop = rect.top + window.pageYOffset;
-      const target = Math.max(0, absoluteTop - APP_BAR_OFFSET - 8); // small padding
+      const target = Math.max(0, absoluteTop - appBarOffset - 8);
       window.scrollTo({ top: target, behavior: "smooth" });
     }
   };
@@ -163,31 +191,31 @@ function CompetitionHome() {
   }
 
   const finished = flatMap(details.competitionEvents, (competitionEvent) =>
-    competitionEvent.rounds.filter((round) => round.finished).map((round) => [competitionEvent, round])
+    competitionEvent.rounds
+      .filter((round) => round.finished)
+      .map((round) => [competitionEvent, round]),
   );
 
   const live = flatMap(details.competitionEvents, (competitionEvent) =>
-    competitionEvent.rounds.filter((round) => round.active && !round.finished).map((round) => [competitionEvent, round])
+    competitionEvent.rounds
+      .filter((round) => round.active && !round.finished)
+      .map((round) => [competitionEvent, round]),
   );
 
-  // Competition information
   const rounds = [
-    { name: "Round 1", dates: "17-19 Oct", status: "completed" },
-    { name: "Semi-Finals", dates: "24-26 Oct", status: "completed" },
-    { name: "Finals", dates: "31 Oct - 2 Nov", status: "completed" },
+    { name: "Qualifier 1", dates: "May 2026", status: "live" },
+    {
+      name: "Qualifier 2",
+      dates: "June 2026",
+      status: "upcoming",
+    },
+    { name: "Grand Finale", dates: "July 2026", status: "upcoming" },
   ];
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
-      {/* Header */}
       <Box sx={styles.header}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mb: 3,
-          }}
-        >
+        <Box sx={styles.logoWrap}>
           <img
             src="/ccl-logo.png"
             alt="Cubuzzle Champion League"
@@ -200,14 +228,13 @@ function CompetitionHome() {
           />
         </Box>
         <Typography variant="h4" component="h1" gutterBottom>
-          Cubuzzle Champion League - Season 2
+          Cubuzzle Champion League - Season 4
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
-          October Challenge 2025 • Live Results & Rankings
+          Summer Championship 2026 • The Ultimate Speedcubing Battle
         </Typography>
       </Box>
 
-      {/* Current Round Status */}
       <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
@@ -215,21 +242,17 @@ function CompetitionHome() {
             Tournament Progress
           </Typography>
           <Grid container spacing={2}>
-            {rounds.map((round, index) => (
-              <Grid item xs={12} sm={4} key={index}>
+            {rounds.map((round) => (
+              <Grid item xs={12} sm={4} key={round.name}>
                 <Card
                   variant="outlined"
-                  onClick={round.status === "live" || round.status === "completed" ? () => scrollToSection(round.status) : undefined}
+                  onClick={
+                    round.status === "live" || round.status === "completed"
+                      ? () => scrollToSection(round.status)
+                      : undefined
+                  }
                   sx={{
                     ...styles.roundCard,
-                    bgcolor:
-                      round.status === "live"
-                        ? (theme) => (theme.palette.mode === "dark" ? "grey.900" : "grey.50")
-                        : "background.paper",
-                    borderColor:
-                      round.status === "live"
-                        ? (theme) => (theme.palette.mode === "dark" ? "grey.700" : "grey.300")
-                        : "divider",
                     borderWidth: round.status === "live" ? 2 : 1,
                   }}
                 >
@@ -240,18 +263,34 @@ function CompetitionHome() {
                         <Box sx={styles.liveIndicatorDot} />
                       </>
                     )}
-                    <Typography variant="subtitle1" fontWeight="600" sx={styles.roundTitle}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="600"
+                      gutterBottom
+                    >
                       {round.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={styles.roundDates(round.status === "live")}>
+                    <Typography variant="body2" color="text.secondary">
                       {round.dates}
                     </Typography>
-                    {round.status === "live" && <Chip label="● LIVE" size="small" sx={styles.liveChip} />}
+                    {round.status === "live" && (
+                      <Chip label="Live" size="small" sx={styles.liveChip} />
+                    )}
                     {round.status === "upcoming" && (
-                      <Chip label="Upcoming" size="small" variant="outlined" sx={styles.upcomingChip} />
+                      <Chip
+                        label="Upcoming"
+                        size="small"
+                        variant="outlined"
+                        sx={styles.statusChip}
+                      />
                     )}
                     {round.status === "completed" && (
-                      <Chip label="Completed" size="small" variant="outlined" sx={styles.upcomingChip} />
+                      <Chip
+                        label="Completed"
+                        size="small"
+                        variant="outlined"
+                        sx={styles.statusChip}
+                      />
                     )}
                   </CardContent>
                 </Card>
@@ -261,50 +300,95 @@ function CompetitionHome() {
         </CardContent>
       </Card>
 
-      {/* Events */}
       <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Events
           </Typography>
           <Grid container spacing={1}>
-            <Grid item>
-              <Chip label="2x2x2" variant="outlined" />
-            </Grid>
-            <Grid item>
-              <Chip label="3x3x3" variant="outlined" />
-            </Grid>
-            <Grid item>
-              <Chip label="Pyraminx" variant="outlined" />
-            </Grid>
+            {events.map((event) => (
+              <Grid item key={event}>
+                <Chip label={event} variant="outlined" />
+              </Grid>
+            ))}
           </Grid>
         </CardContent>
       </Card>
 
-      {/* Competition Info */}
       <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Competition Details
           </Typography>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Location
-              </Typography>
-              <Typography variant="body1">Cubuzzle Lounge, Dubai</Typography>
+            <Grid item xs={12} sm={6} md={3}>
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <CalendarIcon color="action" />
+                <Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Dates
+                  </Typography>
+                  <Typography variant="body1">May - July 2026</Typography>
+                </Box>
+              </Stack>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Participation
-              </Typography>
-              <Typography variant="body1">On-site & Online</Typography>
+            <Grid item xs={12} sm={6} md={3}>
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <PublicIcon color="action" />
+                <Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Format
+                  </Typography>
+                  <Typography variant="body1">
+                    Online global competition
+                  </Typography>
+                </Box>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <GroupsIcon color="action" />
+                <Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Qualifier
+                  </Typography>
+                  <Typography variant="body1">Ao3 → Ao6 → Ao9</Typography>
+                </Box>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <TrophyIcon color="action" />
+                <Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Finale
+                  </Typography>
+                  <Typography variant="body1">
+                    Grand finale championship
+                  </Typography>
+                </Box>
+              </Stack>
             </Grid>
           </Grid>
         </CardContent>
       </Card>
 
-      {/* Live Sessions Section */}
       {live.length > 0 && (
         <Card sx={styles.card} ref={liveSectionRef} id="live-sessions">
           <CardContent>
@@ -314,10 +398,18 @@ function CompetitionHome() {
             </Typography>
             <Grid container spacing={2}>
               {live.map(([competitionEvent, round]) => (
-                <Grid item key={`${round.id}-${competitionEvent.id}-live`} xs={12} sm={6} md={4}>
+                <Grid
+                  item
+                  key={`${round.id}-${competitionEvent.id}-live`}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                >
                   <Card variant="outlined">
-                    <Box />
-                    <CardActionArea component={RouterLink} to={`/events/${competitionEvent.id}/rounds/${round.id}`}>
+                    <CardActionArea
+                      component={RouterLink}
+                      to={`/events/${competitionEvent.id}/rounds/${round.id}`}
+                    >
                       <CardHeader
                         avatar={<CubingIcon eventId={competitionEvent.id} />}
                         title={competitionEvent.name}
@@ -334,7 +426,6 @@ function CompetitionHome() {
         </Card>
       )}
 
-      {/* Results Section */}
       {finished.length > 0 && (
         <Card sx={styles.card} ref={resultsSectionRef} id="latest-results">
           <CardContent>
@@ -344,9 +435,18 @@ function CompetitionHome() {
             </Typography>
             <Grid container spacing={2}>
               {finished.map(([competitionEvent, round]) => (
-                <Grid item key={`${round.id}-${competitionEvent.id}`} xs={12} sm={6} md={4}>
+                <Grid
+                  item
+                  key={`${round.id}-${competitionEvent.id}`}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                >
                   <Card variant="outlined">
-                    <CardActionArea component={RouterLink} to={`/events/${competitionEvent.id}/rounds/${round.id}`}>
+                    <CardActionArea
+                      component={RouterLink}
+                      to={`/events/${competitionEvent.id}/rounds/${round.id}`}
+                    >
                       <CardHeader
                         avatar={<CubingIcon eventId={competitionEvent.id} />}
                         title={competitionEvent.name}
@@ -363,7 +463,6 @@ function CompetitionHome() {
         </Card>
       )}
 
-      {/* No Sessions/Results Message */}
       {live.length === 0 && finished.length === 0 && (
         <Card>
           <CardContent sx={styles.noSessionsContainer}>
