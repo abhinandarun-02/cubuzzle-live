@@ -16,10 +16,8 @@ import {
   CalendarToday as CalendarIcon,
   EmojiEvents as TrophyIcon,
   Groups as GroupsIcon,
-  LiveTv as LiveTvIcon,
+  Leaderboard as LeaderboardIcon,
   Public as PublicIcon,
-  Videocam as VideocamIcon,
-  WorkspacePremium as MedalIcon,
 } from "@mui/icons-material";
 import { keyframes } from "@mui/system";
 import { useQuery } from "@tanstack/react-query";
@@ -135,11 +133,41 @@ const styles = {
     color: "text.secondary",
     mb: 2,
   },
+  leaderboardCard: {
+    height: "100%",
+    borderColor: "divider",
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow: (theme) =>
+        theme.palette.mode === "dark"
+          ? "0 4px 12px rgba(255, 255, 255, 0.08)"
+          : "0 4px 12px rgba(0, 0, 0, 0.08)",
+    },
+  },
+  leaderboardAction: {
+    height: "100%",
+  },
+  leaderboardContent: {
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+  },
+  leaderboardIconWrap: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+  },
 };
 
 const events = ["3x3x3", "3x3x3 One-Handed", "Megaminx"];
-const divisions = ["A+", "A", "B", "C", "D"];
-const platforms = ["Zoom", "Google Meet", "Instagram Live"];
 
 function CompetitionHome() {
   const competitionId = "cubuzzle-s4";
@@ -302,13 +330,34 @@ function CompetitionHome() {
 
       <Card sx={styles.card}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Events
+          <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
+            <LeaderboardIcon />
+            Event Leaderboards
           </Typography>
-          <Grid container spacing={1}>
-            {events.map((event) => (
-              <Grid item key={event}>
-                <Chip label={event} variant="outlined" />
+          <Grid container spacing={2}>
+            {details.competitionEvents.map((competitionEvent) => (
+              <Grid item xs={12} sm={6} md={4} key={competitionEvent.id}>
+                <Card variant="outlined" sx={styles.leaderboardCard}>
+                  <CardActionArea
+                    component={RouterLink}
+                    to={`/events/${competitionEvent.id}/leaderboard`}
+                    sx={styles.leaderboardAction}
+                  >
+                    <CardContent sx={styles.leaderboardContent}>
+                      <Box sx={styles.leaderboardIconWrap}>
+                        <CubingIcon eventId={competitionEvent.id} />
+                      </Box>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="subtitle1" fontWeight="600" noWrap>
+                          {competitionEvent.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          View leaderboard
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
               </Grid>
             ))}
           </Grid>
