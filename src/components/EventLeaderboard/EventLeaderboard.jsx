@@ -277,9 +277,10 @@ function EventLeaderboard() {
 
   const visibleRounds = mdScreen ? rounds : [];
   const totalColumns =
-    3 + // rank, avatar, name
+    4 + // rank, avatar, name, rounds
     (smScreen ? 2 : 0) + // country, division
-    3; // rounds, best average, cumulative score
+    (mdScreen ? 1 : 0) + // best average
+    1; // cumulative score
 
   return (
     <Grid container direction="column" spacing={2} sx={{ width: "100%", maxWidth: "100%" }}>
@@ -307,9 +308,11 @@ function EventLeaderboard() {
                 <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                   Rounds
                 </TableCell>
-                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                  Best Avg
-                </TableCell>
+                {mdScreen && (
+                  <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                    Best Avg
+                  </TableCell>
+                )}
                 <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                   Cumulative
                 </TableCell>
@@ -371,9 +374,11 @@ function EventLeaderboard() {
                     <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
                       <Chip label={` ${entry.roundsAttempted}/3`} size="small" />
                     </TableCell>
-                    <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                      {scoreValue(entry.bestAverage, event.id)}
-                    </TableCell>
+                    {mdScreen && (
+                      <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                        {scoreValue(entry.bestAverage, event.id)}
+                      </TableCell>
+                    )}
                     <TableCell
                       sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }}
                       align="right"
