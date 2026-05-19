@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { green, red } from "@mui/material/colors";
-import { formatCellValue } from "../../lib/attempt-result";
+import { formatAttemptResult, formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats } from "../../lib/result";
 import { withImageWidth } from "../../lib/utils";
 import RecordTagBadge from "../RecordTagBadge/RecordTagBadge";
@@ -75,6 +75,17 @@ const renderDivisionChangeIcon = (divisionChange) => {
   return null;
 };
 
+function resultScore(result) {
+  return result?.cumulativeScore ?? result?.score;
+}
+
+function formatScore(result, eventId) {
+  const score = resultScore(result);
+  if (typeof score !== "number") return "-";
+  if (score === 0) return "-";
+  return formatAttemptResult(score, eventId);
+}
+
 function RoundResultDialog({
   result,
   format,
@@ -86,6 +97,7 @@ function RoundResultDialog({
 }) {
   const stats = orderedResultStats(eventId, format, forecastView, advancementCondition);
   const imageUrlWithWidth = withImageWidth(result?.imageUrl, 100);
+  const hasScore = typeof resultScore(result) === "number";
 
   return (
     <Dialog open={!!result} fullWidth={true} onClose={onClose}>
@@ -144,6 +156,12 @@ function RoundResultDialog({
                       {renderDivisionChangeIcon(result.divisionChange)}
                     </Box>
                   </Typography>
+                </Grid>
+              )}
+              {hasScore && (
+                <Grid item>
+                  <Typography variant="subtitle2">Score</Typography>
+                  <Typography variant="body2">{formatScore(result, eventId)}</Typography>
                 </Grid>
               )}
               {result.ranking && (

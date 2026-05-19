@@ -17,7 +17,7 @@ import {
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { yellow, green, red } from "@mui/material/colors";
 import { times } from "../../lib/utils";
-import { formatCellValue } from "../../lib/attempt-result";
+import { formatAttemptResult, formatCellValue } from "../../lib/attempt-result";
 import { orderedResultStats, paddedAttemptResults } from "../../lib/result";
 import ResultStat from "../ResultStat/ResultStat";
 import { withImageWidth } from "../../lib/utils";
@@ -57,6 +57,9 @@ const styles = {
   result: {
     width: { xl: 100 },
     maxWidth: { xl: 100 },
+  },
+  score: {
+    minWidth: 96,
   },
   advancing: {
     color: (theme) => theme.palette.getContrastText(green["A400"]),
@@ -149,8 +152,20 @@ const renderDivisionChangeIcon = (divisionChange) => {
   return null;
 };
 
+function resultScore(result) {
+  return result.cumulativeScore ?? result.score;
+}
+
+function formatScore(result, eventId) {
+  const score = resultScore(result);
+  if (typeof score !== "number") return "-";
+  if (score === 0) return "-";
+  return formatAttemptResult(score, eventId);
+}
+
 const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forecastView, isDivisionBased = false }) => {
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
+  const showScoreColumn = results?.some((result) => typeof resultScore(result) === "number");
 
   const stats = orderedResultStats(
     eventId,
@@ -166,6 +181,7 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
     (smScreen ? 1 : 0) + // Category column
     (smScreen ? format.numberOfAttempts : 0) + // Attempt columns
     stats.length + // Stat columns
+    (showScoreColumn ? 1 : 0) + // Score column
     (isDivisionBased ? 1 : 0); // Div Rank column
 
   return (
@@ -192,6 +208,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                 {name}
               </TableCell>
             ))}
+            {showScoreColumn && (
+              <TableCell sx={{ ...styles.cell, ...styles.score }} align="right">
+                Score
+              </TableCell>
+            )}
             {isDivisionBased && (
               <TableCell sx={{ ...styles.cell, ...styles.divRank }} align="center">{smScreen ? "Div Rank" : "Div #"}</TableCell>
             )}
@@ -300,6 +321,11 @@ const RoundResultsTable = memo(({ results, format, eventId, onResultClick, forec
                     <ResultStat result={result} field={field} eventId={eventId} forecastView={forecastView} />
                   </TableCell>
                 ))}
+                {showScoreColumn && (
+                  <TableCell align="right" sx={{ ...styles.cell, ...styles.score, fontWeight: 600 }}>
+                    {formatScore(result, eventId)}
+                  </TableCell>
+                )}
                 {isDivisionBased && (
                   <TableCell align="center" sx={{ ...styles.cell, ...styles.divRank }}>
                     {index + 1}
