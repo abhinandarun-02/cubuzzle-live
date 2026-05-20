@@ -27,7 +27,7 @@ import FlagIcon from "../FlagIcon/FlagIcon";
 import Loading from "../Loading/Loading";
 import { formatAttemptResult } from "../../lib/attempt-result";
 import { getEventLeaderboard } from "../../lib/firebase/firestore";
-import { withImageWidth } from "../../lib/utils";
+import { splitResultsByDivision, withImageWidth } from "../../lib/utils";
 
 const styles = {
   cell: {
@@ -83,6 +83,10 @@ function cumulativeRoundScore(roundScore) {
 
 function roundScoreText(value, eventId) {
   return value === 0 ? "-" : formatAttemptResult(value, eventId);
+}
+
+function entryDivision(entry, isDivisionBased) {
+  return isDivisionBased ? entry.calculatedDivision : entry.registeredDivision;
 }
 
 function sortRounds(rounds) {
@@ -271,11 +275,23 @@ function EventLeaderboard() {
 
   const rounds = useMemo(() => sortRounds(event?.rounds ?? []), [event?.rounds]);
   const leaderboard = useMemo(() => sortLeaderboard(event?.leaderboard ?? []), [event?.leaderboard]);
+  const isDivisionBased = event?.divisionBased === true || event?.id === "333";
+  const divisionLeaderboard = useMemo(() => {
+    if (isDivisionBased && leaderboard.length > 0) {
+      return splitResultsByDivision(leaderboard);
+    } else {
+      return [
+        {
+          name: "All",
+          results: leaderboard,
+        },
+      ];
+    }
+  }, [leaderboard, isDivisionBased]);
 
   if (isLoading) return <Loading />;
   if (error) return <Error error={error} />;
 
-  const visibleRounds = mdScreen ? rounds : [];
   const totalColumns =
     4 + // rank, avatar, name, rounds
     (smScreen ? 2 : 0) + // country, division
@@ -293,109 +309,126 @@ function EventLeaderboard() {
         </Grid>
       </Grid>
 
-      <Grid item sx={{ width: "100%", maxWidth: "100%", overflow: "hidden" }}>
-        <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="center">
-                  #
-                </TableCell>
-                <TableCell sx={styles.image}> </TableCell>
-                <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
-                {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
-                {smScreen && <TableCell sx={styles.cell}>Division</TableCell>}
-                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                  Rounds
-                </TableCell>
-                {mdScreen && (
-                  <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                    Best Avg
-                  </TableCell>
-                )}
-                <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                  Cumulative
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {leaderboard.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={totalColumns} align="center" sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No leaderboard entries available
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                leaderboard.map((entry, index) => (
-                  <TableRow
-                    key={entry.userId || entry.id}
-                    hover
-                    sx={{
-                      whiteSpace: "nowrap",
-                      "&:last-child td": { border: 0 },
-                    }}
-                  >
-                    <TableCell align="center" sx={{ ...styles.cell, ...styles.ranking }}>
-                      {typeof entry.cumulativeRanking === "number" ? entry.cumulativeRanking : index + 1}
+      {divisionLeaderboard.map((division) => {
+        const divisionIsUnknown = division.name === "Unknown";
+        const divisionLabel = divisionIsUnknown ? "DNF/DNS" : `Division ${division.name}`;
+        const timeLabel = !divisionIsUnknown && division.time ? ` (${division.time})` : "";
+        return (
+          <Grid item key={division.name} sx={{ width: "100%", maxWidth: "100%", overflow: "hidden" }}>
+            {isDivisionBased && divisionLeaderboard.length > 1 && division.name !== "All" && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" component="h3">
+                  {divisionLabel}
+                  <Typography variant="subtitle1" color="textSecondary" component="span">
+                    {timeLabel}
+                  </Typography>
+                </Typography>
+              </Box>
+            )}
+            <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ ...styles.cell, ...styles.ranking }} align="center">
+                      #
                     </TableCell>
-                    <TableCell sx={styles.image}>
-                      <Avatar
-                        src={withImageWidth(entry.imageUrl, 96)}
-                        alt={entry.name}
-                        sx={{ width: 32, height: 32, fontSize: "2.25rem" }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ ...styles.cell, ...styles.name }}>
-                      {smScreen ? (
-                        <Link component={RouterLink} to={`/competitor/${entry.userId}`} underline="hover">
-                          {entry.name}
-                        </Link>
-                      ) : (
-                        entry.name
-                      )}
-                    </TableCell>
-                    {smScreen && (
-                      <TableCell sx={{ ...styles.cell, ...styles.country }}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <FlagIcon code={entry.country?.code?.toLowerCase()} />
-                          <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
-                            {entry.country?.name ?? "-"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                    )}
-                    {smScreen && (
-                      <TableCell sx={styles.cell}>
-                        {entry.registeredDivision ? <Chip label={entry.registeredDivision} size="small" /> : "-"}
-                      </TableCell>
-                    )}
+                    <TableCell sx={styles.image}> </TableCell>
+                    <TableCell sx={{ ...styles.cell, ...styles.name }}>Name</TableCell>
+                    {smScreen && <TableCell sx={{ ...styles.cell, ...styles.country }}>Country</TableCell>}
+                    {smScreen && <TableCell sx={styles.cell}>Division</TableCell>}
                     <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                      <Chip label={` ${entry.roundsAttempted}/3`} size="small" />
+                      Rounds
                     </TableCell>
                     {mdScreen && (
                       <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
-                        {scoreValue(entry.bestAverage, event.id)}
+                        Best Avg
                       </TableCell>
                     )}
-                    <TableCell
-                      sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }}
-                      align="right"
-                    >
-                      <CumulativeScoreCell
-                        entry={entry}
-                        eventId={event.id}
-                        rounds={rounds}
-                      />
+                    <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                      Cumulative
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
+                </TableHead>
+                <TableBody>
+                  {division.results.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={totalColumns} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          No leaderboard entries available
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    division.results.map((entry, index) => (
+                      <TableRow
+                        key={entry.userId || entry.id}
+                        hover
+                        sx={{
+                          whiteSpace: "nowrap",
+                          "&:last-child td": { border: 0 },
+                        }}
+                      >
+                        <TableCell align="center" sx={{ ...styles.cell, ...styles.ranking }}>
+                          {typeof entry.cumulativeRanking === "number" ? entry.cumulativeRanking : index + 1}
+                        </TableCell>
+                        <TableCell sx={styles.image}>
+                          <Avatar
+                            src={withImageWidth(entry.imageUrl, 96)}
+                            alt={entry.name}
+                            sx={{ width: 32, height: 32, fontSize: "2.25rem" }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ ...styles.cell, ...styles.name }}>
+                          {smScreen ? (
+                            <Link component={RouterLink} to={`/competitor/${entry.userId}`} underline="hover">
+                              {entry.name}
+                            </Link>
+                          ) : (
+                            entry.name
+                          )}
+                        </TableCell>
+                        {smScreen && (
+                          <TableCell sx={{ ...styles.cell, ...styles.country }}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <FlagIcon code={entry.country?.code?.toLowerCase()} />
+                              <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
+                                {entry.country?.name ?? "-"}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                        )}
+                        {smScreen && (
+                          <TableCell sx={styles.cell}>
+                            {entryDivision(entry, isDivisionBased) ? <Chip label={entryDivision(entry, isDivisionBased)} size="small" /> : "-"}
+                          </TableCell>
+                        )}
+                        <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                          <Chip label={` ${entry.roundsAttempted}/3`} size="small" />
+                        </TableCell>
+                        {mdScreen && (
+                          <TableCell sx={{ ...styles.cell, ...styles.stat }} align="right">
+                            {scoreValue(entry.bestAverage, event.id)}
+                          </TableCell>
+                        )}
+                        <TableCell
+                          sx={{ ...styles.cell, ...styles.stat, fontWeight: 600 }}
+                          align="right"
+                        >
+                          <CumulativeScoreCell
+                            entry={entry}
+                            eventId={event.id}
+                            rounds={rounds}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 }
