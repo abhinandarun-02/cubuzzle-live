@@ -43,7 +43,7 @@ function CompetitionEventList({ competitionEvents }) {
                 component={RouterLink}
                 to={`/events/${competitionEvent.id}/leaderboard`}
               >
-                <ListItemText primary="Leaderboard" />
+                <ListItemText primary="Qualifier Leaderboard" />
               </ListItemButton>
               {competitionEvent.rounds.map((round) => (
                 <ListItemButton

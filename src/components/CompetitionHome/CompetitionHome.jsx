@@ -231,9 +231,14 @@ function CompetitionHome() {
   );
 
   const rounds = [
-    { name: "Qualifier 1", dates: "May 2026", status: "live" },
+    { name: "Qualifier - Round 1", dates: "May 2026", status: "live" },
     {
-      name: "Qualifier 2",
+      name: "Qualifier - Round 2",
+      dates: "June 2026",
+      status: "upcoming",
+    },
+    {
+      name: "Qualifier - Round 3",
       dates: "June 2026",
       status: "upcoming",
     },
