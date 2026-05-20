@@ -337,7 +337,7 @@ function CompetitionHome() {
         <CardContent>
           <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
             <LeaderboardIcon />
-            Event Leaderboards
+             Leaderboards - Qualifiers
           </Typography>
           <Grid container spacing={2}>
             {details.competitionEvents.map((competitionEvent) => (
