@@ -28,7 +28,7 @@ function App() {
                   <Navigation />
                 </ConfirmProvider>
               </SnackbarProvider>
-              <ReactQueryDevtools initialIsOpen={false} />
+              {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
             </ThemeProvider>
           </StyledEngineProvider>
           <Analytics />
