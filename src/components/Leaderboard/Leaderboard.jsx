@@ -222,11 +222,12 @@ function Leaderboard() {
   // Filter logic
   const filteredEntries =
     leaderboardData?.filter((entry) => {
-      // Search filter
+      // Search filter (guard against undefined values)
+      const query = debouncedSearchQuery?.toLowerCase() || "";
       const matchesSearch =
-        !debouncedSearchQuery ||
-        entry.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        entry.profile?.country?.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+        !query ||
+        (entry.name || "").toLowerCase().includes(query) ||
+        (entry.profile?.country?.name || "").toLowerCase().includes(query);
 
       // Category filter
       const matchesCategory = categoryFilter === "all" || entry.profile?.category === categoryFilter;
