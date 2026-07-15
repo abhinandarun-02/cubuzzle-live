@@ -89,9 +89,8 @@ export const getCompetitorsByCompetition = async (competitionId) => {
   }
 };
 
-// Fetch competitor document and all results across events/rounds for that competitor
-export const getCompetitorWithResults = async (competitionId, competitorId) => {
-
+// Fetch competitor document and all scored results across competitions/events/rounds.
+export const getCompetitorWithResults = async (competitorId) => {
   try {
     // competitor document
     const competitorRef = doc(db, "users", competitorId);
@@ -101,7 +100,7 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
     }
     const competitor = { id: competitorSnap.id, ...competitorSnap.data() };
 
-    // Use collectionGroup to fetch all result documents matching the competitorId across all competitions
+    // Use collectionGroup to fetch all result documents matching the competitorId across all competitions.
     const resultsGroupRef = collectionGroup(db, "results");
     const resultsQuery = query(
       resultsGroupRef,
@@ -111,18 +110,29 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
     const resSnap = await getDocs(resultsQuery);
 
 
-    // Map results and attach eventId
+    // Map results and attach IDs from:
+    // competitions/{competitionId}/events/{eventId}/rounds/{roundId}/results/{resultId}
     const results = resSnap.docs.map((r) => {
+      let compId = null;
       let eventId = null;
+      let roundId = null;
       try {
-        const maybeEventDoc = r.ref.parent?.parent?.parent?.parent;
+        const roundDoc = r.ref.parent?.parent;
+        const maybeEventDoc = roundDoc?.parent?.parent;
+        const maybeCompetitionDoc = maybeEventDoc?.parent?.parent;
+        if (maybeCompetitionDoc?.id) {
+          compId = maybeCompetitionDoc.id;
+        }
         if (maybeEventDoc?.id) {
           eventId = maybeEventDoc.id;
+        }
+        if (roundDoc?.id) {
+          roundId = roundDoc.id;
         }
       } catch (e) {
         // ignore if structure unexpected
       }
-      return { id: r.id, eventId, ...r.data() };
+      return { id: r.id, compId, eventId, roundId, ...r.data() };
     });
 
     // Attach a deduplicated list of eventIds the competitor appears in

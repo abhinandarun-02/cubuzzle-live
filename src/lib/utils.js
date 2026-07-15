@@ -175,6 +175,8 @@ export function getCompetitionDisplayName(competitionId) {
     cubuzzle2024: "Season 1",
     cubuzzle2025: "Season 2",
     "cubuzzle-s3": "Season 3",
+    'cubuzzle-s4': "Season 4 Qualifiers",
+    'cubicle-s4-finals': "Season 4 Finals",
   };
   return competitionNames[competitionId] || competitionId;
 }

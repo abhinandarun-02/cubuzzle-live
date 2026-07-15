@@ -12,13 +12,6 @@ function Error({ error = null }) {
           <Typography variant="h5">Oh dear!</Typography>
         </Grid>
         <Grid item>
-          <Box
-            component="img"
-            src={errorImage}
-            height={300}
-            alt="error"
-            sx={{ maxWidth: "100%" }}
-          />
         </Grid>
         <Grid item>
           <Typography variant="subtitle1">{message}</Typography>

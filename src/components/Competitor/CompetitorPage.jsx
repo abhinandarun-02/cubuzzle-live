@@ -10,11 +10,9 @@ import CompetitorInfo from "./CompetitorInfo";
 export default function CompetitorPage() {
   const { competitorId } = useParams();
 
-  const competitionId = "cubuzzle2025"; // assumption: single competition id used elsewhere
-
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["competitor", competitionId, competitorId, "withResults"],
-    queryFn: async () => getCompetitorWithResults(competitionId, competitorId),
+    queryKey: ["competitor", competitorId, "withResults"],
+    queryFn: async () => getCompetitorWithResults(competitorId),
   });
 
   if (isLoading) return <Loading />;
@@ -25,7 +23,7 @@ export default function CompetitorPage() {
   return (
     <Box>
       <CompetitorInfo competitor={competitor} />
-      <CompetitorResults results={results} competitionId={competitionId} />
+      <CompetitorResults results={results} />
     </Box>
   );
 }
