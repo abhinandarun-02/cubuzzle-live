@@ -126,12 +126,16 @@ const EVENTS = [
   { id: "444", name: "4x4x4 Cube", divisionBased: false },
   { id: "pyram", name: "Pyraminx", divisionBased: false },
   { id: "skewb", name: "Skewb", divisionBased: false },
+  {id: "minx", name: "Megaminx", divisionBased: false},
+  {id: "333oh", name: "3x3x3 One-Handed", divisionBased: false},
 ];
 
 const EXTERNAL_LEADERBOARDS = [
-  { name: "Cubuzzle Champion League - Season 1", url: "https://ccl-season1-live.vercel.app/" },
-  { name: "Cubuzzle Champion League - Season 2", url: "https://cubuzzle-leaderboard.vercel.app/" },
-  { name: "Cubuzzle Champion League - Season 3", url: "https://cubuzzle-live-season-3.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 1", url: "  https://cubuzzle-champion-league-s1.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 2", url: "  https://cubuzzle-champion-league-s2.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 3", url: "https://cubuzzle-champion-league-s3.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 4 Qualifiers", url: "https://cubuzzle-champion-league-s4.vercel.app/" },
+  { name: "Cubuzzle Champion League - Season 4 Finals", url: "https://cubuzzle-champion-league-s4-finals.vercel.app/" }
 ];
 
 function Leaderboard() {
@@ -344,14 +348,6 @@ function Leaderboard() {
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
               {stats.totalCompetitors}
-            </Typography>
-          </Box>
-          <Box sx={styles.statItem}>
-            <Typography variant="caption" color="text.secondary">
-              Showing
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {stats.filteredCompetitors}
             </Typography>
           </Box>
           <Box sx={styles.statItem}>
