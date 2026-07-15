@@ -231,18 +231,18 @@ function CompetitionHome() {
   );
 
   const rounds = [
-    { name: "Qualifier - Round 1", dates: "May 2026", status: "live" },
+    { name: "Qualifier - Round 1", dates: "May 2026", status: "completed" },
     {
       name: "Qualifier - Round 2",
       dates: "June 2026",
-      status: "upcoming",
+      status: "completed",
     },
     {
       name: "Qualifier - Round 3",
       dates: "June 2026",
-      status: "upcoming",
+      status: "completed",
     },
-    { name: "Grand Finale", dates: "July 2026", status: "upcoming" },
+    { name: "Grand Finale", dates: "July 2026", status: "completed" },
   ];
 
   return (
