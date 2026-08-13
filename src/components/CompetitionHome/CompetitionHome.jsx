@@ -16,6 +16,7 @@ import {
   CalendarToday as CalendarIcon,
   EmojiEvents as TrophyIcon,
   Groups as GroupsIcon,
+  HowToReg as HowToRegIcon,
   Leaderboard as LeaderboardIcon,
   Public as PublicIcon,
 } from "@mui/icons-material";
@@ -165,9 +166,30 @@ const styles = {
     bgcolor: (theme) =>
       theme.palette.mode === "dark" ? "grey.800" : "grey.100",
   },
+  registerContent: {
+    display: "flex",
+    alignItems: { xs: "flex-start", sm: "center" },
+    justifyContent: "space-between",
+    flexDirection: { xs: "column", sm: "row" },
+    gap: 2,
+  },
+  registerIconWrap: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    bgcolor: (theme) =>
+      theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+  },
+  registerText: {
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+  },
 };
-
-const events = ["3x3x3", "3x3x3 One-Handed", "Megaminx"];
 
 function CompetitionHome() {
   const competitionId = "cubuzzle-s4";
@@ -269,6 +291,27 @@ function CompetitionHome() {
       </Box>
 
       <Card sx={styles.card}>
+        <CardActionArea component={RouterLink} to="/register">
+          <CardContent sx={styles.registerContent}>
+            <Box sx={styles.registerText}>
+              <Box sx={styles.registerIconWrap}>
+                <HowToRegIcon color="action" />
+              </Box>
+              <Box>
+                <Typography variant="h6">
+                  Register for the competition
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Submit your Cubuzzle ID, division, and events.
+                </Typography>
+              </Box>
+            </Box>
+            <Chip label="Open" variant="outlined" />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <Card sx={styles.card}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
             <CalendarIcon />
@@ -337,7 +380,7 @@ function CompetitionHome() {
         <CardContent>
           <Typography variant="h6" gutterBottom sx={styles.sectionTitle}>
             <LeaderboardIcon />
-             Leaderboards - Qualifiers
+            Leaderboards - Qualifiers
           </Typography>
           <Grid container spacing={2}>
             {details.competitionEvents.map((competitionEvent) => (

@@ -1,5 +1,16 @@
 import { db } from "./firebase";
-import { collection, collectionGroup, doc, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  collectionGroup,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  runTransaction,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 
 export const getAllCompetitions = async () => {
   try {
@@ -60,7 +71,7 @@ export const getCompetitionDetailsById = async (competitionId) => {
           ...eventData,
           rounds,
         };
-      })
+      }),
     );
 
     const competitionDetails = {
@@ -78,13 +89,68 @@ export const getCompetitionDetailsById = async (competitionId) => {
 
 export const getCompetitorsByCompetition = async (competitionId) => {
   try {
-    const competitorsRef = collection(db, "competitions", competitionId, "competitors");
+    const competitorsRef = collection(
+      db,
+      "competitions",
+      competitionId,
+      "competitors",
+    );
     const q = query(competitorsRef);
     const competitorsSnapshot = await getDocs(q);
-    const competitors = competitorsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const competitors = competitorsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return competitors;
   } catch (error) {
     console.error("Error getting all competitors: ", error);
+    throw error;
+  }
+};
+
+export const isCompetitorIdAvailable = async (competitionId, id) => {
+  try {
+    const competitorRef = doc(
+      db,
+      "competitions",
+      competitionId,
+      "competitors",
+      id,
+    );
+    const competitorSnapshot = await getDoc(competitorRef);
+    return !competitorSnapshot.exists();
+  } catch (error) {
+    console.error("Error checking competitor ID availability: ", error);
+    throw error;
+  }
+};
+
+export const registerCompetitor = async (competitionId, competitor) => {
+  try {
+    const competitorRef = doc(
+      db,
+      "competitions",
+      competitionId,
+      "competitors",
+      competitor.id,
+    );
+
+    await runTransaction(db, async (transaction) => {
+      const competitorSnapshot = await transaction.get(competitorRef);
+
+      if (competitorSnapshot.exists()) {
+        const error = new Error("Competitor ID already registered");
+        error.code = "competitor-id-taken";
+        throw error;
+      }
+
+      transaction.set(competitorRef, {
+        ...competitor,
+        createdAt: serverTimestamp(),
+      });
+    });
+  } catch (error) {
+    console.error("Error registering competitor: ", error);
     throw error;
   }
 };
@@ -93,7 +159,13 @@ export const getCompetitorsByCompetition = async (competitionId) => {
 export const getCompetitorWithResults = async (competitionId, competitorId) => {
   try {
     // competitor document
-    const competitorRef = doc(db, "competitions", competitionId, "competitors", competitorId);
+    const competitorRef = doc(
+      db,
+      "competitions",
+      competitionId,
+      "competitors",
+      competitorId,
+    );
     const competitorSnap = await getDoc(competitorRef);
     if (!competitorSnap.exists()) {
       throw new Error("Competitor not found");
@@ -106,7 +178,7 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
       resultsGroupRef,
       where("id", "==", competitorId),
       where("scored", "==", true),
-      where("compId", "==", competitionId)
+      where("compId", "==", competitionId),
     );
     const resSnap = await getDocs(resultsQuery);
 
@@ -130,7 +202,9 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
     });
 
     // Attach a deduplicated list of eventIds the competitor appears in
-    const events = Array.from(new Set(results.map((res) => res.eventId).filter(Boolean)));
+    const events = Array.from(
+      new Set(results.map((res) => res.eventId).filter(Boolean)),
+    );
     const competitorWithEvents = { ...competitor, events };
 
     return { competitor: competitorWithEvents, results };
@@ -140,20 +214,46 @@ export const getCompetitorWithResults = async (competitionId, competitorId) => {
   }
 };
 
-export const getRoundResults = async (competitionId, eventId, roundId, roundQuery) => {
+export const getRoundResults = async (
+  competitionId,
+  eventId,
+  roundId,
+  roundQuery,
+) => {
   try {
-    const roundRef = doc(db, "competitions", competitionId, "events", eventId, "rounds", roundId);
+    const roundRef = doc(
+      db,
+      "competitions",
+      competitionId,
+      "events",
+      eventId,
+      "rounds",
+      roundId,
+    );
     const roundSnap = await getDoc(roundRef);
     if (!roundSnap.exists()) {
       throw new Error("Round not found");
     }
     const roundData = roundSnap.data();
 
-    const resultsRef = collection(db, "competitions", competitionId, "events", eventId, "rounds", roundId, "results");
+    const resultsRef = collection(
+      db,
+      "competitions",
+      competitionId,
+      "events",
+      eventId,
+      "rounds",
+      roundId,
+      "results",
+    );
     // filter only scored results if specified
     let q = query(resultsRef, orderBy("ranking", "asc"));
     if (roundQuery?.scored) {
-      q = query(resultsRef, where("scored", "==", true), orderBy("ranking", "asc"));
+      q = query(
+        resultsRef,
+        where("scored", "==", true),
+        orderBy("ranking", "asc"),
+      );
     }
     if (roundQuery?.advanced) {
       q = query(resultsRef, where("advancing", "==", true));
@@ -191,7 +291,14 @@ export const getEventLeaderboard = async (competitionId, eventId) => {
       ...roundDoc.data(),
     }));
 
-    const leaderboardRef = collection(db, "competitions", competitionId, "events", eventId, "leaderboard");
+    const leaderboardRef = collection(
+      db,
+      "competitions",
+      competitionId,
+      "events",
+      eventId,
+      "leaderboard",
+    );
     const leaderboardSnap = await getDocs(leaderboardRef);
     const leaderboard = leaderboardSnap.docs.map((leaderboardDoc) => ({
       id: leaderboardDoc.id,

@@ -72,12 +72,24 @@ export function getEventDisplayName(eventId, variant = "short") {
       ? {
           222: "2x2x2",
           333: "3x3x3",
+          444: "4x4x4",
+          555: "5x5x5",
           pyram: "Pyraminx",
+          skewb: "Skewb",
+          mirror: "Mirror",
+          minx: "Megaminx",
+          "333oh": "3x3x3 OH",
         }
       : {
           222: "2x2x2 Cube",
           333: "3x3x3 Cube",
+          444: "4x4x4 Cube",
+          555: "5x5x5 Cube",
           pyram: "Pyraminx",
+          skewb: "Skewb",
+          mirror: "Mirror Cube",
+          minx: "Megaminx",
+          "333oh": "3x3x3 One-Handed",
         };
   return eventMap[eventId] || String(eventId).toUpperCase();
 }
