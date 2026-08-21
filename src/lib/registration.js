@@ -85,19 +85,8 @@ export const validateRegistration = (values) => {
     errors.userId = "Use 3-20 letters, numbers, underscores, or hyphens";
   }
 
-  // Validate previous participant info
   if (!required(values.isPreviousParticipant) && values.isPreviousParticipant !== false) {
     errors.isPreviousParticipant = "Please indicate if you are a previous participant";
-  }
-
-  // If previous participant, validate previous userId
-  if (values.isPreviousParticipant === true) {
-    const previousUserId = normalizeUserId(values.previousUserId || "");
-    if (!required(previousUserId)) {
-      errors.previousUserId = "Previous Cubuzzle ID is required";
-    } else if (!USER_ID_PATTERN.test(previousUserId)) {
-      errors.previousUserId = "Use 3-20 letters, numbers, underscores, or hyphens";
-    }
   }
 
   if (!required(values.name)) {

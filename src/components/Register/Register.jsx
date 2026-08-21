@@ -101,7 +101,6 @@ function Register() {
   const [formData, setFormData] = useState({
     userId: "",
     isPreviousParticipant: null,
-    previousUserId: "",
     name: "",
     email: "",
     phoneNo: "",
@@ -162,7 +161,7 @@ function Register() {
         modeOfParticipation: data.modeOfParticipation,
         country: data.country,
         events: data.events,
-        previousUserId: data.isPreviousParticipant ? (data.previousUserId || null) : null,
+        previousUserId: data.isPreviousParticipant ? data.id : null,
         ...(imageUrl && { imageUrl }),
       };
 
@@ -189,22 +188,8 @@ function Register() {
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
-    // Auto-uppercase user IDs
     if (field === "userId") {
       setFormData((prev) => ({ ...prev, userId: normalizeUserId(value) }));
-    }
-    if (field === "previousUserId") {
-      setFormData((prev) => ({ ...prev, previousUserId: normalizeUserId(value) }));
-    }
-
-    // If changing isPreviousParticipant to false, clear previousUserId
-    if (field === "isPreviousParticipant" && value === false) {
-      setFormData((prev) => ({ ...prev, previousUserId: "" }));
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.previousUserId;
-        return newErrors;
-      });
     }
 
     // Clear error for this field
@@ -286,7 +271,6 @@ function Register() {
     setFormData({
       userId: "",
       isPreviousParticipant: null,
-      previousUserId: "",
       name: "",
       email: "",
       phoneNo: "",
@@ -392,27 +376,7 @@ function Register() {
                 </FormControl>
               </Grid>
 
-              {/* Previous User ID - shown only if previous participant */}
-              {formData.isPreviousParticipant === true && (
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    required
-                    label="Previous Cubuzzle User ID"
-                    value={formData.previousUserId}
-                    onChange={(e) => handleFieldChange("previousUserId", e.target.value)}
-                    onBlur={() => handleBlur("previousUserId")}
-                    error={Boolean(errors.previousUserId)}
-                    helperText={
-                      errors.previousUserId ||
-                      "Enter your User ID from previous season"
-                    }
-                  />
-                </Grid>
-              )}
-
-              {/* User ID */}
-              <Grid item xs={12} md={formData.isPreviousParticipant === true ? 6 : 12}>
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   required
@@ -423,7 +387,9 @@ function Register() {
                   error={Boolean(errors.userId)}
                   helperText={
                     errors.userId ||
-                    "3-20 characters, letters, numbers, hyphens, underscores"
+                    (formData.isPreviousParticipant
+                      ? "Use the same Cubuzzle ID from previous seasons"
+                      : "3-20 characters, letters, numbers, hyphens, underscores")
                   }
                   InputProps={{
                     endAdornment: userIdStatus && (
