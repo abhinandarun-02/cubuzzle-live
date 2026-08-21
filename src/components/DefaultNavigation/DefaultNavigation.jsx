@@ -1,15 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import DefaultLayout from "./DefaultLayout";
-import CompetitionHome from "../CompetitionHome/CompetitionHome";
+import Register from "../Register/Register";
 
 function DefaultNavigation() {
   return (
-    <DefaultLayout currentUser={null} loaded={true}>
-      <Routes>
-        <Route path="" element={<CompetitionHome />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </DefaultLayout>
+    <Routes>
+      <Route path="" element={<Register />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 

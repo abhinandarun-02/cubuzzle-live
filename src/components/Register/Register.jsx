@@ -1,538 +1,540 @@
-import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSnackbar } from "notistack";
+import { useState } from "react";
 import {
-  Alert,
-  Autocomplete,
-  Avatar,
   Box,
-  Button,
   Card,
   CardContent,
-  CardHeader,
-  Checkbox,
-  CircularProgress,
-  Container,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  InputAdornment,
-  MenuItem,
-  Stack,
   TextField,
+  Button,
   Typography,
+  Container,
+  Grid,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  Checkbox,
+  FormHelperText,
+  Avatar,
+  Autocomplete,
+  CircularProgress,
+  InputAdornment,
 } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import HowToRegIcon from "@mui/icons-material/HowToReg";
-
-import CubingIcon from "../CubingIcon/CubingIcon";
-import FlagIcon from "../FlagIcon/FlagIcon";
-import {
-  COUNTRIES,
-  DEFAULT_COUNTRY_CODE,
-  getCountryByCode,
-} from "../../lib/countries";
-import {
-  isCompetitorIdAvailable,
-  registerCompetitor,
-} from "../../lib/firebase/firestore";
+import ErrorIcon from "@mui/icons-material/Error";
+import useDebounce from "../../hooks/useDebounce";
+import { isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
 import {
-  CATEGORIES,
-  DIVISIONS,
-  GENDERS,
-  MODES,
   REGISTRATION_EVENTS,
-  USER_ID_PATTERN,
+  GENDERS,
+  CATEGORIES,
+  MODES,
+  DIVISIONS,
   normalizeUserId,
-  validateImageFile,
   validateRegistration,
+  validateImageFile,
 } from "../../lib/registration";
-import useDebounce from "../../hooks/useDebounce";
-
+import { COUNTRIES, DEFAULT_COUNTRY_CODE, getCountryByCode } from "../../lib/countries";
+import FlagIcon from "../FlagIcon/FlagIcon";
+import CubingIcon from "../CubingIcon/CubingIcon";
 import RegistrationSuccess from "./RegistrationSuccess";
 
-const competitionId = "cubuzzle-s4";
-
-const initialValues = {
-  userId: "",
-  name: "",
-  email: "",
-  phoneNo: "",
-  school: "",
-  gender: "",
-  category: "",
-  registeredDivision: "",
-  modeOfParticipation: "",
-  country: getCountryByCode(DEFAULT_COUNTRY_CODE),
-  events: [],
-};
+const COMPETITION_ID = "cubuzzle-s4";
 
 const styles = {
-  container: {
-    py: 3,
-  },
-  header: {
-    mb: 3,
-  },
   card: {
     mb: 3,
   },
   sectionTitle: {
-    display: "flex",
-    alignItems: "center",
-    gap: 1,
+    mb: 2,
+    fontWeight: 500,
   },
-  photoRow: {
+  photoUpload: {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     gap: 2,
-    flexWrap: "wrap",
-  },
-  avatar: {
-    width: 88,
-    height: 88,
-    fontSize: "2rem",
-  },
-  hiddenInput: {
-    display: "none",
   },
   eventGrid: {
     display: "grid",
-    gridTemplateColumns: {
-      xs: "1fr",
-      sm: "repeat(2, minmax(0, 1fr))",
-      md: "repeat(3, minmax(0, 1fr))",
-    },
-    gap: 1,
+    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+    gap: 2,
   },
-  eventOption: {
-    m: 0,
-    border: 1,
+  eventCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+    p: 1.5,
+    border: "1px solid",
     borderColor: "divider",
     borderRadius: 1,
-    px: 1.25,
-    py: 0.75,
-    minHeight: 48,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    "&:hover": {
+      borderColor: "primary.main",
+      bgcolor: "action.hover",
+    },
   },
-  actions: {
-    alignItems: { xs: "stretch", sm: "center" },
-    justifyContent: "space-between",
-    gap: 2,
+  eventCardSelected: {
+    borderColor: "primary.main",
+    bgcolor: "action.selected",
   },
 };
 
-const fieldHasError = (field, errors, touched) =>
-  Boolean(errors[field] && touched[field]);
-
-const optionLabel = (options, value) =>
-  options.find((option) => option.value === value)?.label ?? value;
-
 function Register() {
-  const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
-  const [values, setValues] = useState(initialValues);
-  const [photo, setPhoto] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState("");
-  const [imageError, setImageError] = useState("");
+  const [formData, setFormData] = useState({
+    userId: "",
+    isPreviousParticipant: null,
+    previousUserId: "",
+    name: "",
+    email: "",
+    phoneNo: "",
+    school: "",
+    gender: "",
+    category: "",
+    registeredDivision: "",
+    modeOfParticipation: "",
+    country: getCountryByCode(DEFAULT_COUNTRY_CODE),
+    events: [],
+  });
+
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
   const [registeredCompetitor, setRegisteredCompetitor] = useState(null);
 
-  const normalizedUserId = normalizeUserId(values.userId);
-  const debouncedUserId = useDebounce(normalizedUserId, 500);
-  const canCheckUserId = USER_ID_PATTERN.test(debouncedUserId);
+  const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const availabilityQuery = useQuery({
-    queryKey: ["competition", competitionId, "competitor-id", debouncedUserId],
-    queryFn: async () =>
-      isCompetitorIdAvailable(competitionId, debouncedUserId),
-    enabled: canCheckUserId,
+  // Debounced user ID for availability check
+  const normalizedUserId = normalizeUserId(formData.userId);
+  const debouncedUserId = useDebounce(normalizedUserId, 500);
+
+  // Check user ID availability
+  const { data: isAvailable, isLoading: checkingAvailability } = useQuery({
+    queryKey: ["competitor-id-availability", COMPETITION_ID, debouncedUserId],
+    queryFn: () => isCompetitorIdAvailable(COMPETITION_ID, debouncedUserId),
+    enabled: Boolean(debouncedUserId && debouncedUserId.length >= 3),
+    staleTime: 10000,
   });
 
-  useEffect(() => {
-    return () => {
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
-      }
-    };
-  }, [photoPreview]);
+  // Registration mutation
+  const registerMutation = useMutation({
+    mutationFn: async (data) => {
+      let imageUrl = null;
 
-  const userIdAvailability = useMemo(() => {
-    if (!values.userId || errors.userId) {
-      return null;
-    }
-    if (availabilityQuery.isFetching || debouncedUserId !== normalizedUserId) {
-      return { severity: "info", message: "Checking..." };
-    }
-    if (availabilityQuery.data === true) {
-      return { severity: "success", message: "Available" };
-    }
-    if (availabilityQuery.data === false) {
-      return { severity: "error", message: "Already registered" };
-    }
-    return null;
-  }, [
-    availabilityQuery.data,
-    availabilityQuery.isFetching,
-    debouncedUserId,
-    errors.userId,
-    normalizedUserId,
-    values.userId,
-  ]);
-
-  const mutation = useMutation({
-    mutationFn: async ({ formValues, file }) => {
-      const competitorId = normalizeUserId(formValues.userId);
-      let imageUrl;
-
-      if (file) {
-        imageUrl = await uploadCompetitorImage(
-          competitionId,
-          competitorId,
-          file,
-        );
+      // Upload photo if provided
+      if (photoFile) {
+        imageUrl = await uploadCompetitorImage(COMPETITION_ID, data.id, photoFile);
       }
 
+      // Register competitor with transaction
       const competitor = {
-        id: competitorId,
-        userId: competitorId,
-        name: formValues.name.trim(),
-        email: formValues.email.trim(),
-        phoneNo: formValues.phoneNo.trim(),
-        school: formValues.school.trim(),
-        gender: formValues.gender,
-        category: formValues.category,
-        registeredDivision: formValues.registeredDivision,
-        events: REGISTRATION_EVENTS.map((event) => event.id).filter((eventId) =>
-          formValues.events.includes(eventId),
-        ),
-        modeOfParticipation: formValues.modeOfParticipation,
-        country: {
-          code: formValues.country.code,
-          name: formValues.country.name,
-        },
-        ...(imageUrl ? { imageUrl } : {}),
+        id: data.id,
+        userId: data.id,
+        name: data.name,
+        email: data.email,
+        phoneNo: data.phoneNo,
+        school: data.school,
+        gender: data.gender,
+        category: data.category,
+        registeredDivision: data.registeredDivision,
+        modeOfParticipation: data.modeOfParticipation,
+        country: data.country,
+        events: data.events,
+        previousUserId: data.isPreviousParticipant ? (data.previousUserId || null) : null,
+        ...(imageUrl && { imageUrl }),
       };
 
-      await registerCompetitor(competitionId, competitor);
+      await registerCompetitor(COMPETITION_ID, competitor);
       return competitor;
     },
-    onSuccess: async (competitor) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["competition", competitionId, "competitors"],
-      });
+    onSuccess: (competitor) => {
+      queryClient.invalidateQueries(["competition", COMPETITION_ID, "competitors"]);
       setRegisteredCompetitor(competitor);
-      enqueueSnackbar("Registration complete.", { variant: "success" });
+      enqueueSnackbar("Registration successful!", { variant: "success" });
     },
     onError: (error) => {
-      if (error?.code === "competitor-id-taken") {
-        setErrors((current) => ({
-          ...current,
-          userId: "This Cubuzzle ID is already registered",
-        }));
-        setTouched((current) => ({ ...current, userId: true }));
-        enqueueSnackbar("That Cubuzzle ID is already registered.", {
+      if (error.code === "competitor-id-taken") {
+        enqueueSnackbar("This User ID is already taken. Please choose another.", {
           variant: "error",
         });
-        return;
+        setErrors((prev) => ({ ...prev, userId: "Already registered" }));
+      } else {
+        enqueueSnackbar("Registration failed. Please try again.", { variant: "error" });
       }
-      enqueueSnackbar("Registration failed. Please try again.", {
-        variant: "error",
-      });
     },
   });
 
-  const setFieldValue = (field, value) => {
-    setValues((current) => ({ ...current, [field]: value }));
-    setTouched((current) => ({ ...current, [field]: true }));
-    setErrors((current) => {
-      const nextValues = { ...values, [field]: value };
-      const nextErrors = validateRegistration(nextValues);
-      return { ...current, [field]: nextErrors[field] };
-    });
+  const handleFieldChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    
+    // Auto-uppercase user IDs
+    if (field === "userId") {
+      setFormData((prev) => ({ ...prev, userId: normalizeUserId(value) }));
+    }
+    if (field === "previousUserId") {
+      setFormData((prev) => ({ ...prev, previousUserId: normalizeUserId(value) }));
+    }
+
+    // If changing isPreviousParticipant to false, clear previousUserId
+    if (field === "isPreviousParticipant" && value === false) {
+      setFormData((prev) => ({ ...prev, previousUserId: "" }));
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.previousUserId;
+        return newErrors;
+      });
+    }
+
+    // Clear error for this field
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
-  const handleTextChange = (field) => (event) => {
-    const value =
-      field === "userId"
-        ? event.target.value.toUpperCase()
-        : event.target.value;
-    setFieldValue(field, value);
-  };
-
-  const handleBlur = (field) => () => {
-    setTouched((current) => ({ ...current, [field]: true }));
-    setErrors(validateRegistration(values));
+  const handleBlur = (field) => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    
+    // Validate single field
+    const validationErrors = validateRegistration(formData);
+    if (validationErrors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: validationErrors[field] }));
+    }
   };
 
   const handlePhotoChange = (event) => {
-    const file = event.target.files?.[0] ?? null;
-    const nextImageError = validateImageFile(file);
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    setPhoto(file && !nextImageError ? file : null);
-    setImageError(nextImageError ?? "");
-    setPhotoPreview(file && !nextImageError ? URL.createObjectURL(file) : "");
+    const error = validateImageFile(file);
+    if (error) {
+      enqueueSnackbar(error, { variant: "error" });
+      return;
+    }
+
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
   };
 
   const handleEventToggle = (eventId) => {
-    const nextEvents = values.events.includes(eventId)
-      ? values.events.filter((id) => id !== eventId)
-      : REGISTRATION_EVENTS.map((event) => event.id).filter((id) =>
-          [...values.events, eventId].includes(id),
-        );
-    setFieldValue("events", nextEvents);
+    const currentEvents = formData.events;
+    const newEvents = currentEvents.includes(eventId)
+      ? currentEvents.filter((id) => id !== eventId)
+      : [...currentEvents, eventId];
+
+    // Re-sort into canonical order
+    const sortedEvents = REGISTRATION_EVENTS.filter((e) => newEvents.includes(e.id)).map((e) => e.id);
+    
+    handleFieldChange("events", sortedEvents);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const nextValues = { ...values, userId: normalizedUserId };
-    const nextErrors = validateRegistration(nextValues);
-    const nextImageError = validateImageFile(photo);
-    const allTouched = Object.keys(initialValues).reduce(
-      (acc, field) => ({ ...acc, [field]: true }),
-      {},
-    );
-
-    setValues(nextValues);
-    setTouched(allTouched);
-    setErrors(nextErrors);
-    setImageError(nextImageError ?? "");
-
-    if (Object.keys(nextErrors).length > 0 || nextImageError) {
-      enqueueSnackbar("Please fix the highlighted fields.", {
-        variant: "error",
-      });
+    // Validate all fields
+    const validationErrors = validateRegistration(formData);
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      const errorMessage = Object.values(validationErrors)[0];
+      enqueueSnackbar(errorMessage, { variant: "error" });
       return;
     }
 
-    if (availabilityQuery.isFetching || debouncedUserId !== normalizedUserId) {
-      enqueueSnackbar("Please wait while the Cubuzzle ID is checked.", {
-        variant: "info",
-      });
+    // Check user ID availability one more time
+    if (isAvailable === false) {
+      enqueueSnackbar("This User ID is already taken", { variant: "error" });
       return;
     }
 
-    if (availabilityQuery.data === false) {
-      setErrors((current) => ({
-        ...current,
-        userId: "This Cubuzzle ID is already registered",
-      }));
-      enqueueSnackbar("That Cubuzzle ID is already registered.", {
-        variant: "error",
-      });
-      return;
-    }
+    // Submit registration
+    const submitData = {
+      ...formData,
+      id: normalizedUserId,
+    };
 
-    mutation.mutate({ formValues: nextValues, file: photo });
+    registerMutation.mutate(submitData);
   };
 
   const handleRegisterAnother = () => {
-    setValues(initialValues);
-    setPhoto(null);
-    setPhotoPreview("");
-    setImageError("");
-    setErrors({});
-    setTouched({});
     setRegisteredCompetitor(null);
+    setFormData({
+      userId: "",
+      isPreviousParticipant: null,
+      previousUserId: "",
+      name: "",
+      email: "",
+      phoneNo: "",
+      school: "",
+      gender: "",
+      category: "",
+      registeredDivision: "",
+      modeOfParticipation: "",
+      country: getCountryByCode(DEFAULT_COUNTRY_CODE),
+      events: [],
+    });
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setErrors({});
+    setTouchedFields({});
   };
 
   if (registeredCompetitor) {
     return (
-      <RegistrationSuccess
-        competitor={registeredCompetitor}
-        onRegisterAnother={handleRegisterAnother}
-      />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <RegistrationSuccess
+          competitor={registeredCompetitor}
+          onRegisterAnother={handleRegisterAnother}
+        />
+      </Container>
     );
   }
 
-  const submitDisabled =
-    mutation.isPending ||
-    availabilityQuery.isFetching ||
-    availabilityQuery.data === false;
+  const userIdStatus = normalizedUserId.length >= 3
+    ? checkingAvailability
+      ? "checking"
+      : isAvailable
+      ? "available"
+      : "taken"
+    : null;
 
   return (
-    <Container maxWidth="md" sx={styles.container}>
-      <Box sx={styles.header}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Register for Cubuzzle S4
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Enter competitor details and choose the events for this competition.
-        </Typography>
-      </Box>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom align="center">
+        Register for Cubuzzle Season 4
+      </Typography>
+      <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
+        Fill in your details to register for the competition
+      </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
+      <form onSubmit={handleSubmit}>
+        {/* Competitor Details */}
         <Card sx={styles.card}>
-          <CardHeader
-            avatar={<HowToRegIcon color="action" />}
-            title="Competitor details"
-            titleTypographyProps={{ variant: "h6" }}
-          />
           <CardContent>
-            <Grid container spacing={2.5}>
+            <Typography variant="h6" sx={styles.sectionTitle}>
+              Competitor Details
+            </Typography>
+
+            {/* Photo Upload */}
+            <Box sx={styles.photoUpload}>
+              <Avatar
+                src={photoPreview}
+                sx={{ width: 120, height: 120 }}
+                variant="rounded"
+              >
+                <PhotoCameraIcon sx={{ fontSize: 48 }} />
+              </Avatar>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<PhotoCameraIcon />}
+              >
+                {photoFile ? "Change Photo" : "Upload Photo (Optional)"}
+                <input
+                  type="file"
+                  hidden
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handlePhotoChange}
+                />
+              </Button>
+            </Box>
+
+            <Grid container spacing={3} sx={{ mt: 1 }}>
+              {/* Previous Participant */}
               <Grid item xs={12}>
-                <Box sx={styles.photoRow}>
-                  <Avatar
-                    src={photoPreview}
-                    alt={values.name}
-                    sx={styles.avatar}
-                    variant="rounded"
-                  />
-                  <Box>
-                    <Button
-                      component="label"
-                      variant="outlined"
-                      startIcon={<CloudUploadIcon />}
-                    >
-                      Upload photo
-                      <Box
-                        component="input"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        sx={styles.hiddenInput}
-                        onChange={handlePhotoChange}
-                      />
-                    </Button>
-                    <Typography
-                      variant="body2"
-                      color={imageError ? "error" : "text.secondary"}
-                      sx={{ mt: 1 }}
-                    >
-                      {imageError ||
-                        (photo
-                          ? photo.name
-                          : "Optional JPEG, PNG, or WebP up to 5 MB")}
-                    </Typography>
-                  </Box>
-                </Box>
+                <FormControl required error={Boolean(errors.isPreviousParticipant)}>
+                  <FormLabel>Are you a previous Cubuzzle participant?</FormLabel>
+                  <RadioGroup
+                    row
+                    value={formData.isPreviousParticipant === null ? "" : String(formData.isPreviousParticipant)}
+                    onChange={(e) => handleFieldChange("isPreviousParticipant", e.target.value === "true")}
+                  >
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label="No"
+                    />
+                  </RadioGroup>
+                  {errors.isPreviousParticipant && (
+                    <FormHelperText>{errors.isPreviousParticipant}</FormHelperText>
+                  )}
+                </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              {/* Previous User ID - shown only if previous participant */}
+              {formData.isPreviousParticipant === true && (
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Previous Cubuzzle User ID"
+                    value={formData.previousUserId}
+                    onChange={(e) => handleFieldChange("previousUserId", e.target.value)}
+                    onBlur={() => handleBlur("previousUserId")}
+                    error={Boolean(errors.previousUserId)}
+                    helperText={
+                      errors.previousUserId ||
+                      "Enter your User ID from previous season"
+                    }
+                  />
+                </Grid>
+              )}
+
+              {/* User ID */}
+              <Grid item xs={12} md={formData.isPreviousParticipant === true ? 6 : 12}>
                 <TextField
-                  label="Cubuzzle ID"
-                  value={values.userId}
-                  onChange={handleTextChange("userId")}
-                  onBlur={handleBlur("userId")}
-                  error={
-                    fieldHasError("userId", errors, touched) ||
-                    userIdAvailability?.severity === "error"
-                  }
-                  helperText={
-                    fieldHasError("userId", errors, touched)
-                      ? errors.userId
-                      : userIdAvailability?.message || " "
-                  }
                   fullWidth
                   required
-                  inputProps={{ maxLength: 20 }}
+                  label="User ID for Season 4"
+                  value={formData.userId}
+                  onChange={(e) => handleFieldChange("userId", e.target.value)}
+                  onBlur={() => handleBlur("userId")}
+                  error={Boolean(errors.userId)}
+                  helperText={
+                    errors.userId ||
+                    "3-20 characters, letters, numbers, hyphens, underscores"
+                  }
                   InputProps={{
-                    endAdornment: userIdAvailability && (
+                    endAdornment: userIdStatus && (
                       <InputAdornment position="end">
-                        {userIdAvailability.severity === "info" && (
-                          <CircularProgress size={18} />
+                        {userIdStatus === "checking" && (
+                          <CircularProgress size={20} />
                         )}
-                        {userIdAvailability.severity === "success" && (
+                        {userIdStatus === "available" && (
                           <CheckCircleIcon color="success" fontSize="small" />
                         )}
-                        {userIdAvailability.severity === "error" && (
-                          <ErrorOutlineIcon color="error" fontSize="small" />
+                        {userIdStatus === "taken" && (
+                          <ErrorIcon color="error" fontSize="small" />
                         )}
                       </InputAdornment>
                     ),
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Name */}
+              <Grid item xs={12} md={6}>
                 <TextField
+                  fullWidth
+                  required
                   label="Name"
-                  value={values.name}
-                  onChange={handleTextChange("name")}
-                  onBlur={handleBlur("name")}
-                  error={fieldHasError("name", errors, touched)}
-                  helperText={
-                    fieldHasError("name", errors, touched) ? errors.name : " "
-                  }
-                  fullWidth
-                  required
+                  value={formData.name}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
+                  onBlur={() => handleBlur("name")}
+                  error={Boolean(errors.name)}
+                  helperText={errors.name}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Email */}
+              <Grid item xs={12} md={6}>
                 <TextField
-                  label="Email"
+                  fullWidth
+                  required
                   type="email"
-                  value={values.email}
-                  onChange={handleTextChange("email")}
-                  onBlur={handleBlur("email")}
-                  error={fieldHasError("email", errors, touched)}
-                  helperText={
-                    fieldHasError("email", errors, touched) ? errors.email : " "
-                  }
-                  fullWidth
-                  required
+                  label="Email"
+                  value={formData.email}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
+                  error={Boolean(errors.email)}
+                  helperText={errors.email}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Phone */}
+              <Grid item xs={12} md={6}>
                 <TextField
-                  label="Phone"
-                  value={values.phoneNo}
-                  onChange={handleTextChange("phoneNo")}
-                  onBlur={handleBlur("phoneNo")}
-                  error={fieldHasError("phoneNo", errors, touched)}
-                  helperText={
-                    fieldHasError("phoneNo", errors, touched)
-                      ? errors.phoneNo
-                      : " "
-                  }
                   fullWidth
                   required
+                  label="Phone Number"
+                  value={formData.phoneNo}
+                  onChange={(e) => handleFieldChange("phoneNo", e.target.value)}
+                  onBlur={() => handleBlur("phoneNo")}
+                  error={Boolean(errors.phoneNo)}
+                  helperText={errors.phoneNo}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* School */}
+              <Grid item xs={12}>
                 <TextField
-                  select
-                  label="Gender"
-                  value={values.gender}
-                  onChange={handleTextChange("gender")}
-                  onBlur={handleBlur("gender")}
-                  error={fieldHasError("gender", errors, touched)}
-                  helperText={
-                    fieldHasError("gender", errors, touched)
-                      ? errors.gender
-                      : " "
-                  }
                   fullWidth
                   required
-                >
-                  {GENDERS.map((gender) => (
-                    <MenuItem key={gender.value} value={gender.value}>
-                      {gender.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  label="School"
+                  value={formData.school}
+                  onChange={(e) => handleFieldChange("school", e.target.value)}
+                  onBlur={() => handleBlur("school")}
+                  error={Boolean(errors.school)}
+                  helperText={errors.school}
+                />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Gender */}
+              <Grid item xs={12} md={6}>
+                <FormControl required error={Boolean(errors.gender)}>
+                  <FormLabel>Gender</FormLabel>
+                  <RadioGroup
+                    value={formData.gender}
+                    onChange={(e) => handleFieldChange("gender", e.target.value)}
+                  >
+                    {GENDERS.map((gender) => (
+                      <FormControlLabel
+                        key={gender.value}
+                        value={gender.value}
+                        control={<Radio />}
+                        label={gender.label}
+                      />
+                    ))}
+                  </RadioGroup>
+                  {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Category */}
+              <Grid item xs={12} md={6}>
+                <FormControl required error={Boolean(errors.category)}>
+                  <FormLabel>Age Category</FormLabel>
+                  <RadioGroup
+                    value={formData.category}
+                    onChange={(e) => handleFieldChange("category", e.target.value)}
+                  >
+                    {CATEGORIES.map((category) => (
+                      <FormControlLabel
+                        key={category.value}
+                        value={category.value}
+                        control={<Radio />}
+                        label={category.label}
+                      />
+                    ))}
+                  </RadioGroup>
+                  {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              {/* Country */}
+              <Grid item xs={12}>
                 <Autocomplete
                   options={COUNTRIES}
-                  value={values.country}
                   getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.code === value.code
-                  }
-                  onChange={(_, country) => setFieldValue("country", country)}
-                  onBlur={handleBlur("country")}
+                  value={formData.country}
+                  onChange={(event, newValue) => handleFieldChange("country", newValue)}
                   renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                    >
+                    <Box component="li" {...props} sx={{ display: "flex", gap: 1 }}>
                       <FlagIcon code={option.code.toLowerCase()} />
                       {option.name}
                     </Box>
@@ -540,21 +542,15 @@ function Register() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Country"
                       required
-                      error={fieldHasError("country", errors, touched)}
-                      helperText={
-                        fieldHasError("country", errors, touched)
-                          ? errors.country
-                          : " "
-                      }
+                      label="Country"
+                      error={Boolean(errors.country)}
+                      helperText={errors.country}
                       InputProps={{
                         ...params.InputProps,
-                        startAdornment: values.country && (
+                        startAdornment: formData.country && (
                           <InputAdornment position="start">
-                            <FlagIcon
-                              code={values.country.code.toLowerCase()}
-                            />
+                            <FlagIcon code={formData.country.code.toLowerCase()} />
                           </InputAdornment>
                         ),
                       }}
@@ -562,177 +558,124 @@ function Register() {
                   )}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="School"
-                  value={values.school}
-                  onChange={handleTextChange("school")}
-                  onBlur={handleBlur("school")}
-                  error={fieldHasError("school", errors, touched)}
-                  helperText={
-                    fieldHasError("school", errors, touched)
-                      ? errors.school
-                      : " "
-                  }
-                  fullWidth
-                  required
-                />
-              </Grid>
             </Grid>
           </CardContent>
         </Card>
 
+        {/* Competition Details */}
         <Card sx={styles.card}>
-          <CardHeader
-            title="Competition details"
-            titleTypographyProps={{ variant: "h6" }}
-          />
           <CardContent>
-            <Grid container spacing={2.5}>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Category"
-                  value={values.category}
-                  onChange={handleTextChange("category")}
-                  onBlur={handleBlur("category")}
-                  error={fieldHasError("category", errors, touched)}
-                  helperText={
-                    fieldHasError("category", errors, touched)
-                      ? errors.category
-                      : " "
-                  }
-                  fullWidth
-                  required
-                >
-                  {CATEGORIES.map((category) => (
-                    <MenuItem key={category.value} value={category.value}>
-                      {category.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Division"
-                  value={values.registeredDivision}
-                  onChange={handleTextChange("registeredDivision")}
-                  onBlur={handleBlur("registeredDivision")}
-                  error={fieldHasError("registeredDivision", errors, touched)}
-                  helperText={
-                    fieldHasError("registeredDivision", errors, touched)
-                      ? errors.registeredDivision
-                      : values.registeredDivision
-                        ? DIVISIONS.find(
-                            (division) =>
-                              division.value === values.registeredDivision,
-                          )?.hint
-                        : " "
-                  }
-                  fullWidth
-                  required
-                >
-                  {DIVISIONS.map((division) => (
-                    <MenuItem key={division.value} value={division.value}>
-                      {division.label} - {division.hint}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Mode"
-                  value={values.modeOfParticipation}
-                  onChange={handleTextChange("modeOfParticipation")}
-                  onBlur={handleBlur("modeOfParticipation")}
-                  error={fieldHasError("modeOfParticipation", errors, touched)}
-                  helperText={
-                    fieldHasError("modeOfParticipation", errors, touched)
-                      ? errors.modeOfParticipation
-                      : " "
-                  }
-                  fullWidth
-                  required
-                >
-                  {MODES.map((mode) => (
-                    <MenuItem key={mode.value} value={mode.value}>
-                      {mode.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+            <Typography variant="h6" sx={styles.sectionTitle}>
+              Competition Details
+            </Typography>
 
-              <Grid item xs={12}>
-                <FormControl
-                  component="fieldset"
-                  required
-                  error={fieldHasError("events", errors, touched)}
-                  fullWidth
-                >
-                  <FormLabel component="legend">Events</FormLabel>
-                  <FormGroup sx={styles.eventGrid}>
-                    {REGISTRATION_EVENTS.map((event) => (
+            <Grid container spacing={3}>
+              {/* Division */}
+              <Grid item xs={12} md={6}>
+                <FormControl required error={Boolean(errors.registeredDivision)}>
+                  <FormLabel>Division</FormLabel>
+                  <RadioGroup
+                    value={formData.registeredDivision}
+                    onChange={(e) =>
+                      handleFieldChange("registeredDivision", e.target.value)
+                    }
+                  >
+                    {DIVISIONS.map((division) => (
                       <FormControlLabel
-                        key={event.id}
-                        sx={styles.eventOption}
-                        control={
-                          <Checkbox
-                            checked={values.events.includes(event.id)}
-                            onChange={() => handleEventToggle(event.id)}
-                          />
-                        }
+                        key={division.value}
+                        value={division.value}
+                        control={<Radio />}
                         label={
-                          <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                          >
-                            <CubingIcon eventId={event.id} small />
+                          <Box>
                             <Typography variant="body2">
-                              {event.label}
+                              {division.label}
                             </Typography>
-                          </Stack>
+                            <Typography variant="caption" color="text.secondary">
+                              {division.hint}
+                            </Typography>
+                          </Box>
                         }
                       />
                     ))}
-                  </FormGroup>
-                  <FormHelperText>
-                    {fieldHasError("events", errors, touched)
-                      ? errors.events
-                      : " "}
-                  </FormHelperText>
+                  </RadioGroup>
+                  {errors.registeredDivision && (
+                    <FormHelperText>{errors.registeredDivision}</FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+
+              {/* Mode */}
+              <Grid item xs={12} md={6}>
+                <FormControl required error={Boolean(errors.modeOfParticipation)}>
+                  <FormLabel>Mode of Participation</FormLabel>
+                  <RadioGroup
+                    value={formData.modeOfParticipation}
+                    onChange={(e) =>
+                      handleFieldChange("modeOfParticipation", e.target.value)
+                    }
+                  >
+                    {MODES.map((mode) => (
+                      <FormControlLabel
+                        key={mode.value}
+                        value={mode.value}
+                        control={<Radio />}
+                        label={mode.label}
+                      />
+                    ))}
+                  </RadioGroup>
+                  {errors.modeOfParticipation && (
+                    <FormHelperText>{errors.modeOfParticipation}</FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+
+              {/* Events */}
+              <Grid item xs={12}>
+                <FormControl required error={Boolean(errors.events)} fullWidth>
+                  <FormLabel>Events (select at least one)</FormLabel>
+                  <Box sx={styles.eventGrid}>
+                    {REGISTRATION_EVENTS.map((event) => {
+                      const isSelected = formData.events.includes(event.id);
+                      return (
+                        <Box
+                          key={event.id}
+                          sx={{
+                            ...styles.eventCard,
+                            ...(isSelected && styles.eventCardSelected),
+                          }}
+                          onClick={() => handleEventToggle(event.id)}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            size="small"
+                            sx={{ p: 0 }}
+                          />
+                          <CubingIcon eventId={event.id} small />
+                          <Typography variant="body2">{event.label}</Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                  {errors.events && <FormHelperText>{errors.events}</FormHelperText>}
                 </FormControl>
               </Grid>
             </Grid>
           </CardContent>
         </Card>
 
-        {availabilityQuery.isError && (
-          <Alert severity="warning" sx={{ mb: 3 }}>
-            Cubuzzle ID availability could not be checked right now. The final
-            submit will still verify it.
-          </Alert>
-        )}
-
-        <Stack direction={{ xs: "column", sm: "row" }} sx={styles.actions}>
-          <Typography variant="body2" color="text.secondary">
-            {values.registeredDivision
-              ? `Selected division: ${optionLabel(DIVISIONS, values.registeredDivision)}`
-              : "Choose your division and events before submitting."}
-          </Typography>
+        {/* Submit */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<HowToRegIcon />}
-            disabled={submitDisabled}
+            disabled={registerMutation.isPending || userIdStatus === "taken"}
+            sx={{ minWidth: 200 }}
           >
-            {mutation.isPending ? "Registering..." : "Register"}
+            {registerMutation.isPending ? "Registering..." : "Register"}
           </Button>
-        </Stack>
-      </Box>
+        </Box>
+      </form>
     </Container>
   );
 }
