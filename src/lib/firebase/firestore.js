@@ -125,6 +125,16 @@ export const isCompetitorIdAvailable = async (competitionId, id) => {
   }
 };
 
+export const getUserProfile = async (userId) => {
+  try {
+    const userSnap = await getDoc(doc(db, "users", userId));
+    return userSnap.exists() ? { id: userSnap.id, ...userSnap.data() } : null;
+  } catch (error) {
+    console.error("Error getting user profile: ", error);
+    throw error;
+  }
+};
+
 export const registerCompetitor = async (competitionId, competitor) => {
   try {
     const competitorRef = doc(

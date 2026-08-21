@@ -1,15 +1,11 @@
 import { differenceInYears, isFuture, isValid, parse } from "date-fns";
 import { getEventDisplayName } from "./competition";
+import { COUNTRIES, getCountryByCode } from "./countries";
 
 export const REGISTRATION_EVENTS = [
   "222",
   "333",
-  "444",
-  "555",
   "pyram",
-  "skewb",
-  "mirror",
-  "minx",
   "333oh",
 ].map((id) => ({
   id,
@@ -67,6 +63,36 @@ export const DIVISIONS = [
 export const USER_ID_PATTERN = /^[A-Z0-9][A-Z0-9_-]{2,19}$/;
 
 export const normalizeUserId = (userId) => userId.trim().toUpperCase();
+
+export const resolveCountry = (value) => {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    const byCode = getCountryByCode(value);
+    if (byCode) return byCode;
+
+    const normalized = value.trim().toLowerCase();
+    return (
+      COUNTRIES.find((country) => country.name.toLowerCase() === normalized) ??
+      null
+    );
+  }
+
+  if (typeof value === "object") {
+    const byCode = getCountryByCode(value.code);
+    if (byCode) return byCode;
+
+    if (value.name) {
+      const normalized = String(value.name).trim().toLowerCase();
+      return (
+        COUNTRIES.find((country) => country.name.toLowerCase() === normalized) ??
+        null
+      );
+    }
+  }
+
+  return null;
+};
 
 const required = (value) => {
   if (Array.isArray(value)) {

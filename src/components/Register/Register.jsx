@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Card,
@@ -26,7 +26,7 @@ import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import useDebounce from "../../hooks/useDebounce";
-import { isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
+import { getUserProfile, isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
 import {
   REGISTRATION_EVENTS,
@@ -34,6 +34,7 @@ import {
   MODES,
   DIVISIONS,
   normalizeUserId,
+  resolveCountry,
   validateRegistration,
   validateImageFile,
   getAgeFromDob,
@@ -116,9 +117,13 @@ function Register() {
 
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState(null);
   const [errors, setErrors] = useState({});
   const [touchedFields, setTouchedFields] = useState({});
   const [registeredCompetitor, setRegisteredCompetitor] = useState(null);
+  const lastAppliedProfileIdRef = useRef(null);
+  const photoFileRef = useRef(photoFile);
+  photoFileRef.current = photoFile;
 
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
@@ -135,10 +140,65 @@ function Register() {
     staleTime: 10000,
   });
 
+  const {
+    data: previousProfile,
+    isLoading: loadingProfile,
+    isFetched: profileFetched,
+  } = useQuery({
+    queryKey: ["user-profile", debouncedUserId],
+    queryFn: () => getUserProfile(debouncedUserId),
+    enabled: Boolean(formData.isPreviousParticipant && debouncedUserId.length >= 3),
+    staleTime: 60000,
+  });
+
+  useEffect(() => {
+    lastAppliedProfileIdRef.current = null;
+    if (!photoFileRef.current) {
+      setExistingImageUrl(null);
+      setPhotoPreview(null);
+    }
+  }, [normalizedUserId, formData.isPreviousParticipant]);
+
+  useEffect(() => {
+    if (!formData.isPreviousParticipant || !previousProfile) return;
+    if (previousProfile.id !== debouncedUserId) return;
+    if (debouncedUserId !== normalizedUserId) return;
+    if (lastAppliedProfileIdRef.current === previousProfile.id) return;
+
+    lastAppliedProfileIdRef.current = previousProfile.id;
+
+    setFormData((prev) => ({
+      ...prev,
+      name: previousProfile.name ?? prev.name,
+      gender: previousProfile.gender
+        ? String(previousProfile.gender).toLowerCase()
+        : prev.gender,
+      country: resolveCountry(previousProfile.country) ?? prev.country,
+    }));
+
+    if (!photoFileRef.current && previousProfile.imageUrl) {
+      setExistingImageUrl(previousProfile.imageUrl);
+      setPhotoPreview(previousProfile.imageUrl);
+    }
+  }, [
+    previousProfile,
+    formData.isPreviousParticipant,
+    debouncedUserId,
+    normalizedUserId,
+  ]);
+
+  const previousIdMissing =
+    formData.isPreviousParticipant === true &&
+    debouncedUserId.length >= 3 &&
+    debouncedUserId === normalizedUserId &&
+    profileFetched &&
+    !loadingProfile &&
+    !previousProfile;
+
   // Registration mutation
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      let imageUrl = null;
+      let imageUrl = existingImageUrl;
 
       // Upload photo if provided
       if (photoFile) {
@@ -257,6 +317,13 @@ function Register() {
       return;
     }
 
+    if (formData.isPreviousParticipant && !previousProfile) {
+      enqueueSnackbar("No previous Cubuzzle profile found for this ID", {
+        variant: "error",
+      });
+      return;
+    }
+
     // Submit registration
     const submitData = {
       ...formData,
@@ -285,6 +352,8 @@ function Register() {
     });
     setPhotoFile(null);
     setPhotoPreview(null);
+    setExistingImageUrl(null);
+    lastAppliedProfileIdRef.current = null;
     setErrors({});
     setTouchedFields({});
   };
@@ -301,8 +370,10 @@ function Register() {
   }
 
   const userIdStatus = normalizedUserId.length >= 3
-    ? checkingAvailability
+    ? checkingAvailability || loadingProfile
       ? "checking"
+      : previousIdMissing
+      ? "missing"
       : isAvailable
       ? "available"
       : "taken"
@@ -339,7 +410,7 @@ function Register() {
                 component="label"
                 startIcon={<PhotoCameraIcon />}
               >
-                {photoFile ? "Change Photo" : "Upload Photo (Optional)"}
+                {photoFile || existingImageUrl ? "Change Photo" : "Upload Photo (Optional)"}
                 <input
                   type="file"
                   hidden
@@ -384,10 +455,12 @@ function Register() {
                   value={formData.userId}
                   onChange={(e) => handleFieldChange("userId", e.target.value)}
                   onBlur={() => handleBlur("userId")}
-                  error={Boolean(errors.userId)}
+                  error={Boolean(errors.userId) || previousIdMissing}
                   helperText={
                     errors.userId ||
-                    (formData.isPreviousParticipant
+                    (previousIdMissing
+                      ? "No previous Cubuzzle profile found for this ID"
+                      : formData.isPreviousParticipant
                       ? "Use the same Cubuzzle ID from previous seasons"
                       : "3-20 characters, letters, numbers, hyphens, underscores")
                   }
@@ -400,7 +473,7 @@ function Register() {
                         {userIdStatus === "available" && (
                           <CheckCircleIcon color="success" fontSize="small" />
                         )}
-                        {userIdStatus === "taken" && (
+                        {(userIdStatus === "taken" || userIdStatus === "missing") && (
                           <ErrorIcon color="error" fontSize="small" />
                         )}
                       </InputAdornment>
@@ -663,7 +736,12 @@ function Register() {
             type="submit"
             variant="contained"
             size="large"
-            disabled={registerMutation.isPending || userIdStatus === "taken"}
+            disabled={
+              registerMutation.isPending ||
+              userIdStatus === "taken" ||
+              previousIdMissing ||
+              (formData.isPreviousParticipant && !previousProfile)
+            }
             sx={{ minWidth: 200 }}
           >
             {registerMutation.isPending ? "Registering..." : "Register"}
