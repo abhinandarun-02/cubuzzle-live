@@ -43,7 +43,7 @@ import FlagIcon from "../FlagIcon/FlagIcon";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import RegistrationSuccess from "./RegistrationSuccess";
 
-const COMPETITION_ID = "cubuzzle-s4";
+const COMPETITION_ID = "cubuzzle-s5";
 
 const styles = {
   card: {

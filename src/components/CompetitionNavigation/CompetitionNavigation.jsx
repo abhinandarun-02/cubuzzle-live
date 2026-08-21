@@ -13,7 +13,7 @@ import Loading from "../Loading/Loading";
 import Error from "../Error/Error";
 
 function CompetitionNavigation() {
-  const competitionId = "cubuzzle-s4";
+  const competitionId = "cubuzzle-s5";
 
   const {
     data: competition,

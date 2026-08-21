@@ -260,7 +260,7 @@ function CumulativeScoreCell({ entry, eventId, rounds }) {
 }
 
 function EventLeaderboard() {
-  const competitionId = "cubuzzle-s4";
+  const competitionId = "cubuzzle-s5";
   const { eventId } = useParams();
   const smScreen = useMediaQuery((theme) => theme.breakpoints.up("sm"));
   const mdScreen = useMediaQuery((theme) => theme.breakpoints.up("md"));
