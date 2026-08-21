@@ -283,7 +283,7 @@ function CompetitionHome() {
           />
         </Box>
         <Typography variant="h4" component="h1" gutterBottom>
-          Cubuzzle Champion League - Season 4
+          Cubuzzle Champion League - Season 5
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
           Summer Championship 2026 • The Ultimate Speedcubing Battle
