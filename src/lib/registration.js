@@ -1,3 +1,4 @@
+import { differenceInYears, isFuture, isValid, parse } from "date-fns";
 import { getEventDisplayName } from "./competition";
 
 export const REGISTRATION_EVENTS = [
@@ -26,6 +27,29 @@ export const CATEGORIES = [
   { value: "8-12", label: "8 - 12" },
   { value: "A-13", label: "Above 13" },
 ];
+
+export const parseDob = (dob) => {
+  if (!dob) return null;
+  const date = parse(dob, "yyyy-MM-dd", new Date());
+  return isValid(date) ? date : null;
+};
+
+export const getAgeFromDob = (dob) => {
+  const date = parseDob(dob);
+  if (!date) return null;
+  return differenceInYears(new Date(), date);
+};
+
+export const getCategoryFromDob = (dob) => {
+  const age = getAgeFromDob(dob);
+  if (age === null || age < 0) return null;
+  if (age < 8) return "B-8";
+  if (age <= 12) return "8-12";
+  return "A-13";
+};
+
+export const getCategoryLabel = (category) =>
+  CATEGORIES.find((item) => item.value === category)?.label || category;
 
 export const MODES = [
   { value: "onsite", label: "Onsite" },
@@ -98,8 +122,23 @@ export const validateRegistration = (values) => {
     errors.gender = "Gender is required";
   }
 
-  if (!required(values.category)) {
-    errors.category = "Category is required";
+  if (!required(values.dob)) {
+    errors.dob = "Date of birth is required";
+  } else {
+    const dobDate = parseDob(values.dob);
+    if (!dobDate) {
+      errors.dob = "Enter a valid date of birth";
+    } else if (isFuture(dobDate)) {
+      errors.dob = "Date of birth cannot be in the future";
+    } else if (getAgeFromDob(values.dob) > 100) {
+      errors.dob = "Enter a valid date of birth";
+    } else if (getCategoryFromDob(values.dob) == null) {
+      errors.dob = "Enter a valid date of birth";
+    }
+  }
+
+  if (!required(values.orderId)) {
+    errors.orderId = "Order ID is required";
   }
 
   if (!required(values.registeredDivision)) {

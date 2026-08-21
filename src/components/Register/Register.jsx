@@ -31,12 +31,14 @@ import { uploadCompetitorImage } from "../../lib/firebase/storage";
 import {
   REGISTRATION_EVENTS,
   GENDERS,
-  CATEGORIES,
   MODES,
   DIVISIONS,
   normalizeUserId,
   validateRegistration,
   validateImageFile,
+  getAgeFromDob,
+  getCategoryFromDob,
+  getCategoryLabel,
 } from "../../lib/registration";
 import { COUNTRIES, DEFAULT_COUNTRY_CODE, getCountryByCode } from "../../lib/countries";
 import FlagIcon from "../FlagIcon/FlagIcon";
@@ -85,6 +87,16 @@ const styles = {
   },
 };
 
+function getDobHelperText(dob) {
+  const category = getCategoryFromDob(dob);
+  if (!category) {
+    return "Age category is determined from date of birth";
+  }
+
+  const age = getAgeFromDob(dob);
+  return `Category : ${getCategoryLabel(category)}`;
+}
+
 function Register() {
   const [formData, setFormData] = useState({
     userId: "",
@@ -95,7 +107,8 @@ function Register() {
     phoneNo: "",
     school: "",
     gender: "",
-    category: "",
+    dob: "",
+    orderId: "",
     registeredDivision: "",
     modeOfParticipation: "",
     country: getCountryByCode(DEFAULT_COUNTRY_CODE),
@@ -142,7 +155,9 @@ function Register() {
         phoneNo: data.phoneNo,
         school: data.school,
         gender: data.gender,
-        category: data.category,
+        dob: data.dob,
+        category: getCategoryFromDob(data.dob),
+        orderId: data.orderId.trim(),
         registeredDivision: data.registeredDivision,
         modeOfParticipation: data.modeOfParticipation,
         country: data.country,
@@ -277,7 +292,8 @@ function Register() {
       phoneNo: "",
       school: "",
       gender: "",
-      category: "",
+      dob: "",
+      orderId: "",
       registeredDivision: "",
       modeOfParticipation: "",
       country: getCountryByCode(DEFAULT_COUNTRY_CODE),
@@ -400,7 +416,7 @@ function Register() {
                 <TextField
                   fullWidth
                   required
-                  label="User ID for Season 4"
+                  label="Cubuzzle ID"
                   value={formData.userId}
                   onChange={(e) => handleFieldChange("userId", e.target.value)}
                   onBlur={() => handleBlur("userId")}
@@ -505,25 +521,37 @@ function Register() {
                 </FormControl>
               </Grid>
 
-              {/* Category */}
+              {/* Date of Birth */}
               <Grid item xs={12} md={6}>
-                <FormControl required error={Boolean(errors.category)}>
-                  <FormLabel>Age Category</FormLabel>
-                  <RadioGroup
-                    value={formData.category}
-                    onChange={(e) => handleFieldChange("category", e.target.value)}
-                  >
-                    {CATEGORIES.map((category) => (
-                      <FormControlLabel
-                        key={category.value}
-                        value={category.value}
-                        control={<Radio />}
-                        label={category.label}
-                      />
-                    ))}
-                  </RadioGroup>
-                  {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
-                </FormControl>
+                <TextField
+                  fullWidth
+                  required
+                  type="date"
+                  label="Date of Birth"
+                  value={formData.dob}
+                  onChange={(e) => handleFieldChange("dob", e.target.value)}
+                  onBlur={() => handleBlur("dob")}
+                  error={Boolean(errors.dob)}
+                  helperText={errors.dob || getDobHelperText(formData.dob)}
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{
+                    max: new Date().toLocaleDateString("en-CA"),
+                  }}
+                />
+              </Grid>
+
+              {/* Order ID */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Order ID"
+                  value={formData.orderId}
+                  onChange={(e) => handleFieldChange("orderId", e.target.value)}
+                  onBlur={() => handleBlur("orderId")}
+                  error={Boolean(errors.orderId)}
+                  helperText={errors.orderId}
+                />
               </Grid>
 
               {/* Country */}
