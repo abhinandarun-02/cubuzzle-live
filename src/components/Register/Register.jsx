@@ -343,7 +343,6 @@ function Register() {
 
       let imageUrl = existingImageUrl;
 
-      // Upload photo if provided
       if (photoFile) {
         imageUrl = await uploadCompetitorImage(COMPETITION_ID, competitorId, photoFile);
       }
@@ -366,7 +365,7 @@ function Register() {
         nationality: data.nationality,
         events: data.events,
         previousUserId: data.isPreviousParticipant ? competitorId : null,
-        ...(imageUrl && { imageUrl }),
+        imageUrl,
       };
 
       await registerCompetitor(COMPETITION_ID, competitor);
@@ -440,6 +439,21 @@ function Register() {
 
     setPhotoFile(file);
     setPhotoPreview(URL.createObjectURL(file));
+    setErrors((prev) => {
+      if (!prev.photo) return prev;
+      const next = { ...prev };
+      delete next.photo;
+      return next;
+    });
+  };
+
+  const handlePhotoRemove = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setExistingImageUrl(null);
+    setErrors((prev) => ({ ...prev, photo: "Photo is required" }));
   };
 
   const handleEventToggle = (eventId) => {
@@ -459,7 +473,10 @@ function Register() {
 
     // Validate all fields
     const validationErrors = validateRegistration(formData);
-    
+    if (!photoFile && !existingImageUrl) {
+      validationErrors.photo = "Photo is required";
+    }
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = Object.values(validationErrors)[0];
@@ -550,14 +567,18 @@ function Register() {
             </Typography>
 
             {/* Photo Upload */}
-            <Box sx={styles.photoUpload}>
-              <Box
-                component="label"
-                sx={styles.photoDropzone}
-              >
+            <FormControl required error={Boolean(errors.photo)} sx={styles.photoUpload}>
+              <FormLabel sx={styles.fieldLabel}>Photo</FormLabel>
+              <Box component="label" sx={styles.photoDropzone}>
                 <Avatar
                   src={photoPreview}
-                  sx={{ width: 128, height: 128, border: "3px solid", borderColor: "divider" }}
+                  sx={{
+                    width: 128,
+                    height: 128,
+                    borderWidth: 3,
+                    borderStyle: errors.photo || photoPreview ? "solid" : "dashed",
+                    borderColor: errors.photo ? "error.main" : "divider",
+                  }}
                 >
                   <PhotoCameraIcon sx={{ fontSize: 40, color: "text.disabled" }} />
                 </Avatar>
@@ -572,13 +593,7 @@ function Register() {
                     <IconButton
                       size="small"
                       sx={styles.photoRemoveBtn}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setPhotoFile(null);
-                        setPhotoPreview(null);
-                        setExistingImageUrl(null);
-                      }}
+                      onClick={handlePhotoRemove}
                     >
                       <CloseIcon fontSize="small" />
                     </IconButton>
@@ -592,9 +607,10 @@ function Register() {
                 />
               </Box>
               <Typography variant="caption" color="text.secondary">
-                Optional &middot; JPEG, PNG or WebP, up to 5&nbsp;MB
+                JPEG, PNG or WebP, up to 5&nbsp;MB
               </Typography>
-            </Box>
+              {errors.photo && <FormHelperText>{errors.photo}</FormHelperText>}
+            </FormControl>
 
             <Grid container spacing={3}>
               {/* Previous Participant */}
