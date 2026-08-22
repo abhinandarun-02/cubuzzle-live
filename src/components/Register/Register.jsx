@@ -10,15 +10,15 @@ import {
   Grid,
   FormControl,
   FormLabel,
-  RadioGroup,
-  Radio,
-  FormControlLabel,
   FormHelperText,
   Avatar,
   Autocomplete,
   CircularProgress,
   InputAdornment,
   Stack,
+  IconButton,
+  Divider,
+  Tooltip,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
@@ -27,6 +27,13 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import LanguageIcon from "@mui/icons-material/Language";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import useDebounce from "../../hooks/useDebounce";
 import { createCompetitorId, getUserProfile, isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
@@ -62,7 +69,44 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 2,
+    gap: 1.25,
+    mb: 3.5,
+  },
+  photoDropzone: {
+    position: "relative",
+    width: 128,
+    height: 128,
+    borderRadius: "50%",
+    cursor: "pointer",
+    "&:hover .photo-overlay": {
+      opacity: 1,
+    },
+  },
+  photoOverlay: {
+    position: "absolute",
+    inset: 0,
+    borderRadius: "50%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 0.5,
+    color: "#fff",
+    bgcolor: "rgba(0,0,0,0.55)",
+    opacity: 0,
+    transition: "opacity 0.15s",
+    pointerEvents: "none",
+  },
+  photoRemoveBtn: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    bgcolor: "background.paper",
+    boxShadow: 1,
+    "&:hover": {
+      bgcolor: "error.main",
+      color: "#fff",
+    },
   },
   fieldLabel: {
     mb: 0.75,
@@ -71,6 +115,29 @@ const styles = {
   fieldHint: {
     mb: 1.5,
     display: "block",
+  },
+  sectionCaption: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+    color: "text.secondary",
+    fontWeight: 600,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    fontSize: 12,
+  },
+  yesNoGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 200px))",
+    gap: 1.25,
+  },
+  genderGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "repeat(1, minmax(0, 1fr))",
+      sm: "repeat(3, minmax(0, 1fr))",
+    },
+    gap: 1.25,
   },
   choiceCard: {
     appearance: "none",
@@ -477,49 +544,80 @@ function Register() {
 
             {/* Photo Upload */}
             <Box sx={styles.photoUpload}>
-              <Avatar
-                src={photoPreview}
-                sx={{ width: 120, height: 120 }}
-                variant="rounded"
-              >
-                <PhotoCameraIcon sx={{ fontSize: 48 }} />
-              </Avatar>
-              <Button
-                variant="outlined"
+              <Box
                 component="label"
-                startIcon={<PhotoCameraIcon />}
+                sx={styles.photoDropzone}
               >
-                {photoFile || existingImageUrl ? "Change Photo" : "Upload Photo (Optional)"}
+                <Avatar
+                  src={photoPreview}
+                  sx={{ width: 128, height: 128, border: "3px solid", borderColor: "divider" }}
+                >
+                  <PhotoCameraIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                </Avatar>
+                <Box className="photo-overlay" sx={styles.photoOverlay}>
+                  <PhotoCameraIcon fontSize="small" />
+                  <Typography variant="caption" fontWeight={600}>
+                    {photoFile || existingImageUrl ? "Change" : "Upload"}
+                  </Typography>
+                </Box>
+                {(photoFile || photoPreview) && (
+                  <Tooltip title="Remove photo">
+                    <IconButton
+                      size="small"
+                      sx={styles.photoRemoveBtn}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPhotoFile(null);
+                        setPhotoPreview(null);
+                        setExistingImageUrl(null);
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 <input
                   type="file"
                   hidden
                   accept="image/jpeg,image/png,image/webp"
                   onChange={handlePhotoChange}
                 />
-              </Button>
+              </Box>
+              <Typography variant="caption" color="text.secondary">
+                Optional &middot; JPEG, PNG or WebP, up to 5&nbsp;MB
+              </Typography>
             </Box>
 
-            <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid container spacing={3}>
               {/* Previous Participant */}
               <Grid item xs={12}>
-                <FormControl required error={Boolean(errors.isPreviousParticipant)}>
-                  <FormLabel>Are you a previous Cubuzzle participant?</FormLabel>
-                  <RadioGroup
-                    row
-                    value={formData.isPreviousParticipant === null ? "" : String(formData.isPreviousParticipant)}
-                    onChange={(e) => handleFieldChange("isPreviousParticipant", e.target.value === "true")}
-                  >
-                    <FormControlLabel
-                      value="true"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="false"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
+                <FormControl required error={Boolean(errors.isPreviousParticipant)} fullWidth>
+                  <FormLabel sx={styles.fieldLabel}>
+                    Are you a previous Cubuzzle participant?
+                  </FormLabel>
+                  <Box role="radiogroup" aria-label="Previous participant" sx={styles.yesNoGrid}>
+                    {[
+                      { value: true, label: "Yes" },
+                      { value: false, label: "No" },
+                    ].map((option) => {
+                      const selected = formData.isPreviousParticipant === option.value;
+                      return (
+                        <ChoiceCard
+                          key={String(option.value)}
+                          role="radio"
+                          aria-checked={selected}
+                          selected={selected}
+                          onClick={() => handleFieldChange("isPreviousParticipant", option.value)}
+                          sx={{ justifyContent: "center", minHeight: 44 }}
+                        >
+                          <Typography variant="body2" fontWeight={600}>
+                            {option.label}
+                          </Typography>
+                        </ChoiceCard>
+                      );
+                    })}
+                  </Box>
                   {errors.isPreviousParticipant && (
                     <FormHelperText>{errors.isPreviousParticipant}</FormHelperText>
                   )}
@@ -543,6 +641,11 @@ function Register() {
                         : "Use the same Cubuzzle ID from previous seasons")
                     }
                     InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <HowToRegOutlinedIcon fontSize="small" color="action" />
+                        </InputAdornment>
+                      ),
                       endAdornment: userIdStatus && (
                         <InputAdornment position="end">
                           {userIdStatus === "checking" && (
@@ -561,6 +664,12 @@ function Register() {
                 </Grid>
               )}
 
+              <Grid item xs={12}>
+                <Divider sx={{ mb: -1 }}>
+                  <Typography sx={styles.sectionCaption}>Personal Information</Typography>
+                </Divider>
+              </Grid>
+
               {/* Name */}
               <Grid item xs={12} md={6}>
                 <TextField
@@ -572,6 +681,13 @@ function Register() {
                   onBlur={() => handleBlur("name")}
                   error={Boolean(errors.name)}
                   helperText={errors.name}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutlineIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
 
@@ -587,6 +703,13 @@ function Register() {
                   onBlur={() => handleBlur("email")}
                   error={Boolean(errors.email)}
                   helperText={errors.email}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailOutlinedIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
 
@@ -601,11 +724,18 @@ function Register() {
                   onBlur={() => handleBlur("phoneNo")}
                   error={Boolean(errors.phoneNo)}
                   helperText={errors.phoneNo}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LocalPhoneOutlinedIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
 
               {/* School */}
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   required
@@ -615,28 +745,14 @@ function Register() {
                   onBlur={() => handleBlur("school")}
                   error={Boolean(errors.school)}
                   helperText={errors.school}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SchoolOutlinedIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              </Grid>
-
-              {/* Gender */}
-              <Grid item xs={12} md={6}>
-                <FormControl required error={Boolean(errors.gender)}>
-                  <FormLabel>Gender</FormLabel>
-                  <RadioGroup
-                    value={formData.gender}
-                    onChange={(e) => handleFieldChange("gender", e.target.value)}
-                  >
-                    {GENDERS.map((gender) => (
-                      <FormControlLabel
-                        key={gender.value}
-                        value={gender.value}
-                        control={<Radio />}
-                        label={gender.label}
-                      />
-                    ))}
-                  </RadioGroup>
-                  {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
-                </FormControl>
               </Grid>
 
               {/* Date of Birth */}
@@ -658,6 +774,39 @@ function Register() {
                 />
               </Grid>
 
+              {/* Gender */}
+              <Grid item xs={12} md={6}>
+                <FormControl required error={Boolean(errors.gender)} fullWidth>
+                  <FormLabel sx={styles.fieldLabel}>Gender</FormLabel>
+                  <Box role="radiogroup" aria-label="Gender" sx={styles.genderGrid}>
+                    {GENDERS.map((gender) => {
+                      const selected = formData.gender === gender.value;
+                      return (
+                        <ChoiceCard
+                          key={gender.value}
+                          role="radio"
+                          aria-checked={selected}
+                          selected={selected}
+                          onClick={() => handleFieldChange("gender", gender.value)}
+                          sx={{ justifyContent: "center", minHeight: 44 }}
+                        >
+                          <Typography variant="body2" fontWeight={600}>
+                            {gender.label}
+                          </Typography>
+                        </ChoiceCard>
+                      );
+                    })}
+                  </Box>
+                  {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider sx={{ mb: -1 }}>
+                  <Typography sx={styles.sectionCaption}>Registration Details</Typography>
+                </Divider>
+              </Grid>
+
               {/* Order ID */}
               <Grid item xs={12} md={6}>
                 <TextField
@@ -669,11 +818,18 @@ function Register() {
                   onBlur={() => handleBlur("orderId")}
                   error={Boolean(errors.orderId)}
                   helperText={errors.orderId}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ConfirmationNumberOutlinedIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
 
               {/* Country */}
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <Autocomplete
                   options={COUNTRIES}
                   getOptionLabel={(option) => option.name}
