@@ -26,7 +26,7 @@ import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import useDebounce from "../../hooks/useDebounce";
-import { getUserProfile, isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
+import { createCompetitorId, getUserProfile, isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
 import {
   REGISTRATION_EVENTS,
@@ -136,7 +136,9 @@ function Register() {
   const { data: isAvailable, isLoading: checkingAvailability } = useQuery({
     queryKey: ["competitor-id-availability", COMPETITION_ID, debouncedUserId],
     queryFn: () => isCompetitorIdAvailable(COMPETITION_ID, debouncedUserId),
-    enabled: Boolean(debouncedUserId && debouncedUserId.length >= 3),
+    enabled: Boolean(
+      formData.isPreviousParticipant && debouncedUserId && debouncedUserId.length >= 3
+    ),
     staleTime: 10000,
   });
 
@@ -198,17 +200,21 @@ function Register() {
   // Registration mutation
   const registerMutation = useMutation({
     mutationFn: async (data) => {
+      const competitorId = data.isPreviousParticipant
+        ? normalizeUserId(data.userId)
+        : createCompetitorId(COMPETITION_ID);
+
       let imageUrl = existingImageUrl;
 
       // Upload photo if provided
       if (photoFile) {
-        imageUrl = await uploadCompetitorImage(COMPETITION_ID, data.id, photoFile);
+        imageUrl = await uploadCompetitorImage(COMPETITION_ID, competitorId, photoFile);
       }
 
       // Register competitor with transaction
       const competitor = {
-        id: data.id,
-        userId: data.id,
+        id: competitorId,
+        userId: competitorId,
         name: data.name,
         email: data.email,
         phoneNo: data.phoneNo,
@@ -221,7 +227,7 @@ function Register() {
         modeOfParticipation: data.modeOfParticipation,
         country: data.country,
         events: data.events,
-        previousUserId: data.isPreviousParticipant ? data.id : null,
+        previousUserId: data.isPreviousParticipant ? competitorId : null,
         ...(imageUrl && { imageUrl }),
       };
 
@@ -235,7 +241,7 @@ function Register() {
     },
     onError: (error) => {
       if (error.code === "competitor-id-taken") {
-        enqueueSnackbar("This User ID is already taken. Please choose another.", {
+        enqueueSnackbar("This Cubuzzle ID is already registered. Please choose another.", {
           variant: "error",
         });
         setErrors((prev) => ({ ...prev, userId: "Already registered" }));
@@ -246,20 +252,32 @@ function Register() {
   });
 
   const handleFieldChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    
-    if (field === "userId") {
-      setFormData((prev) => ({ ...prev, userId: normalizeUserId(value) }));
-    }
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
 
-    // Clear error for this field
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
+      if (field === "userId") {
+        next.userId = normalizeUserId(value);
+      }
+
+      if (field === "isPreviousParticipant" && value !== true) {
+        next.userId = "";
+      }
+
+      return next;
+    });
+
+    setErrors((prev) => {
+      if (!prev[field] && !(field === "isPreviousParticipant" && prev.userId)) {
+        return prev;
+      }
+
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      if (field === "isPreviousParticipant") {
+        delete newErrors.userId;
+      }
+      return newErrors;
+    });
   };
 
   const handleBlur = (field) => {
@@ -311,26 +329,21 @@ function Register() {
       return;
     }
 
-    // Check user ID availability one more time
-    if (isAvailable === false) {
-      enqueueSnackbar("This User ID is already taken", { variant: "error" });
-      return;
+    if (formData.isPreviousParticipant) {
+      if (isAvailable === false) {
+        enqueueSnackbar("This Cubuzzle ID is already registered", { variant: "error" });
+        return;
+      }
+
+      if (!previousProfile) {
+        enqueueSnackbar("No previous Cubuzzle profile found for this ID", {
+          variant: "error",
+        });
+        return;
+      }
     }
 
-    if (formData.isPreviousParticipant && !previousProfile) {
-      enqueueSnackbar("No previous Cubuzzle profile found for this ID", {
-        variant: "error",
-      });
-      return;
-    }
-
-    // Submit registration
-    const submitData = {
-      ...formData,
-      id: normalizedUserId,
-    };
-
-    registerMutation.mutate(submitData);
+    registerMutation.mutate(formData);
   };
 
   const handleRegisterAnother = () => {
@@ -369,15 +382,16 @@ function Register() {
     );
   }
 
-  const userIdStatus = normalizedUserId.length >= 3
-    ? checkingAvailability || loadingProfile
-      ? "checking"
-      : previousIdMissing
-      ? "missing"
-      : isAvailable
-      ? "available"
-      : "taken"
-    : null;
+  const userIdStatus =
+    formData.isPreviousParticipant && normalizedUserId.length >= 3
+      ? checkingAvailability || loadingProfile
+        ? "checking"
+        : previousIdMissing
+        ? "missing"
+        : isAvailable
+        ? "available"
+        : "taken"
+      : null;
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -447,40 +461,40 @@ function Register() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  required
-                  label="Cubuzzle ID"
-                  value={formData.userId}
-                  onChange={(e) => handleFieldChange("userId", e.target.value)}
-                  onBlur={() => handleBlur("userId")}
-                  error={Boolean(errors.userId) || previousIdMissing}
-                  helperText={
-                    errors.userId ||
-                    (previousIdMissing
-                      ? "No previous Cubuzzle profile found for this ID"
-                      : formData.isPreviousParticipant
-                      ? "Use the same Cubuzzle ID from previous seasons"
-                      : "3-20 characters, letters, numbers, hyphens, underscores")
-                  }
-                  InputProps={{
-                    endAdornment: userIdStatus && (
-                      <InputAdornment position="end">
-                        {userIdStatus === "checking" && (
-                          <CircularProgress size={20} />
-                        )}
-                        {userIdStatus === "available" && (
-                          <CheckCircleIcon color="success" fontSize="small" />
-                        )}
-                        {(userIdStatus === "taken" || userIdStatus === "missing") && (
-                          <ErrorIcon color="error" fontSize="small" />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
+              {formData.isPreviousParticipant === true && (
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Cubuzzle ID"
+                    value={formData.userId}
+                    onChange={(e) => handleFieldChange("userId", e.target.value)}
+                    onBlur={() => handleBlur("userId")}
+                    error={Boolean(errors.userId) || previousIdMissing}
+                    helperText={
+                      errors.userId ||
+                      (previousIdMissing
+                        ? "No previous Cubuzzle profile found for this ID"
+                        : "Use the same Cubuzzle ID from previous seasons")
+                    }
+                    InputProps={{
+                      endAdornment: userIdStatus && (
+                        <InputAdornment position="end">
+                          {userIdStatus === "checking" && (
+                            <CircularProgress size={20} />
+                          )}
+                          {userIdStatus === "available" && (
+                            <CheckCircleIcon color="success" fontSize="small" />
+                          )}
+                          {(userIdStatus === "taken" || userIdStatus === "missing") && (
+                            <ErrorIcon color="error" fontSize="small" />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
 
               {/* Name */}
               <Grid item xs={12} md={6}>
@@ -738,9 +752,10 @@ function Register() {
             size="large"
             disabled={
               registerMutation.isPending ||
-              userIdStatus === "taken" ||
-              previousIdMissing ||
-              (formData.isPreviousParticipant && !previousProfile)
+              (formData.isPreviousParticipant === true &&
+                (userIdStatus === "taken" ||
+                  previousIdMissing ||
+                  !previousProfile))
             }
             sx={{ minWidth: 200 }}
           >

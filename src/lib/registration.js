@@ -103,16 +103,19 @@ const required = (value) => {
 
 export const validateRegistration = (values) => {
   const errors = {};
-  const userId = normalizeUserId(values.userId);
-
-  if (!required(userId)) {
-    errors.userId = "Cubuzzle ID is required";
-  } else if (!USER_ID_PATTERN.test(userId)) {
-    errors.userId = "Use 3-20 letters, numbers, underscores, or hyphens";
-  }
 
   if (!required(values.isPreviousParticipant) && values.isPreviousParticipant !== false) {
     errors.isPreviousParticipant = "Please indicate if you are a previous participant";
+  }
+
+  if (values.isPreviousParticipant === true) {
+    const userId = normalizeUserId(values.userId || "");
+
+    if (!required(userId)) {
+      errors.userId = "Cubuzzle ID is required";
+    } else if (!USER_ID_PATTERN.test(userId)) {
+      errors.userId = "Use 3-20 letters, numbers, underscores, or hyphens";
+    }
   }
 
   if (!required(values.name)) {

@@ -67,9 +67,11 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
             Registration complete
           </Typography>
           <Typography variant="h6">{competitor.name}</Typography>
-          <Typography variant="body1" color="text.secondary">
-            Cubuzzle ID: {competitor.id}
-          </Typography>
+          {competitor.previousUserId && (
+            <Typography variant="body1" color="text.secondary">
+              Cubuzzle ID: {competitor.id}
+            </Typography>
+          )}
 
           <Stack direction="row" sx={styles.chipWrap}>
             <Chip

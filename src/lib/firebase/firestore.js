@@ -108,6 +108,9 @@ export const getCompetitorsByCompetition = async (competitionId) => {
   }
 };
 
+export const createCompetitorId = (competitionId) =>
+  doc(collection(db, "competitions", competitionId, "competitors")).id;
+
 export const isCompetitorIdAvailable = async (competitionId, id) => {
   try {
     const competitorRef = doc(
