@@ -87,22 +87,6 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
           </Stack>
 
           <Stack direction="row" sx={styles.actions}>
-            <Button
-              component={RouterLink}
-              to={`/competitor/${competitor.id}`}
-              variant="contained"
-              startIcon={<PersonSearchIcon />}
-            >
-              View profile
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/competitors"
-              variant="outlined"
-              startIcon={<PeopleIcon />}
-            >
-              Competitors
-            </Button>
             <Button onClick={onRegisterAnother} startIcon={<RestartAltIcon />}>
               Register another
             </Button>
