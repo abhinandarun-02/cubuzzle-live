@@ -13,18 +13,20 @@ import {
   RadioGroup,
   Radio,
   FormControlLabel,
-  Checkbox,
   FormHelperText,
   Avatar,
   Autocomplete,
   CircularProgress,
   InputAdornment,
+  Stack,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import LanguageIcon from "@mui/icons-material/Language";
 import useDebounce from "../../hooks/useDebounce";
 import { createCompetitorId, getUserProfile, isCompetitorIdAvailable, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
@@ -62,31 +64,94 @@ const styles = {
     alignItems: "center",
     gap: 2,
   },
-  eventGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-    gap: 2,
+  fieldLabel: {
+    mb: 0.75,
+    fontWeight: 500,
   },
-  eventCard: {
+  fieldHint: {
+    mb: 1.5,
+    display: "block",
+  },
+  choiceCard: {
+    appearance: "none",
+    WebkitAppearance: "none",
     display: "flex",
     alignItems: "center",
-    gap: 1,
-    p: 1.5,
+    width: "100%",
+    m: 0,
+    px: 1.75,
+    py: 1.5,
     border: "1px solid",
     borderColor: "divider",
-    borderRadius: 1,
+    borderRadius: 2,
+    bgcolor: "transparent",
+    color: "inherit",
+    font: "inherit",
+    textAlign: "left",
     cursor: "pointer",
-    transition: "all 0.2s",
+    userSelect: "none",
+    transition: "border-color 0.15s, background-color 0.15s",
     "&:hover": {
       borderColor: "primary.main",
       bgcolor: "action.hover",
     },
+    "&:focus-visible": {
+      outline: "2px solid",
+      outlineColor: "primary.main",
+      outlineOffset: 2,
+    },
   },
-  eventCardSelected: {
+  choiceCardSelected: {
     borderColor: "primary.main",
     bgcolor: "action.selected",
+    boxShadow: (theme) => `inset 0 0 0 1px ${theme.palette.primary.main}`,
+  },
+  divisionGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "repeat(2, minmax(0, 1fr))",
+      sm: "repeat(3, minmax(0, 1fr))",
+      md: "repeat(5, minmax(0, 1fr))",
+    },
+    gap: 1.25,
+  },
+  modeGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      sm: "repeat(2, minmax(0, 220px))",
+    },
+    gap: 1.25,
+  },
+  eventGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "repeat(2, minmax(0, 1fr))",
+      sm: "repeat(4, minmax(0, 1fr))",
+    },
+    gap: 1.25,
   },
 };
+
+function ChoiceCard({ selected, onClick, children, sx, role, ...props }) {
+  return (
+    <Box
+      component="button"
+      type="button"
+      role={role}
+      aria-pressed={role === "radio" ? undefined : selected}
+      onClick={onClick}
+      sx={{
+        ...styles.choiceCard,
+        ...(selected && styles.choiceCardSelected),
+        ...sx,
+      }}
+      {...props}
+    >
+      {children}
+    </Box>
+  );
+}
 
 function getDobHelperText(dob) {
   const category = getCategoryFromDob(dob);
@@ -650,97 +715,113 @@ function Register() {
               Competition Details
             </Typography>
 
-            <Grid container spacing={3}>
-              {/* Division */}
-              <Grid item xs={12} md={6}>
-                <FormControl required error={Boolean(errors.registeredDivision)}>
-                  <FormLabel>Division</FormLabel>
-                  <RadioGroup
-                    value={formData.registeredDivision}
-                    onChange={(e) =>
-                      handleFieldChange("registeredDivision", e.target.value)
-                    }
-                  >
-                    {DIVISIONS.map((division) => (
-                      <FormControlLabel
+            <Stack spacing={3.5}>
+              <FormControl required error={Boolean(errors.registeredDivision)}>
+                <FormLabel sx={styles.fieldLabel}>Division</FormLabel>
+                <Typography variant="caption" color="text.secondary" sx={styles.fieldHint}>
+                  Choose the division closest to your typical 3x3 average
+                </Typography>
+                <Box
+                  role="radiogroup"
+                  aria-label="Division"
+                  sx={styles.divisionGrid}
+                >
+                  {DIVISIONS.map((division) => {
+                    const selected = formData.registeredDivision === division.value;
+                    return (
+                      <ChoiceCard
                         key={division.value}
-                        value={division.value}
-                        control={<Radio />}
-                        label={
-                          <Box>
-                            <Typography variant="body2">
-                              {division.label}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {division.hint}
-                            </Typography>
-                          </Box>
+                        role="radio"
+                        aria-checked={selected}
+                        selected={selected}
+                        onClick={() =>
+                          handleFieldChange("registeredDivision", division.value)
                         }
-                      />
-                    ))}
-                  </RadioGroup>
-                  {errors.registeredDivision && (
-                    <FormHelperText>{errors.registeredDivision}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
+                        sx={{
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          gap: 0.5,
+                          minHeight: 76,
+                        }}
+                      >
+                        <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2}>
+                          {division.label}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {division.hint}
+                        </Typography>
+                      </ChoiceCard>
+                    );
+                  })}
+                </Box>
+                {errors.registeredDivision && (
+                  <FormHelperText>{errors.registeredDivision}</FormHelperText>
+                )}
+              </FormControl>
 
-              {/* Mode */}
-              <Grid item xs={12} md={6}>
-                <FormControl required error={Boolean(errors.modeOfParticipation)}>
-                  <FormLabel>Mode of Participation</FormLabel>
-                  <RadioGroup
-                    value={formData.modeOfParticipation}
-                    onChange={(e) =>
-                      handleFieldChange("modeOfParticipation", e.target.value)
-                    }
-                  >
-                    {MODES.map((mode) => (
-                      <FormControlLabel
+              <FormControl required error={Boolean(errors.modeOfParticipation)}>
+                <FormLabel sx={styles.fieldLabel}>Mode of Participation</FormLabel>
+                <Box
+                  role="radiogroup"
+                  aria-label="Mode of Participation"
+                  sx={styles.modeGrid}
+                >
+                  {MODES.map((mode) => {
+                    const selected = formData.modeOfParticipation === mode.value;
+                    const Icon = mode.value === "onsite" ? PlaceOutlinedIcon : LanguageIcon;
+                    return (
+                      <ChoiceCard
                         key={mode.value}
-                        value={mode.value}
-                        control={<Radio />}
-                        label={mode.label}
-                      />
-                    ))}
-                  </RadioGroup>
-                  {errors.modeOfParticipation && (
-                    <FormHelperText>{errors.modeOfParticipation}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
+                        role="radio"
+                        aria-checked={selected}
+                        selected={selected}
+                        onClick={() =>
+                          handleFieldChange("modeOfParticipation", mode.value)
+                        }
+                        sx={{ gap: 1.25, minHeight: 56 }}
+                      >
+                        <Icon fontSize="small" color={selected ? "primary" : "action"} />
+                        <Typography variant="body2" fontWeight={600}>
+                          {mode.label}
+                        </Typography>
+                      </ChoiceCard>
+                    );
+                  })}
+                </Box>
+                {errors.modeOfParticipation && (
+                  <FormHelperText>{errors.modeOfParticipation}</FormHelperText>
+                )}
+              </FormControl>
 
-              {/* Events */}
-              <Grid item xs={12}>
-                <FormControl required error={Boolean(errors.events)} fullWidth>
-                  <FormLabel>Events (select at least one)</FormLabel>
-                  <Box sx={styles.eventGrid}>
-                    {REGISTRATION_EVENTS.map((event) => {
-                      const isSelected = formData.events.includes(event.id);
-                      return (
-                        <Box
-                          key={event.id}
-                          sx={{
-                            ...styles.eventCard,
-                            ...(isSelected && styles.eventCardSelected),
-                          }}
-                          onClick={() => handleEventToggle(event.id)}
-                        >
-                          <Checkbox
-                            checked={isSelected}
-                            size="small"
-                            sx={{ p: 0 }}
-                          />
-                          <CubingIcon eventId={event.id} small />
-                          <Typography variant="body2">{event.label}</Typography>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                  {errors.events && <FormHelperText>{errors.events}</FormHelperText>}
-                </FormControl>
-              </Grid>
-            </Grid>
+              <FormControl required error={Boolean(errors.events)} fullWidth>
+                <FormLabel sx={styles.fieldLabel}>Events</FormLabel>
+                <Typography variant="caption" color="text.secondary" sx={styles.fieldHint}>
+                  Select every event you want to compete in
+                </Typography>
+                <Box role="group" aria-label="Events" sx={styles.eventGrid}>
+                  {REGISTRATION_EVENTS.map((event) => {
+                    const isSelected = formData.events.includes(event.id);
+                    return (
+                      <ChoiceCard
+                        key={event.id}
+                        selected={isSelected}
+                        onClick={() => handleEventToggle(event.id)}
+                        sx={{ gap: 1.25, minHeight: 56 }}
+                      >
+                        <CubingIcon eventId={event.id} />
+                        <Typography variant="body2" fontWeight={500} sx={{ flex: 1 }}>
+                          {event.label}
+                        </Typography>
+                        {isSelected && (
+                          <CheckCircleIcon color="primary" fontSize="small" />
+                        )}
+                      </ChoiceCard>
+                    );
+                  })}
+                </Box>
+                {errors.events && <FormHelperText>{errors.events}</FormHelperText>}
+              </FormControl>
+            </Stack>
           </CardContent>
         </Card>
 
