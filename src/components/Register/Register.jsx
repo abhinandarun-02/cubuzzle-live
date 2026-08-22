@@ -244,6 +244,7 @@ function Register() {
     registeredDivision: "",
     modeOfParticipation: "",
     country: getCountryByCode(DEFAULT_COUNTRY_CODE),
+    nationality: getCountryByCode(DEFAULT_COUNTRY_CODE),
     events: [],
   });
 
@@ -308,6 +309,10 @@ function Register() {
         ? String(previousProfile.gender).toLowerCase()
         : prev.gender,
       country: resolveCountry(previousProfile.country) ?? prev.country,
+      nationality:
+        resolveCountry(previousProfile.nationality) ??
+        resolveCountry(previousProfile.country) ??
+        prev.nationality,
     }));
 
     if (!photoFileRef.current && previousProfile.imageUrl) {
@@ -358,6 +363,7 @@ function Register() {
         registeredDivision: data.registeredDivision,
         modeOfParticipation: data.modeOfParticipation,
         country: data.country,
+        nationality: data.nationality,
         events: data.events,
         previousUserId: data.isPreviousParticipant ? competitorId : null,
         ...(imageUrl && { imageUrl }),
@@ -493,6 +499,7 @@ function Register() {
       registeredDivision: "",
       modeOfParticipation: "",
       country: getCountryByCode(DEFAULT_COUNTRY_CODE),
+      nationality: getCountryByCode(DEFAULT_COUNTRY_CODE),
       events: [],
     });
     setPhotoFile(null);
@@ -808,7 +815,7 @@ function Register() {
               </Grid>
 
               {/* Order ID */}
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   required
@@ -853,6 +860,39 @@ function Register() {
                         startAdornment: formData.country && (
                           <InputAdornment position="start">
                             <FlagIcon code={formData.country.code.toLowerCase()} />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Nationality */}
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  options={COUNTRIES}
+                  getOptionLabel={(option) => option.name}
+                  value={formData.nationality}
+                  onChange={(event, newValue) => handleFieldChange("nationality", newValue)}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props} sx={{ display: "flex", gap: 1 }}>
+                      <FlagIcon code={option.code.toLowerCase()} />
+                      {option.name}
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      required
+                      label="Nationality"
+                      error={Boolean(errors.nationality)}
+                      helperText={errors.nationality}
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: formData.nationality && (
+                          <InputAdornment position="start">
+                            <FlagIcon code={formData.nationality.code.toLowerCase()} />
                           </InputAdornment>
                         ),
                       }}

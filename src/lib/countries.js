@@ -1,4 +1,4 @@
-export const DEFAULT_COUNTRY_CODE = "IN";
+export const DEFAULT_COUNTRY_CODE = "AE";
 
 export const COUNTRIES = [
   { code: "AF", name: "Afghanistan" },

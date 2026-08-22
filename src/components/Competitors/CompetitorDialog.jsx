@@ -105,6 +105,18 @@ function CompetitorDialog({ competitor, onClose }) {
                   </Grid>
 
                   <Grid item xs={4}>
+                    <Typography variant="subtitle2">Nationality</Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <FlagIcon code={competitor.nationality?.code?.toLowerCase()} />
+                      <Typography variant="body2" sx={{ color: "text.primary" }} noWrap>
+                        {competitor.nationality?.name ?? "—"}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={4}>
                     <Typography variant="subtitle2">Gender</Typography>
                   </Grid>
                   <Grid item xs={8}>

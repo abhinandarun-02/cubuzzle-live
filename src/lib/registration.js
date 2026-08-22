@@ -171,6 +171,10 @@ export const validateRegistration = (values) => {
     errors.country = "Country is required";
   }
 
+  if (!values.nationality?.code || !values.nationality?.name) {
+    errors.nationality = "Nationality is required";
+  }
+
   if (!required(values.events)) {
     errors.events = "Select at least one event";
   }
