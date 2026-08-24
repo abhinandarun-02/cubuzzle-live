@@ -1,14 +1,5 @@
 import { Link as RouterLink } from "react-router-dom";
-import {
-  Avatar,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Container,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Avatar, Button, Card, CardContent, Chip, Container, Stack, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import PeopleIcon from "@mui/icons-material/People";
@@ -16,40 +7,9 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { getEventDisplayName } from "../../lib/competition";
+import styles from "./styles";
 
-const styles = {
-  container: {
-    py: 3,
-  },
-  cardContent: {
-    p: { xs: 3, sm: 4 },
-    textAlign: "center",
-  },
-  successIcon: {
-    fontSize: 52,
-    color: "success.main",
-    mb: 2,
-  },
-  avatar: {
-    mx: "auto",
-    mb: 2,
-    width: 96,
-    height: 96,
-    fontSize: "2.5rem",
-  },
-  chipWrap: {
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 1,
-    mt: 2,
-  },
-  actions: {
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 1.5,
-    mt: 4,
-  },
-};
+const styles = styles.successContainer;
 
 function RegistrationSuccess({ competitor, onRegisterAnother }) {
   return (
@@ -74,17 +34,9 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
           )}
 
           <Stack direction="row" sx={styles.chipWrap}>
-            <Chip
-              label={`Division ${competitor.registeredDivision}`}
-              variant="outlined"
-            />
+            <Chip label={`Division ${competitor.registeredDivision}`} variant="outlined" />
             {competitor.events.map((eventId) => (
-              <Chip
-                key={eventId}
-                icon={<CubingIcon eventId={eventId} small />}
-                label={getEventDisplayName(eventId)}
-                variant="outlined"
-              />
+              <Chip key={eventId} icon={<CubingIcon eventId={eventId} small />} label={getEventDisplayName(eventId)} variant="outlined" />
             ))}
           </Stack>
 
