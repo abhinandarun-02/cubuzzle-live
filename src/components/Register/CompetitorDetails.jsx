@@ -15,7 +15,6 @@ import ErrorIcon from "@mui/icons-material/Error";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import { format, isValid, subYears } from "date-fns";
@@ -28,6 +27,7 @@ import {
 import ChoiceGroup from "./ChoiceGroup";
 import CountrySelect from "./CountrySelect";
 import PhotoUpload from "./PhotoUpload";
+import SchoolSelect from "./SchoolSelect";
 import TextInput from "./TextInput";
 import { styles } from "./styles";
 
@@ -151,11 +151,7 @@ function CompetitorDetails({ form, userIdStatus }) {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextInput
-                label="School"
-                icon={SchoolOutlinedIcon}
-                {...fieldProps("school")}
-              />
+              <SchoolSelect label="School" {...fieldProps("school")} />
             </Grid>
 
             <Grid item xs={12} md={6}>
