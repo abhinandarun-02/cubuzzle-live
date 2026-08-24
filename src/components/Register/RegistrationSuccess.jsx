@@ -7,20 +7,20 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import CubingIcon from "../CubingIcon/CubingIcon";
 import { getEventDisplayName } from "../../lib/competition";
-import styles from "./styles";
+import { styles } from "./styles";
 
-const styles = styles.successContainer;
+const succesStyles = styles.successContainer;
 
 function RegistrationSuccess({ competitor, onRegisterAnother }) {
   return (
-    <Container maxWidth="md" sx={styles.container}>
+    <Container maxWidth="md" sx={succesStyles.container}>
       <Card>
-        <CardContent sx={styles.cardContent}>
-          <CheckCircleIcon sx={styles.successIcon} />
+        <CardContent sx={succesStyles.cardContent}>
+          <CheckCircleIcon sx={succesStyles.successIcon} />
           <Avatar
             src={competitor.imageUrl}
             alt={competitor.name}
-            sx={styles.avatar}
+            sx={succesStyles.avatar}
             variant="rounded"
           />
           <Typography variant="h5" component="h1" gutterBottom>
@@ -33,14 +33,14 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
             </Typography>
           )}
 
-          <Stack direction="row" sx={styles.chipWrap}>
+          <Stack direction="row" sx={succesStyles.chipWrap}>
             <Chip label={`Division ${competitor.registeredDivision}`} variant="outlined" />
             {competitor.events.map((eventId) => (
               <Chip key={eventId} icon={<CubingIcon eventId={eventId} small />} label={getEventDisplayName(eventId)} variant="outlined" />
             ))}
           </Stack>
 
-          <Stack direction="row" sx={styles.actions}>
+          <Stack direction="row" sx={succesStyles.actions}>
             <Button onClick={onRegisterAnother} startIcon={<RestartAltIcon />}>
               Register another
             </Button>
