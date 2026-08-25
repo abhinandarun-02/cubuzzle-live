@@ -16,7 +16,9 @@ const MODE_OPTIONS = MODES.map((mode) => ({
   icon: mode.value === "onsite" ? PlaceOutlinedIcon : LanguageIcon,
 }));
 
-function CompetitionDetails({ form }) {
+const DEFAULT_DIVISION_HINT = "Choose the division closest to your typical 3x3 average";
+
+function CompetitionDetails({ form, showDivision = true, divisionHint }) {
   const { fieldProps } = form;
 
   return (
@@ -27,19 +29,21 @@ function CompetitionDetails({ form }) {
         </Typography>
 
         <Stack spacing={3.5}>
-          <ChoiceGroup
-            label="Division"
-            hint="Choose the division closest to your typical 3x3 average"
-            options={DIVISIONS}
-            columns={{ xs: 2, sm: 3, md: 5 }}
-            cardSx={{
-              flexDirection: "column",
-              alignItems: "flex-start",
-              gap: 0.5,
-              minHeight: 76,
-            }}
-            {...fieldProps("registeredDivision")}
-          />
+          {showDivision && (
+            <ChoiceGroup
+              label="Division"
+              hint={divisionHint || DEFAULT_DIVISION_HINT}
+              options={DIVISIONS}
+              columns={{ xs: 2, sm: 3, md: 5 }}
+              cardSx={{
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 0.5,
+                minHeight: 76,
+              }}
+              {...fieldProps("registeredDivision")}
+            />
+          )}
 
           <ChoiceGroup
             label="Mode of Participation"

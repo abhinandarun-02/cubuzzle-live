@@ -138,6 +138,46 @@ export const getUserProfile = async (userId) => {
   }
 };
 
+function createdAtMillis(createdAt) {
+  if (!createdAt) return -Infinity;
+  if (typeof createdAt.toMillis === "function") return createdAt.toMillis();
+  if (typeof createdAt.seconds === "number") return createdAt.seconds * 1000;
+  const parsed = Date.parse(createdAt);
+  return Number.isNaN(parsed) ? -Infinity : parsed;
+}
+
+// Looks across all past competitions for the competitor's most recent 3x3 result and returns the division from it, or null if none is found.
+export const getPreviousDivision = async (userId, { excludeCompetitionId } = {}) => {
+  try {
+    const resultsQuery = query(
+      collectionGroup(db, "results"),
+      where("id", "==", userId),
+      where("scored", "==", true),
+    );
+    const resultsSnapshot = await getDocs(resultsQuery);
+
+    const previous3x3Results = resultsSnapshot.docs
+      .map((resultDoc) => ({ id: resultDoc.id, ...resultDoc.data() })) // map to object
+      .filter((result) => result.compId !== excludeCompetitionId) // filter out excluded competition
+      .filter((result) => result.eventId === "333") // filter only 3x3 results
+      .filter((result) => result.calculatedDivision); // filter only results with a calculated division
+
+    if (previous3x3Results.length === 0) {
+      return null;
+    }
+
+    // sort by created at descending
+    previous3x3Results.sort((a, b) => createdAtMillis(b.createdAt) - createdAtMillis(a.createdAt));
+    
+    console.log("previous3x3Results", previous3x3Results);
+
+    return previous3x3Results[0].calculatedDivision ?? null;
+  } catch (error) {
+    console.error("Error getting previous division: ", error);
+    return null;
+  }
+};
+
 export const registerCompetitor = async (competitionId, competitor) => {
   try {
     const competitorRef = doc(

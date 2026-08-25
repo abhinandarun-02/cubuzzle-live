@@ -1,22 +1,17 @@
 import {
   Card,
   CardContent,
-  CircularProgress,
   Divider,
   Grid,
-  InputAdornment,
   Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
-import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import { format, isValid, subYears } from "date-fns";
 import {
   GENDERS,
@@ -39,23 +34,7 @@ function getDobHelperText(dob) {
   return `Category : ${getCategoryLabel(category)}`;
 }
 
-function UserIdStatusAdornment({ status }) {
-  if (!status) return null;
-
-  return (
-    <InputAdornment position="end">
-      {status === "checking" && <CircularProgress size={20} />}
-      {status === "available" && (
-        <CheckCircleIcon color="success" fontSize="small" />
-      )}
-      {(status === "taken" || status === "missing") && (
-        <ErrorIcon color="error" fontSize="small" />
-      )}
-    </InputAdornment>
-  );
-}
-
-function CompetitorDetails({ form, userIdStatus }) {
+function CompetitorDetails({ form, hiddenFields = [] }) {
   const {
     values,
     errors,
@@ -68,6 +47,7 @@ function CompetitorDetails({ form, userIdStatus }) {
   } = form;
 
   const dobField = fieldProps("dob");
+  const isHidden = (field) => hiddenFields.includes(field);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -87,37 +67,6 @@ function CompetitorDetails({ form, userIdStatus }) {
 
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <ChoiceGroup
-                label="Are you a previous Cubuzzle participant?"
-                options={[
-                  { value: true, label: "Yes" },
-                  { value: false, label: "No" },
-                ]}
-                columns="repeat(2, minmax(0, 200px))"
-                cardSx={{ justifyContent: "center", minHeight: 44 }}
-                {...fieldProps("isPreviousParticipant")}
-              />
-            </Grid>
-
-            {values.isPreviousParticipant === true && (
-              <Grid item xs={12}>
-                <TextInput
-                  label="Cubuzzle ID"
-                  icon={HowToRegOutlinedIcon}
-                  {...fieldProps("userId")}
-                  error={Boolean(errors.userId) || userIdStatus === "missing"}
-                  helperText={
-                    errors.userId ||
-                    (userIdStatus === "missing"
-                      ? "No previous Cubuzzle profile found for this ID"
-                      : "Use the same Cubuzzle ID from previous seasons")
-                  }
-                  endAdornment={<UserIdStatusAdornment status={userIdStatus} />}
-                />
-              </Grid>
-            )}
-
-            <Grid item xs={12}>
               <Divider sx={{ mb: -1 }}>
                 <Typography sx={styles.sectionCaption}>
                   Personal Information
@@ -125,30 +74,36 @@ function CompetitorDetails({ form, userIdStatus }) {
               </Divider>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <TextInput
-                label="Name"
-                icon={PersonOutlineIcon}
-                {...fieldProps("name")}
-              />
-            </Grid>
+            {!isHidden("name") && (
+              <Grid item xs={12} md={6}>
+                <TextInput
+                  label="Name"
+                  icon={PersonOutlineIcon}
+                  {...fieldProps("name")}
+                />
+              </Grid>
+            )}
 
-            <Grid item xs={12} md={6}>
-              <TextInput
-                label="Email"
-                type="email"
-                icon={EmailOutlinedIcon}
-                {...fieldProps("email")}
-              />
-            </Grid>
+            {!isHidden("email") && (
+              <Grid item xs={12} md={6}>
+                <TextInput
+                  label="Email"
+                  type="email"
+                  icon={EmailOutlinedIcon}
+                  {...fieldProps("email")}
+                />
+              </Grid>
+            )}
 
-            <Grid item xs={12} md={6}>
-              <TextInput
-                label="Phone Number"
-                icon={LocalPhoneOutlinedIcon}
-                {...fieldProps("phoneNo")}
-              />
-            </Grid>
+            {!isHidden("phoneNo") && (
+              <Grid item xs={12} md={6}>
+                <TextInput
+                  label="Phone Number"
+                  icon={LocalPhoneOutlinedIcon}
+                  {...fieldProps("phoneNo")}
+                />
+              </Grid>
+            )}
 
             <Grid item xs={12} md={6}>
               <SchoolSelect label="School" {...fieldProps("school")} />
@@ -180,15 +135,17 @@ function CompetitorDetails({ form, userIdStatus }) {
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <ChoiceGroup
-                label="Gender"
-                options={GENDERS}
-                columns={{ xs: 1, sm: 3 }}
-                cardSx={{ justifyContent: "center", minHeight: 44 }}
-                {...fieldProps("gender")}
-              />
-            </Grid>
+            {!isHidden("gender") && (
+              <Grid item xs={12} md={6}>
+                <ChoiceGroup
+                  label="Gender"
+                  options={GENDERS}
+                  columns={{ xs: 1, sm: 3 }}
+                  cardSx={{ justifyContent: "center", minHeight: 44 }}
+                  {...fieldProps("gender")}
+                />
+              </Grid>
+            )}
 
             <Grid item xs={12}>
               <Divider sx={{ mb: -1 }}>

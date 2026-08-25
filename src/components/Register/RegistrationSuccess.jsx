@@ -34,7 +34,9 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
           )}
 
           <Stack direction="row" sx={succesStyles.chipWrap}>
-            <Chip label={`Division ${competitor.registeredDivision}`} variant="outlined" />
+            {competitor.registeredDivision && (
+              <Chip label={`Division ${competitor.registeredDivision}`} variant="outlined" />
+            )}
             {competitor.events.map((eventId) => (
               <Chip key={eventId} icon={<CubingIcon eventId={eventId} small />} label={getEventDisplayName(eventId)} variant="outlined" />
             ))}

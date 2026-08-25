@@ -62,6 +62,10 @@ export const DIVISIONS = [
 
 export const USER_ID_PATTERN = /^[A-Z0-9][A-Z0-9_-]{2,19}$/;
 
+// Fields that are filled silently from a returning participant's profile and
+// hidden from the form (unless the profile is missing that value).
+export const RETURNING_HIDDEN_FIELDS = ["name", "email", "phoneNo", "gender"];
+
 export const normalizeUserId = (userId) => userId.trim().toUpperCase();
 
 export const resolveCountry = (value) => {
@@ -101,8 +105,9 @@ const required = (value) => {
   return value !== null && value !== undefined && String(value).trim() !== "";
 };
 
-export const validateRegistration = (values) => {
+export const validateRegistration = (values, { hiddenFields = [], skipDivision = false } = {}) => {
   const errors = {};
+  const isHidden = (field) => hiddenFields.includes(field);
 
   if (!required(values.isPreviousParticipant) && values.isPreviousParticipant !== false) {
     errors.isPreviousParticipant = "Please indicate if you are a previous participant";
@@ -118,17 +123,19 @@ export const validateRegistration = (values) => {
     }
   }
 
-  if (!required(values.name)) {
+  if (!isHidden("name") && !required(values.name)) {
     errors.name = "Name is required";
   }
 
-  if (!required(values.email)) {
-    errors.email = "Email is required";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
-    errors.email = "Enter a valid email";
+  if (!isHidden("email")) {
+    if (!required(values.email)) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
+      errors.email = "Enter a valid email";
+    }
   }
 
-  if (!required(values.phoneNo)) {
+  if (!isHidden("phoneNo") && !required(values.phoneNo)) {
     errors.phoneNo = "Phone number is required";
   }
 
@@ -136,7 +143,7 @@ export const validateRegistration = (values) => {
     errors.school = "School is required";
   }
 
-  if (!required(values.gender)) {
+  if (!isHidden("gender") && !required(values.gender)) {
     errors.gender = "Gender is required";
   }
 
@@ -159,7 +166,7 @@ export const validateRegistration = (values) => {
     errors.orderId = "Order ID is required";
   }
 
-  if (!required(values.registeredDivision)) {
+  if (!skipDivision && !required(values.registeredDivision)) {
     errors.registeredDivision = "Division is required";
   }
 
