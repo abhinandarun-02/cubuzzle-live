@@ -164,7 +164,7 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <CountrySelect label="Country" {...fieldProps("country")} />
+              <CountrySelect label="Country of Residence" {...fieldProps("country")} />
             </Grid>
 
             <Grid item xs={12} md={6}>
