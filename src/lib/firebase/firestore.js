@@ -178,6 +178,20 @@ export const getPreviousDivision = async (userId, { excludeCompetitionId } = {})
   }
 };
 
+function userProfileFromCompetitor(competitor) {
+  return {
+    name: competitor.name,
+    email: competitor.email,
+    phoneNo: competitor.phoneNo,
+    school: competitor.school,
+    gender: competitor.gender,
+    dob: competitor.dob,
+    country: competitor.country,
+    nationality: competitor.nationality,
+    imageUrl: competitor.imageUrl,
+  };
+}
+
 export const registerCompetitor = async (competitionId, competitor) => {
   try {
     const competitorRef = doc(
@@ -187,6 +201,8 @@ export const registerCompetitor = async (competitionId, competitor) => {
       "competitors",
       competitor.id,
     );
+    const userRef = doc(db, "users", competitor.id);
+    const isNewUser = !competitor.previousUserId;
 
     await runTransaction(db, async (transaction) => {
       const competitorSnapshot = await transaction.get(competitorRef);
@@ -197,10 +213,26 @@ export const registerCompetitor = async (competitionId, competitor) => {
         throw error;
       }
 
+      if (isNewUser) {
+        const userSnapshot = await transaction.get(userRef);
+        if (userSnapshot.exists()) {
+          const error = new Error("Competitor ID already registered");
+          error.code = "competitor-id-taken";
+          throw error;
+        }
+      }
+
       transaction.set(competitorRef, {
         ...competitor,
         createdAt: serverTimestamp(),
       });
+
+      if (isNewUser) {
+        transaction.set(userRef, {
+          ...userProfileFromCompetitor(competitor),
+          createdAt: serverTimestamp(),
+        });
+      }
     });
   } catch (error) {
     console.error("Error registering competitor: ", error);
