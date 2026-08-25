@@ -8,17 +8,10 @@ const extensionByType = {
   "image/webp": "webp",
 };
 
-export const uploadCompetitorImage = async (
-  competitionId,
-  competitorId,
-  file,
-) => {
+export const uploadCompetitorImage = async (userId, file) => {
   try {
     const extension = extensionByType[file.type] ?? "jpg";
-    const imageRef = ref(
-      storage,
-      `competitions/${competitionId}/competitors/${competitorId}.${extension}`,
-    );
+    const imageRef = ref(storage, `users/${userId}.${extension}`);
     await uploadBytes(imageRef, file, { contentType: file.type });
     return getDownloadURL(imageRef);
   } catch (error) {

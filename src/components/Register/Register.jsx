@@ -61,7 +61,7 @@ function Register() {
       let imageUrl = form.existingImageUrl;
 
       if (form.photoFile) {
-        imageUrl = await uploadCompetitorImage(COMPETITION_ID, competitorId, form.photoFile);
+        imageUrl = await uploadCompetitorImage(competitorId, form.photoFile);
       }
 
       const competitor = {
