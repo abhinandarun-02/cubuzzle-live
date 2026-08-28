@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Container, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  FormLabel,
+  Typography,
+} from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { allocateUserId, registerCompetitor } from "../../lib/firebase/firestore";
@@ -173,6 +183,28 @@ function Register() {
           showDivision={showDivision}
           divisionHint={isReturning ? NOT_FOUND_DIVISION_HINT : undefined}
         />
+        <FormControl
+          required
+          error={Boolean(form.errors.termsConsent)}
+          sx={{ display: "block", mb: 3 }}
+        >
+          <FormLabel sx={{ mb: 0.75, fontWeight: 500 }}>Terms</FormLabel>
+          <FormControlLabel
+            sx={{ alignItems: "flex-start", ml: 0 }}
+            control={
+              <Checkbox
+                checked={values.termsConsent === true}
+                onChange={(event) => setField("termsConsent", event.target.checked)}
+                sx={{ pt: 0.25 }}
+              />
+            }
+            label="I agree to comply by the rules and give consent for Cubuzzle to use my photos, videos, and competition data."
+          />
+          {form.errors.termsConsent && (
+            <FormHelperText>{form.errors.termsConsent}</FormHelperText>
+          )}
+        </FormControl>
+
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button type="submit" variant="contained" size="large" sx={{ minWidth: 200 }}
             disabled={registerMutation.isPending || values.isPreviousParticipant === true && (status === "taken" || status === "missing" || !profile)}

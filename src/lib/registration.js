@@ -187,6 +187,10 @@ export const validateRegistration = (values, { hiddenFields = [], skipDivision =
     errors.events = "Select at least one event";
   }
 
+  if (values.termsConsent !== true) {
+    errors.termsConsent = "You must agree to the terms to register";
+  }
+
   return errors;
 };
 

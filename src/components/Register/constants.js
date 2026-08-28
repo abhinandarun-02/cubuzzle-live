@@ -17,4 +17,5 @@ export const INITIAL_VALUES = {
   country: getCountryByCode(DEFAULT_COUNTRY_CODE),
   nationality: getCountryByCode(DEFAULT_COUNTRY_CODE),
   events: [],
+  termsConsent: false,
 };
