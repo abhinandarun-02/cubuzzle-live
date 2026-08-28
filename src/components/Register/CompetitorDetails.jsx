@@ -160,6 +160,10 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
                 label="Order ID"
                 icon={ConfirmationNumberOutlinedIcon}
                 {...fieldProps("orderId")}
+                helperText={
+                  errors.orderId ||
+                  "Cubuzzle Order ID (starting with CBZL**)"
+                }
               />
             </Grid>
 
