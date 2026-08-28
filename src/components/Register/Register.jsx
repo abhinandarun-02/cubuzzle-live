@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { createCompetitorId, registerCompetitor} from "../../lib/firebase/firestore";
+import { allocateUserId, registerCompetitor } from "../../lib/firebase/firestore";
 import { uploadCompetitorImage } from "../../lib/firebase/storage";
 import { getCategoryFromDob, normalizeUserId } from "../../lib/registration";
 import CompetitionDetails from "./CompetitionDetails";
@@ -57,8 +57,9 @@ function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      const competitorId = data.isPreviousParticipant ? normalizeUserId(data.userId) : createCompetitorId(COMPETITION_ID);
+      const competitorId = data.isPreviousParticipant ? normalizeUserId(data.userId) : await allocateUserId({ name: data.name });
       let imageUrl = form.existingImageUrl;
+
 
       if (form.photoFile) {
         imageUrl = await uploadCompetitorImage(competitorId, form.photoFile);
@@ -107,24 +108,25 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    
     const validationErrors = form.validate();
     if (Object.keys(validationErrors).length > 0) {
       enqueueSnackbar(Object.values(validationErrors)[0], { variant: "error" });
       return;
     }
-
+    
     if (values.isPreviousParticipant) {
       if (status === "taken") {
         enqueueSnackbar("This Cubuzzle ID is already registered", { variant: "error" });
         return;
       }
-
+      
       if (!profile) {
         enqueueSnackbar("No previous Cubuzzle profile found for this ID", { variant: "error" });
         return;
       }
     }
-
+    
     registerMutation.mutate(values);
   };
 

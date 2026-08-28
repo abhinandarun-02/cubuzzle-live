@@ -27,11 +27,9 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
             Registration complete
           </Typography>
           <Typography variant="h6">{competitor.name}</Typography>
-          {competitor.previousUserId && (
-            <Typography variant="body1" color="text.secondary">
-              Cubuzzle ID: {competitor.id}
-            </Typography>
-          )}
+          <Typography variant="body1" color="text.secondary">
+            Cubuzzle ID: {competitor.id}
+          </Typography>
 
           <Stack direction="row" sx={succesStyles.chipWrap}>
             {competitor.registeredDivision && (

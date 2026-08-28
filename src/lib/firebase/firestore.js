@@ -11,6 +11,43 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
+import { buildUserId } from "../userId";
+
+export const allocateUserId = async({ name, date } = {}) => {
+  const counterRef = doc(db, "counters", "userIdCounter");
+
+  const serial = await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(counterRef);
+
+    if (!snapshot.exists()) {
+      const error = new Error(
+        "User ID counter is not initialized. Seed counters/userIdCounter with lastSerial: 300 before generating IDs.",
+      );
+      error.code = "user-id-counter-missing";
+      throw error;
+    }
+
+    const lastSerial = snapshot.data()?.lastSerial;
+    if (
+      typeof lastSerial !== "number" ||
+      !Number.isInteger(lastSerial) ||
+      lastSerial < 0
+    ) {
+      const error = new Error(
+        "User ID counter has an invalid lastSerial value.",
+      );
+      error.code = "user-id-counter-invalid";
+      throw error;
+    }
+
+    const next = lastSerial + 1;
+    transaction.update(counterRef, { lastSerial: next });
+    return next;
+  });
+
+  return buildUserId({ name, serial, date });
+};
+
 
 export const getAllCompetitions = async () => {
   try {
@@ -168,7 +205,7 @@ export const getPreviousDivision = async (userId, { excludeCompetitionId } = {})
 
     // sort by created at descending
     previous3x3Results.sort((a, b) => createdAtMillis(b.createdAt) - createdAtMillis(a.createdAt));
-    
+
     console.log("previous3x3Results", previous3x3Results);
 
     return previous3x3Results[0].calculatedDivision ?? null;
