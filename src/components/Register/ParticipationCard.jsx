@@ -149,7 +149,7 @@ function ParticipationCard({ form, userIdStatus, profile, previousDivision }) {
                   errors.userId ||
                   (userIdStatus === "missing"
                     ? "No previous Cubuzzle profile found for this ID"
-                    : "Use the same Cubuzzle ID from previous seasons")
+                    : "Use the same Cubuzzle ID from previous seasons, e.g. 2410301AS")
                 }
                 endAdornment={<UserIdStatusAdornment status={userIdStatus} />}
               />

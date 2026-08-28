@@ -1,6 +1,9 @@
 import { differenceInYears, isFuture, isValid, parse } from "date-fns";
 import { getEventDisplayName } from "./competition";
 import { COUNTRIES, getCountryByCode } from "./countries";
+import { USER_ID_PATTERN } from "./userId";
+
+export { USER_ID_PATTERN };
 
 export const REGISTRATION_EVENTS = [
   "222",
@@ -60,8 +63,6 @@ export const DIVISIONS = [
   { value: "D", label: "D", hint: "45+ seconds" },
 ];
 
-export const USER_ID_PATTERN = /^[A-Z0-9][A-Z0-9_-]{2,19}$/;
-
 // Fields that are filled silently from a returning participant's profile and
 // hidden from the form (unless the profile is missing that value).
 export const RETURNING_HIDDEN_FIELDS = ["name", "email", "phoneNo", "gender"];
@@ -119,7 +120,7 @@ export const validateRegistration = (values, { hiddenFields = [], skipDivision =
     if (!required(userId)) {
       errors.userId = "Cubuzzle ID is required";
     } else if (!USER_ID_PATTERN.test(userId)) {
-      errors.userId = "Use 3-20 letters, numbers, underscores, or hyphens";
+      errors.userId = "Use a Cubuzzle ID like 2410301AS";
     }
   }
 

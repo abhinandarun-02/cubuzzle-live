@@ -46,3 +46,8 @@ export const buildUserId = ({ name, serial, date = new Date() }) => {
   const { yy, mm } = getYearMonthParts(date);
   return `${yy}${mm}${formatSerial(serial)}${deriveInitials(name)}`;
 };
+
+// YY (2 digits) + MM (01-12) + serial (3+ digits) + initials (2 letters).
+export const USER_ID_PATTERN = /^\d{2}(0[1-9]|1[0-2])\d{3,}[A-Z]{2}$/;
+
+export const isValidUserId = (userId) => USER_ID_PATTERN.test(userId || "");

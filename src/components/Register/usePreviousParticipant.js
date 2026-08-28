@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../../hooks/useDebounce";
 import { getUserProfile, isCompetitorIdAvailable } from "../../lib/firebase/firestore";
 import { normalizeUserId } from "../../lib/registration";
+import { isValidUserId } from "../../lib/userId";
 import { COMPETITION_ID } from "./constants";
 
-const MIN_USER_ID_LENGTH = 3;
 const DEBOUNCE_MS = 500;
 
 // Looks up whether `userId` belongs to a returning participant and whether
@@ -30,12 +30,12 @@ function usePreviousParticipant({
   onProfileLoadedRef.current = onProfileLoaded;
   onLookupResetRef.current = onLookupReset;
 
-  const isIdLongEnough = debouncedUserId.length >= MIN_USER_ID_LENGTH;
+  const isValidId = isValidUserId(debouncedUserId);
 
   const { data: isAvailable, isLoading: checkingAvailability } = useQuery({
     queryKey: ["competitor-id-availability", COMPETITION_ID, debouncedUserId],
     queryFn: () => isCompetitorIdAvailable(COMPETITION_ID, debouncedUserId),
-    enabled: Boolean(enabled && isIdLongEnough),
+    enabled: Boolean(enabled && isValidId),
     staleTime: 10_000,
   });
 
@@ -46,7 +46,7 @@ function usePreviousParticipant({
   } = useQuery({
     queryKey: ["user-profile", debouncedUserId],
     queryFn: () => getUserProfile(debouncedUserId),
-    enabled: Boolean(enabled && isIdLongEnough),
+    enabled: Boolean(enabled && isValidId),
     staleTime: 60_000,
   });
 
@@ -71,13 +71,20 @@ function usePreviousParticipant({
 
   const previousIdMissing =
     enabled &&
-    isIdLongEnough &&
+    isValidId &&
     debouncedUserId === normalizedUserId &&
     profileFetched &&
     !loadingProfile &&
     !previousProfile;
 
-  const status = getLookupStatus({ enabled, normalizedUserId, checkingAvailability, loadingProfile, previousIdMissing, isAvailable });
+  const status = getLookupStatus({
+    enabled,
+    isValidId: isValidUserId(normalizedUserId),
+    checkingAvailability,
+    loadingProfile,
+    previousIdMissing,
+    isAvailable,
+  });
 
   return { status, profile: previousProfile };
 }
@@ -89,13 +96,13 @@ function usePreviousParticipant({
  */
 function getLookupStatus({
   enabled,
-  normalizedUserId,
+  isValidId,
   checkingAvailability,
   loadingProfile,
   previousIdMissing,
   isAvailable,
 }) {
-  if (!enabled || normalizedUserId.length < MIN_USER_ID_LENGTH) return null;
+  if (!enabled || !isValidId) return null;
   if (checkingAvailability || loadingProfile) return "checking";
   if (previousIdMissing) return "missing";
   return isAvailable ? "available" : "taken";
