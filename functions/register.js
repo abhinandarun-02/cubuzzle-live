@@ -17,7 +17,19 @@ const ALLOWED_EVENTS = new Set(["222", "333", "pyram", "333oh"]);
 const registerCompetitor = onCall(
   { cors: true, invoker: "public" },
   async (request) => {
-    const data = request.data || {};
+    try {
+      return await handleRegisterCompetitor(request.data || {});
+    } catch (error) {
+      logger.warn("registerCompetitor failed", {
+        code: error.code || error.status,
+        message: error.message,
+      });
+      throw error;
+    }
+  },
+);
+
+async function handleRegisterCompetitor(data) {
     const competitionId = data.competitionId;
 
     if (
@@ -27,14 +39,14 @@ const registerCompetitor = onCall(
       throw new HttpsError("invalid-argument", "Invalid competition ID.");
     }
 
-    if (data.isPreviousParticipant !== true && data.isPreviousParticipant !== false) {
+    const isPreviousParticipant = parseBoolean(data.isPreviousParticipant);
+    if (isPreviousParticipant == null) {
       throw new HttpsError(
         "invalid-argument",
         "Indicate if you are a previous participant.",
       );
     }
 
-    const isPreviousParticipant = data.isPreviousParticipant === true;
     const db = getFirestore();
 
     const competitionSnap = await db.doc(`competitions/${competitionId}`).get();
@@ -44,9 +56,9 @@ const registerCompetitor = onCall(
 
     const name = requireTrimmedString(data.name, "name", 200);
     const email = requireEmail(data.email);
-    const phoneNo = requireTrimmedString(data.phoneNo, "phone number", 50);
+    const phoneNo = requireTrimmedString(data.phoneNo, "phone number", 80);
     const school = requireTrimmedString(data.school, "school", 200);
-    const gender = requireEnum(String(data.gender || "").toLowerCase(), ALLOWED_GENDERS, "gender");
+    const gender = requireGender(data.gender);
     const dob = requireDob(data.dob);
     const category = getCategoryFromDob(dob);
     const orderId = requireTrimmedString(data.orderId, "order ID", 100);
@@ -109,8 +121,7 @@ const registerCompetitor = onCall(
       events,
       tempImagePath,
     });
-  },
-);
+}
 
 async function registerReturningCompetitor(db, input) {
   const userId = normalizeUserId(input.userId);
@@ -182,12 +193,8 @@ async function registerNewCompetitor(db, input) {
       );
     }
 
-    const lastSerial = counterSnap.data()?.lastSerial;
-    if (
-      typeof lastSerial !== "number" ||
-      !Number.isInteger(lastSerial) ||
-      lastSerial < 0
-    ) {
+    const lastSerial = Number(counterSnap.data()?.lastSerial);
+    if (!Number.isInteger(lastSerial) || lastSerial < 0) {
       throw new HttpsError(
         "failed-precondition",
         "User ID counter has an invalid lastSerial value.",
@@ -338,7 +345,19 @@ function createdAtMillis(createdAt) {
   return Number.isNaN(parsed) ? -Infinity : parsed;
 }
 
+function parseBoolean(value) {
+  if (value === true || value === "true" || value === 1) return true;
+  if (value === false || value === "false" || value === 0) return false;
+  return null;
+}
+
 function requireTrimmedString(value, field, max) {
+  if (value && typeof value === "object" && typeof value.label === "string") {
+    value = value.label;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    value = String(value);
+  }
   if (typeof value !== "string") {
     throw new HttpsError("invalid-argument", `Invalid ${field}.`);
   }
@@ -347,6 +366,17 @@ function requireTrimmedString(value, field, max) {
     throw new HttpsError("invalid-argument", `Invalid ${field}.`);
   }
   return trimmed;
+}
+
+function requireGender(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (ALLOWED_GENDERS.has(normalized)) return normalized;
+  if (["m", "man", "boy"].includes(normalized)) return "male";
+  if (["f", "w", "woman", "girl"].includes(normalized)) return "female";
+  if (["o", "nb", "non-binary", "nonbinary"].includes(normalized)) return "other";
+  throw new HttpsError("invalid-argument", "Invalid gender.");
 }
 
 function requireEmail(value) {
@@ -412,7 +442,10 @@ function getCategoryFromDob(dob) {
 }
 
 function requireCountry(value, field) {
-  if (!value || typeof value !== "object") {
+  if (typeof value === "string") {
+    return { code: "XX", name: requireTrimmedString(value, field, 100) };
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new HttpsError("invalid-argument", `Invalid ${field}.`);
   }
   const code = requireTrimmedString(value.code, `${field} code`, 8).toUpperCase();
@@ -451,16 +484,7 @@ function optionalImageUrl(value) {
   if (typeof value !== "string" || value.length > 2000) {
     throw new HttpsError("invalid-argument", "Invalid image URL.");
   }
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-      throw new HttpsError("invalid-argument", "Invalid image URL.");
-    }
-  } catch (error) {
-    if (error instanceof HttpsError) throw error;
-    throw new HttpsError("invalid-argument", "Invalid image URL.");
-  }
-  return value;
+  return value.trim() || null;
 }
 
 function normalizeUserId(userId) {

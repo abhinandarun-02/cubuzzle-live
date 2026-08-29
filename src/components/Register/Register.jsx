@@ -117,7 +117,11 @@ function Register() {
         enqueueSnackbar("This Cubuzzle ID is already registered. Please choose another.", { variant: "error" });
         form.setError("userId", "Already registered");
       } else {
-        enqueueSnackbar("Registration failed. Please try again.", { variant: "error" });
+        const details =
+          typeof error.message === "string" && error.code?.startsWith("functions/")
+            ? error.message.replace(/^[^:]+:\s*/, "")
+            : null;
+        enqueueSnackbar(details || "Registration failed. Please try again.", { variant: "error" });
       }
     },
   });
