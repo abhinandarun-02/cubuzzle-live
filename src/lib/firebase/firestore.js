@@ -216,7 +216,7 @@ export const getPreviousDivision = async (userId, { excludeCompetitionId } = {})
 };
 
 function userProfileFromCompetitor(competitor) {
-  return {
+  const profile = {
     name: competitor.name,
     email: competitor.email,
     phoneNo: competitor.phoneNo,
@@ -225,8 +225,13 @@ function userProfileFromCompetitor(competitor) {
     dob: competitor.dob,
     country: competitor.country,
     nationality: competitor.nationality,
-    imageUrl: competitor.imageUrl,
   };
+
+  if (competitor.imageUrl) {
+    profile.imageUrl = competitor.imageUrl;
+  }
+
+  return profile;
 }
 
 export const registerCompetitor = async (competitionId, competitor) => {

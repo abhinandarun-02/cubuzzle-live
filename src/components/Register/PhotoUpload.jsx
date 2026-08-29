@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  CircularProgress,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -58,9 +59,10 @@ const styles = {
   },
 };
 
-function PhotoUpload({ preview, hasFile, error, onChange, onRemove }) {
+function PhotoUpload({ preview, hasFile, error, uploading, onChange, onRemove }) {
   const handleChange = (event) => {
     const file = event.target.files?.[0];
+    event.target.value = "";
     if (file) {
       onChange(file);
     }
@@ -88,11 +90,28 @@ function PhotoUpload({ preview, hasFile, error, onChange, onRemove }) {
         >
           <PhotoCameraIcon sx={{ fontSize: 40, color: "text.disabled" }} />
         </Avatar>
-        <Box className="photo-overlay" sx={styles.photoOverlay}>
-          <PhotoCameraIcon fontSize="small" />
-          <Typography variant="caption" fontWeight={600}>
-            {hasFile ? "Change" : "Upload"}
-          </Typography>
+        <Box
+          className="photo-overlay"
+          sx={{
+            ...styles.photoOverlay,
+            ...(uploading ? { opacity: 1 } : {}),
+          }}
+        >
+          {uploading ? (
+            <>
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+              <Typography variant="caption" fontWeight={600}>
+                Uploading…
+              </Typography>
+            </>
+          ) : (
+            <>
+              <PhotoCameraIcon fontSize="small" />
+              <Typography variant="caption" fontWeight={600}>
+                {hasFile ? "Change" : "Upload"}
+              </Typography>
+            </>
+          )}
         </Box>
         {(hasFile || preview) && (
           <Tooltip title="Remove photo">

@@ -13,7 +13,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { allocateUserId, registerCompetitor } from "../../lib/firebase/firestore";
-import { uploadCompetitorImage } from "../../lib/firebase/storage";
+import { copyTempImageToUser } from "../../lib/firebase/storage";
 import { getCategoryFromDob, normalizeUserId } from "../../lib/registration";
 import CompetitionDetails from "./CompetitionDetails";
 import CompetitorDetails from "./CompetitorDetails";
@@ -34,7 +34,7 @@ function Register() {
   const { status, profile } = usePreviousParticipant({
     userId: values.userId,
     enabled: values.isPreviousParticipant === true,
-    hasLocalPhoto: Boolean(form.photoFile),
+    hasLocalPhoto: Boolean(form.photoFile || form.tempImagePath || form.photoUploadStatus === "uploading"),
     onProfileLoaded: form.applyProfile,
     onLookupReset: form.clearExistingPhoto,
   });
@@ -68,12 +68,6 @@ function Register() {
   const registerMutation = useMutation({
     mutationFn: async (data) => {
       const competitorId = data.isPreviousParticipant ? normalizeUserId(data.userId) : await allocateUserId({ name: data.name });
-      let imageUrl = form.existingImageUrl;
-
-
-      if (form.photoFile) {
-        imageUrl = await uploadCompetitorImage(competitorId, form.photoFile);
-      }
 
       const competitor = {
         id: competitorId,
@@ -92,11 +86,25 @@ function Register() {
         nationality: data.nationality,
         events: data.events,
         previousUserId: data.isPreviousParticipant ? competitorId : null,
-        imageUrl,
       };
 
+      if (form.tempImagePath) {
+        competitor.tempImagePath = form.tempImagePath;
+      } else {
+        competitor.imageUrl = form.existingImageUrl;
+      }
+
       await registerCompetitor(COMPETITION_ID, competitor);
-      return competitor;
+
+      let imageUrl = competitor.imageUrl;
+      if (form.tempImagePath) {
+        imageUrl = await copyTempImageToUser({
+          competitionId: COMPETITION_ID,
+          userId: competitorId,
+        });
+      }
+
+      return { ...competitor, imageUrl };
     },
 
     onSuccess: (competitor) => {
@@ -118,25 +126,25 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    
+
     const validationErrors = form.validate();
     if (Object.keys(validationErrors).length > 0) {
       enqueueSnackbar(Object.values(validationErrors)[0], { variant: "error" });
       return;
     }
-    
+
     if (values.isPreviousParticipant) {
       if (status === "taken") {
         enqueueSnackbar("This Cubuzzle ID is already registered", { variant: "error" });
         return;
       }
-      
+
       if (!profile) {
         enqueueSnackbar("No previous Cubuzzle profile found for this ID", { variant: "error" });
         return;
       }
     }
-    
+
     registerMutation.mutate(values);
   };
 
@@ -207,7 +215,7 @@ function Register() {
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button type="submit" variant="contained" size="large" sx={{ minWidth: 200 }}
-            disabled={registerMutation.isPending || values.isPreviousParticipant === true && (status === "taken" || status === "missing" || !profile)}
+            disabled={registerMutation.isPending || form.photoUploadStatus === "uploading" || values.isPreviousParticipant === true && (status === "taken" || status === "missing" || !profile)}
           >
             {registerMutation.isPending ? "Registering..." : "Register"}
           </Button>

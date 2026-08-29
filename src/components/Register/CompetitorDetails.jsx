@@ -42,6 +42,7 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
     photoPreview,
     photoFile,
     existingImageUrl,
+    photoUploadStatus,
     setPhoto,
     removePhoto,
   } = form;
@@ -61,6 +62,7 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
             preview={photoPreview}
             hasFile={Boolean(photoFile || existingImageUrl)}
             error={errors.photo}
+            uploading={photoUploadStatus === "uploading"}
             onChange={setPhoto}
             onRemove={removePhoto}
           />

@@ -2,9 +2,14 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /users/{userId} {
+    match /temp/{fileName} {
       allow read: if true;
       allow write: if true;
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if false;
     }
 
     match /{allPaths=**} {
