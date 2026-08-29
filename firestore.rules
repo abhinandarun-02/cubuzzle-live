@@ -3,28 +3,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Anonymous write access to competition competitors
     match /competitions/{competitionId}/competitors/{competitorId} {
       allow read: if true;
-      allow create: if true;
-      allow update, delete: if false;
-    }
-    
-		// Anonymous write access to users collection
-    match /users/{userId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if false;
+      allow write: if false;
     }
 
-     // Anonymous write access to userIdCounter
-     // Global serial for Cubuzzle IDs (YY + MM + serial + initials).
-     match /counters/userIdCounter {
+    match /users/{userId} {
       allow read: if true;
-      allow create, delete: if false;
-     // Clients may only increment lastSerial by 1. They cannot create or delete it.
-      allow update: if request.resource.data.get('lastSerial', -1)
-        == resource.data.get('lastSerial', 0) + 1;
+      allow write: if false;
+    }
+
+    // Global serial for Cubuzzle IDs (YY + MM + serial + initials).
+    match /counters/userIdCounter {
+      allow read: if true;
+      allow write: if false;
     }
 
     // Everything else

@@ -12,9 +12,8 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { allocateUserId, registerCompetitor } from "../../lib/firebase/firestore";
+import { registerCompetitor } from "../../lib/firebase/register";
 import { copyTempImageToUser } from "../../lib/firebase/storage";
-import { getCategoryFromDob, normalizeUserId } from "../../lib/registration";
 import CompetitionDetails from "./CompetitionDetails";
 import CompetitorDetails from "./CompetitorDetails";
 import ParticipationCard from "./ParticipationCard";
@@ -67,40 +66,40 @@ function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      const competitorId = data.isPreviousParticipant ? normalizeUserId(data.userId) : await allocateUserId({ name: data.name });
-
-      const competitor = {
-        id: competitorId,
-        userId: competitorId,
+      const payload = {
+        competitionId: COMPETITION_ID,
+        isPreviousParticipant: data.isPreviousParticipant,
         name: data.name,
         email: data.email,
         phoneNo: data.phoneNo,
         school: data.school,
         gender: data.gender,
         dob: data.dob,
-        category: getCategoryFromDob(data.dob),
         orderId: data.orderId.trim(),
         registeredDivision: previousDivision ?? data.registeredDivision,
         modeOfParticipation: data.modeOfParticipation,
         country: data.country,
         nationality: data.nationality,
         events: data.events,
-        previousUserId: data.isPreviousParticipant ? competitorId : null,
       };
 
-      if (form.tempImagePath) {
-        competitor.tempImagePath = form.tempImagePath;
-      } else {
-        competitor.imageUrl = form.existingImageUrl;
+      if (data.isPreviousParticipant) {
+        payload.userId = data.userId;
       }
 
-      await registerCompetitor(COMPETITION_ID, competitor);
+      if (form.tempImagePath) {
+        payload.tempImagePath = form.tempImagePath;
+      } else {
+        payload.imageUrl = form.existingImageUrl;
+      }
+
+      const competitor = await registerCompetitor(payload);
 
       let imageUrl = competitor.imageUrl;
       if (form.tempImagePath) {
         imageUrl = await copyTempImageToUser({
           competitionId: COMPETITION_ID,
-          userId: competitorId,
+          userId: competitor.id,
         });
       }
 
@@ -114,7 +113,7 @@ function Register() {
     },
 
     onError: (error) => {
-      if (error.code === "competitor-id-taken") {
+      if (error.code === "functions/already-exists") {
         enqueueSnackbar("This Cubuzzle ID is already registered. Please choose another.", { variant: "error" });
         form.setError("userId", "Already registered");
       } else {

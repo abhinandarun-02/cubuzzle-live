@@ -7,47 +7,8 @@ import {
   getDocs,
   orderBy,
   query,
-  runTransaction,
-  serverTimestamp,
   where,
 } from "firebase/firestore";
-import { buildUserId } from "../userId";
-
-export const allocateUserId = async({ name, date } = {}) => {
-  const counterRef = doc(db, "counters", "userIdCounter");
-
-  const serial = await runTransaction(db, async (transaction) => {
-    const snapshot = await transaction.get(counterRef);
-
-    if (!snapshot.exists()) {
-      const error = new Error(
-        "User ID counter is not initialized. Seed counters/userIdCounter with lastSerial: 300 before generating IDs.",
-      );
-      error.code = "user-id-counter-missing";
-      throw error;
-    }
-
-    const lastSerial = snapshot.data()?.lastSerial;
-    if (
-      typeof lastSerial !== "number" ||
-      !Number.isInteger(lastSerial) ||
-      lastSerial < 0
-    ) {
-      const error = new Error(
-        "User ID counter has an invalid lastSerial value.",
-      );
-      error.code = "user-id-counter-invalid";
-      throw error;
-    }
-
-    const next = lastSerial + 1;
-    transaction.update(counterRef, { lastSerial: next });
-    return next;
-  });
-
-  return buildUserId({ name, serial, date });
-};
-
 
 export const getAllCompetitions = async () => {
   try {
@@ -212,73 +173,6 @@ export const getPreviousDivision = async (userId, { excludeCompetitionId } = {})
   } catch (error) {
     console.error("Error getting previous division: ", error);
     return null;
-  }
-};
-
-function userProfileFromCompetitor(competitor) {
-  const profile = {
-    name: competitor.name,
-    email: competitor.email,
-    phoneNo: competitor.phoneNo,
-    school: competitor.school,
-    gender: competitor.gender,
-    dob: competitor.dob,
-    country: competitor.country,
-    nationality: competitor.nationality,
-  };
-
-  if (competitor.imageUrl) {
-    profile.imageUrl = competitor.imageUrl;
-  }
-
-  return profile;
-}
-
-export const registerCompetitor = async (competitionId, competitor) => {
-  try {
-    const competitorRef = doc(
-      db,
-      "competitions",
-      competitionId,
-      "competitors",
-      competitor.id,
-    );
-    const userRef = doc(db, "users", competitor.id);
-    const isNewUser = !competitor.previousUserId;
-
-    await runTransaction(db, async (transaction) => {
-      const competitorSnapshot = await transaction.get(competitorRef);
-
-      if (competitorSnapshot.exists()) {
-        const error = new Error("Competitor ID already registered");
-        error.code = "competitor-id-taken";
-        throw error;
-      }
-
-      if (isNewUser) {
-        const userSnapshot = await transaction.get(userRef);
-        if (userSnapshot.exists()) {
-          const error = new Error("Competitor ID already registered");
-          error.code = "competitor-id-taken";
-          throw error;
-        }
-      }
-
-      transaction.set(competitorRef, {
-        ...competitor,
-        createdAt: serverTimestamp(),
-      });
-
-      if (isNewUser) {
-        transaction.set(userRef, {
-          ...userProfileFromCompetitor(competitor),
-          createdAt: serverTimestamp(),
-        });
-      }
-    });
-  } catch (error) {
-    console.error("Error registering competitor: ", error);
-    throw error;
   }
 };
 

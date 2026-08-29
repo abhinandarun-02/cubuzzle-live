@@ -10,9 +10,13 @@ initializeApp();
 
 setGlobalOptions({ maxInstances: 10, region: "asia-south1" });
 
+const { registerCompetitor } = require("./register");
+const { USER_ID_PATTERN } = require("./userId");
+
 const TEMP_PATH_PATTERN = /^temp\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|png|webp)$/i;
-const USER_ID_PATTERN = /^\d{2}(0[1-9]|1[0-2])\d{3,}[A-Z]{2}$/;
 const COMPETITION_ID_PATTERN = /^[a-z0-9-]+$/;
+
+exports.registerCompetitor = registerCompetitor;
 
 exports.copyTempImageToUser = onCall(
   { cors: true, invoker: "public" },
