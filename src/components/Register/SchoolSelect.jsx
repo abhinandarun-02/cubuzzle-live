@@ -5,6 +5,17 @@ import { SCHOOLS } from "../../lib/schools";
 
 const filter = createFilterOptions();
 
+const SORTED_SCHOOLS = [...SCHOOLS].sort(
+  (a, b) =>
+    a.label.localeCompare(b.label, undefined, { sensitivity: "base" }) ||
+    a.emirate.localeCompare(b.emirate, undefined, { sensitivity: "base" }),
+);
+
+function formatSchoolOption(school) {
+  if (!school?.label) return "";
+  return school.emirate ? `${school.label}, ${school.emirate}` : school.label;
+}
+
 function getSchoolLabel(option) {
   if (typeof option === "string") {
     return option;
@@ -12,7 +23,7 @@ function getSchoolLabel(option) {
   if (option?.inputValue) {
     return option.inputValue;
   }
-  return option?.label ?? "";
+  return formatSchoolOption(option);
 }
 
 function toSchoolValue(newValue) {
@@ -24,7 +35,7 @@ function toSchoolValue(newValue) {
 
 function SchoolSelect({ label, value, onChange, onBlur, error, helperText }) {
   const selected =
-    SCHOOLS.find((school) => school.label === value) ?? (value || null);
+    SORTED_SCHOOLS.find((school) => school.label === value) ?? (value || null);
 
   return (
     <Autocomplete
@@ -33,8 +44,7 @@ function SchoolSelect({ label, value, onChange, onBlur, error, helperText }) {
       clearOnBlur
       handleHomeEndKeys
       fullWidth
-      options={SCHOOLS}
-      groupBy={(option) => option.emirate}
+      options={SORTED_SCHOOLS}
       value={selected}
       onChange={(event, newValue) => onChange(toSchoolValue(newValue))}
       onBlur={onBlur}
@@ -61,7 +71,7 @@ function SchoolSelect({ label, value, onChange, onBlur, error, helperText }) {
         const { key, ...optionProps } = props;
         return (
           <li key={key} {...optionProps}>
-            {option.label}
+            {option.inputValue ? option.label : getSchoolLabel(option)}
           </li>
         );
       }}
