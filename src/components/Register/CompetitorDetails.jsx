@@ -23,6 +23,7 @@ import ChoiceGroup from "./ChoiceGroup";
 import CountrySelect from "./CountrySelect";
 import PhotoUpload from "./PhotoUpload";
 import SchoolSelect from "./SchoolSelect";
+import SectionHeader from "./SectionHeader";
 import TextInput from "./TextInput";
 import { styles } from "./styles";
 
@@ -53,10 +54,8 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Card sx={styles.card}>
-        <CardContent>
-          <Typography variant="h6" sx={styles.sectionTitle}>
-            Competitor Details
-          </Typography>
+        <CardContent sx={styles.cardContent}>
+          <SectionHeader icon={PersonOutlineIcon} title="Competitor Details" />
 
           <PhotoUpload
             preview={photoPreview}

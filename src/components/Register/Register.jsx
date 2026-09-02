@@ -3,13 +3,15 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormLabel,
   Typography,
 } from "@mui/material";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { registerCompetitor } from "../../lib/firebase/register";
@@ -18,7 +20,9 @@ import CompetitionDetails from "./CompetitionDetails";
 import CompetitorDetails from "./CompetitorDetails";
 import ParticipationCard from "./ParticipationCard";
 import RegistrationSuccess from "./RegistrationSuccess";
+import SectionHeader from "./SectionHeader";
 import { COMPETITION_ID } from "./constants";
+import { fadeInStyle, styles } from "./styles";
 import usePreviousDivision from "./usePreviousDivision";
 import usePreviousParticipant from "./usePreviousParticipant";
 import useRegistrationForm from "./useRegistrationForm";
@@ -172,56 +176,97 @@ function Register() {
   // the lookup has resolved and found nothing to derive.
   const showDivision = !isReturning || (divisionResolved && !previousDivision);
 
+  const isSubmitDisabled =
+    registerMutation.isPending ||
+    form.photoUploadStatus === "uploading" ||
+    (values.isPreviousParticipant === true &&
+      (status === "taken" || status === "missing" || !profile));
+
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Register for Cubuzzle Season 5
-      </Typography>
-      <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
-        Fill in your details to register for the competition
-      </Typography>
+    <Container maxWidth="md" sx={styles.page}>
+      <Box sx={styles.hero}>
+        <Box sx={styles.heroIcon}>
+          <HowToRegIcon fontSize="large" />
+        </Box>
+        <Typography variant="h4" sx={styles.heroTitle}>
+          Register for Cubuzzle Season 5
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={styles.heroSubtitle}>
+          Fill in your details below to secure your spot at the competition
+        </Typography>
+      </Box>
 
       <form onSubmit={handleSubmit}>
-        <ParticipationCard
-          form={form}
-          userIdStatus={status}
-          profile={profile}
-          previousDivision={previousDivision}
-        />
-        <CompetitorDetails form={form} hiddenFields={form.hiddenFields} />
-        <CompetitionDetails
-          form={form}
-          showDivision={showDivision}
-          divisionHint={isReturning ? NOT_FOUND_DIVISION_HINT : undefined}
-        />
-        <FormControl
-          required
-          error={Boolean(form.errors.termsConsent)}
-          sx={{ display: "block", mb: 3 }}
-        >
-          <FormLabel sx={{ mb: 0.75, fontWeight: 500 }}>Terms</FormLabel>
-          <FormControlLabel
-            sx={{ alignItems: "flex-start", ml: 0 }}
-            control={
-              <Checkbox
-                checked={values.termsConsent === true}
-                onChange={(event) => setField("termsConsent", event.target.checked)}
-                sx={{ pt: 0.25 }}
-              />
-            }
-            label="I agree to comply by the rules and give consent for Cubuzzle to use my photos, videos, and competition data."
+        <Box sx={fadeInStyle(0)}>
+          <ParticipationCard
+            form={form}
+            userIdStatus={status}
+            profile={profile}
+            previousDivision={previousDivision}
           />
-          {form.errors.termsConsent && (
-            <FormHelperText>{form.errors.termsConsent}</FormHelperText>
-          )}
-        </FormControl>
+        </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Button type="submit" variant="contained" size="large" sx={{ minWidth: 200 }}
-            disabled={registerMutation.isPending || form.photoUploadStatus === "uploading" || values.isPreviousParticipant === true && (status === "taken" || status === "missing" || !profile)}
+        <Box sx={fadeInStyle(80)}>
+          <CompetitorDetails form={form} hiddenFields={form.hiddenFields} />
+        </Box>
+
+        <Box sx={fadeInStyle(160)}>
+          <CompetitionDetails
+            form={form}
+            showDivision={showDivision}
+            divisionHint={isReturning ? NOT_FOUND_DIVISION_HINT : undefined}
+          />
+        </Box>
+
+        <Box sx={fadeInStyle(240)}>
+          <FormControl
+            required
+            error={Boolean(form.errors.termsConsent)}
+            sx={{
+              ...styles.termsBox,
+              ...(form.errors.termsConsent ? styles.termsBoxError : null),
+            }}
           >
-            {registerMutation.isPending ? "Registering..." : "Register"}
-          </Button>
+            <SectionHeader icon={AssignmentTurnedInOutlinedIcon} title="Terms & Consent" />
+            <FormControlLabel
+              sx={{ alignItems: "flex-start", ml: 0 }}
+              control={
+                <Checkbox
+                  checked={values.termsConsent === true}
+                  onChange={(event) => setField("termsConsent", event.target.checked)}
+                  sx={{ pt: 0.25 }}
+                />
+              }
+              label="I agree to comply by the rules and give consent for Cubuzzle to use my photos, videos, and competition data."
+            />
+            {form.errors.termsConsent && (
+              <FormHelperText>{form.errors.termsConsent}</FormHelperText>
+            )}
+          </FormControl>
+        </Box>
+
+        <Box sx={styles.actionBarWrapper}>
+          <Box sx={styles.actionBarInner}>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              sx={styles.submitButton}
+              disabled={isSubmitDisabled}
+              startIcon={
+                registerMutation.isPending ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <HowToRegIcon />
+                )
+              }
+            >
+              {registerMutation.isPending ? "Registering…" : "Register"}
+            </Button>
+            <Typography variant="caption" color="text.secondary" align="center">
+              You can review any section above before submitting
+            </Typography>
+          </Box>
         </Box>
       </form>
     </Container>
