@@ -278,8 +278,12 @@ function Register() {
 
     const validationErrors = form.validate();
     if (Object.keys(validationErrors).length > 0) {
-      enqueueSnackbar(Object.values(validationErrors)[0], { variant: "error" });
       const firstError = FIELD_ORDER.find((field) => validationErrors[field]);
+      enqueueSnackbar(
+        (firstError && validationErrors[firstError]) ||
+          Object.values(validationErrors)[0],
+        { variant: "error" },
+      );
       if (firstError) {
         scrollToField(firstError);
       }
@@ -365,8 +369,7 @@ function Register() {
               direction="row"
               alignItems="center"
               spacing={1}
-              useFlexGap
-              flexWrap="wrap"
+              sx={{ flexWrap: "nowrap" }}
             >
               {SECTIONS.map((section, index) => (
                 <Chip
@@ -374,7 +377,20 @@ function Register() {
                   clickable
                   size="small"
                   variant="outlined"
-                  label={`${index + 1}. ${section.label}`}
+                  aria-label={section.label}
+                  label={
+                    <>
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", sm: "inline" } }}
+                      >
+                        {index + 1}. {section.label}
+                      </Box>
+                      <Box component="span" sx={{ display: { sm: "none" } }}>
+                        {index + 1}
+                      </Box>
+                    </>
+                  }
                   onClick={() =>
                     document.getElementById(section.id)?.scrollIntoView({
                       behavior: "smooth",

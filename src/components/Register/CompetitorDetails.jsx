@@ -164,7 +164,7 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
               icon={ConfirmationNumberOutlinedIcon}
               autoComplete="off"
               spellCheck={false}
-              placeholder="CBZL"
+              placeholder="CBZL…"
               {...fieldProps("orderId")}
               helperText={
                 errors.orderId || "Cubuzzle Order ID (starting with CBZL**)"
