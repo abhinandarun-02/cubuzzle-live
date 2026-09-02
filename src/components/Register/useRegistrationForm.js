@@ -38,7 +38,9 @@ function useRegistrationForm() {
     values.isPreviousParticipant === true
       ? profileSuppliedFields === null
         ? RETURNING_HIDDEN_FIELDS
-        : RETURNING_HIDDEN_FIELDS.filter((field) => profileSuppliedFields.has(field))
+        : RETURNING_HIDDEN_FIELDS.filter((field) =>
+            profileSuppliedFields.has(field),
+          )
       : [];
 
   const revokePreview = () => {
@@ -92,7 +94,11 @@ function useRegistrationForm() {
       return next;
     });
 
-    if (field === "isPreviousParticipant" && value !== true && profileSuppliedFields !== null) {
+    if (
+      field === "isPreviousParticipant" &&
+      value !== true &&
+      profileSuppliedFields !== null
+    ) {
       setProfileSuppliedFields(null);
       setSkipDivision(false);
       if (!hasLocalUploadRef.current) {
@@ -116,13 +122,17 @@ function useRegistrationForm() {
   };
 
   const handleBlur = (field) => {
-    const validationErrors = validateRegistration(values, { hiddenFields, skipDivision });
+    const validationErrors = validateRegistration(values, {
+      hiddenFields,
+      skipDivision,
+    });
     if (validationErrors[field]) {
       setErrors((prev) => ({ ...prev, [field]: validationErrors[field] }));
     }
   };
 
   const fieldProps = (name) => ({
+    name,
     value: values[name],
     onChange: (value) => setField(name, value),
     onBlur: () => handleBlur(name),
@@ -176,7 +186,9 @@ function useRegistrationForm() {
         tempImagePathRef.current = null;
         setTempImagePath(null);
         setPhotoUploadStatus("error");
-        enqueueSnackbar("Photo upload failed. Please try again.", { variant: "error" });
+        enqueueSnackbar("Photo upload failed. Please try again.", {
+          variant: "error",
+        });
       });
   };
 
@@ -239,11 +251,15 @@ function useRegistrationForm() {
   };
 
   const validate = () => {
-    const validationErrors = validateRegistration(values, { hiddenFields, skipDivision });
+    const validationErrors = validateRegistration(values, {
+      hiddenFields,
+      skipDivision,
+    });
     if (photoUploadStatus === "uploading") {
       validationErrors.photo = "Photo is still uploading";
     } else if (photoUploadStatus === "error") {
-      validationErrors.photo = "Photo upload failed. Please choose the file again.";
+      validationErrors.photo =
+        "Photo upload failed. Please choose the file again.";
     } else if (!tempImagePath && !existingImageUrl) {
       validationErrors.photo = "Photo is required";
     }
