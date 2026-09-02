@@ -99,12 +99,25 @@ export const resolveCountry = (value) => {
   return null;
 };
 
+export const ORDER_ID_PATTERN = /^CBZL/i;
+const PHONE_ALLOWED_PATTERN = /^\+?[\d\s\-().]+$/;
+
 const required = (value) => {
   if (Array.isArray(value)) {
     return value.length > 0;
   }
   return value !== null && value !== undefined && String(value).trim() !== "";
 };
+
+export const isValidPhoneNumber = (value) => {
+  const trimmed = String(value ?? "").trim();
+  if (!PHONE_ALLOWED_PATTERN.test(trimmed)) return false;
+  const digits = trimmed.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15;
+};
+
+export const isValidOrderId = (value) =>
+  ORDER_ID_PATTERN.test(String(value ?? "").trim());
 
 export const validateRegistration = (values, { hiddenFields = [], skipDivision = false } = {}) => {
   const errors = {};
@@ -136,8 +149,12 @@ export const validateRegistration = (values, { hiddenFields = [], skipDivision =
     }
   }
 
-  if (!isHidden("phoneNo") && !required(values.phoneNo)) {
-    errors.phoneNo = "Phone number is required";
+  if (!isHidden("phoneNo")) {
+    if (!required(values.phoneNo)) {
+      errors.phoneNo = "Phone number is required";
+    } else if (!isValidPhoneNumber(values.phoneNo)) {
+      errors.phoneNo = "Enter a valid phone number";
+    }
   }
 
   if (!required(values.school)) {
@@ -165,6 +182,8 @@ export const validateRegistration = (values, { hiddenFields = [], skipDivision =
 
   if (!required(values.orderId)) {
     errors.orderId = "Order ID is required";
+  } else if (!isValidOrderId(values.orderId)) {
+    errors.orderId = "Order ID must start with CBZL";
   }
 
   if (!skipDivision && !required(values.registeredDivision)) {

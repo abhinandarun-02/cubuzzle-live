@@ -8,6 +8,8 @@ const TEMP_PATH_PATTERN =
 const COMPETITION_ID_PATTERN = /^[a-z0-9-]+$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOB_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const PHONE_ALLOWED_PATTERN = /^\+?[\d\s\-().]+$/;
+const ORDER_ID_PATTERN = /^CBZL/i;
 
 const ALLOWED_GENDERS = new Set(["male", "female", "other"]);
 const ALLOWED_MODES = new Set(["onsite", "online"]);
@@ -56,12 +58,12 @@ async function handleRegisterCompetitor(data) {
 
     const name = requireTrimmedString(data.name, "name", 200);
     const email = requireEmail(data.email);
-    const phoneNo = requireTrimmedString(data.phoneNo, "phone number", 80);
+    const phoneNo = requirePhoneNumber(data.phoneNo);
     const school = requireTrimmedString(data.school, "school", 200);
     const gender = requireGender(data.gender);
     const dob = requireDob(data.dob);
     const category = getCategoryFromDob(dob);
-    const orderId = requireTrimmedString(data.orderId, "order ID", 100);
+    const orderId = requireOrderId(data.orderId);
     const modeOfParticipation = requireEnum(
       data.modeOfParticipation,
       ALLOWED_MODES,
@@ -385,6 +387,23 @@ function requireEmail(value) {
     throw new HttpsError("invalid-argument", "Invalid email.");
   }
   return email;
+}
+
+function requirePhoneNumber(value) {
+  const phoneNo = requireTrimmedString(value, "phone number", 80);
+  const digits = phoneNo.replace(/\D/g, "");
+  if (!PHONE_ALLOWED_PATTERN.test(phoneNo) || digits.length < 10 || digits.length > 15) {
+    throw new HttpsError("invalid-argument", "Invalid phone number.");
+  }
+  return phoneNo;
+}
+
+function requireOrderId(value) {
+  const orderId = requireTrimmedString(value, "order ID", 100);
+  if (!ORDER_ID_PATTERN.test(orderId)) {
+    throw new HttpsError("invalid-argument", "Order ID must start with CBZL.");
+  }
+  return orderId;
 }
 
 function requireEnum(value, allowed, field) {

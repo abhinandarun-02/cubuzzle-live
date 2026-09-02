@@ -101,6 +101,7 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
               <Grid item xs={12} md={6}>
                 <TextInput
                   label="Phone Number"
+                  type="tel"
                   icon={LocalPhoneOutlinedIcon}
                   {...fieldProps("phoneNo")}
                 />
