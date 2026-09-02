@@ -8,6 +8,7 @@ export { USER_ID_PATTERN };
 export const REGISTRATION_EVENTS = [
   "222",
   "333",
+  "444",
   "pyram",
   "333oh",
 ].map((id) => ({

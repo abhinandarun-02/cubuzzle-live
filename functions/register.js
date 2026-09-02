@@ -14,7 +14,7 @@ const ORDER_ID_PATTERN = /^CBZL/i;
 const ALLOWED_GENDERS = new Set(["male", "female", "other"]);
 const ALLOWED_MODES = new Set(["onsite", "online"]);
 const ALLOWED_DIVISIONS = new Set(["A+", "A", "B", "C", "D"]);
-const ALLOWED_EVENTS = new Set(["222", "333", "pyram", "333oh"]);
+const ALLOWED_EVENTS = new Set(["222", "333", "444", "pyram", "333oh"]);
 
 const registerCompetitor = onCall(
   { cors: true, invoker: "public" },
