@@ -1,9 +1,11 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import LanguageIcon from "@mui/icons-material/Language";
+import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import { DIVISIONS, MODES, REGISTRATION_EVENTS } from "../../lib/registration";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import ChoiceGroup from "./ChoiceGroup";
+import SectionHeader from "./SectionHeader";
 import { styles } from "./styles";
 
 const EVENT_OPTIONS = REGISTRATION_EVENTS.map((event) => ({
@@ -23,10 +25,8 @@ function CompetitionDetails({ form, showDivision = true, divisionHint }) {
 
   return (
     <Card sx={styles.card}>
-      <CardContent>
-        <Typography variant="h6" sx={styles.sectionTitle}>
-          Competition Details
-        </Typography>
+      <CardContent sx={styles.cardContent}>
+        <SectionHeader icon={EmojiEventsOutlinedIcon} title="Competition Details" />
 
         <Stack spacing={3.5}>
           {showDivision && (

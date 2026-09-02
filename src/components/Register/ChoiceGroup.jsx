@@ -5,6 +5,7 @@ import {
   FormLabel,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { styles as sharedStyles } from "./styles";
 
@@ -26,10 +27,11 @@ const choiceCardSx = {
   textAlign: "left",
   cursor: "pointer",
   userSelect: "none",
-  transition: "border-color 0.15s, background-color 0.15s",
+  transition: "border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease",
   "&:hover": {
     borderColor: "primary.main",
     bgcolor: "action.hover",
+    transform: "translateY(-1px)",
   },
   "&:focus-visible": {
     outline: "2px solid",
@@ -41,7 +43,8 @@ const choiceCardSx = {
 const choiceCardSelectedSx = {
   borderColor: "primary.main",
   bgcolor: "action.selected",
-  boxShadow: (theme) => `inset 0 0 0 1px ${theme.palette.primary.main}`,
+  boxShadow: (theme) =>
+    `0 0 0 1px ${theme.palette.primary.main}, 0 6px 16px ${alpha(theme.palette.primary.main, 0.28)}`,
 };
 
 function toGridColumns(columns) {

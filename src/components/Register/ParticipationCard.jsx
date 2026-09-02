@@ -18,7 +18,9 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
+import PersonSearchOutlinedIcon from "@mui/icons-material/PersonSearchOutlined";
 import ChoiceGroup from "./ChoiceGroup";
+import SectionHeader from "./SectionHeader";
 import TextInput from "./TextInput";
 import { styles } from "./styles";
 
@@ -119,10 +121,8 @@ function ParticipationCard({ form, userIdStatus, profile, previousDivision }) {
 
   return (
     <Card sx={styles.card}>
-      <CardContent>
-        <Typography variant="h6" sx={styles.sectionTitle}>
-          Returning Participant?
-        </Typography>
+      <CardContent sx={styles.cardContent}>
+        <SectionHeader icon={PersonSearchOutlinedIcon} title="Returning Participant?" />
 
         <Grid container spacing={3}>
           <Grid item xs={12}>
