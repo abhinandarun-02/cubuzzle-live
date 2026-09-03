@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, Grid, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -21,6 +15,7 @@ import {
 } from "../../lib/registration";
 import ChoiceGroup from "./ChoiceGroup";
 import CountrySelect from "./CountrySelect";
+import FormSection from "./FormSection";
 import PhotoUpload from "./PhotoUpload";
 import SchoolSelect from "./SchoolSelect";
 import TextInput from "./TextInput";
@@ -34,7 +29,7 @@ function getDobHelperText(dob) {
   return `Category : ${getCategoryLabel(category)}`;
 }
 
-function CompetitorDetails({ form, hiddenFields = [] }) {
+function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
   const {
     values,
     errors,
@@ -52,67 +47,71 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Card sx={styles.card}>
-        <CardContent>
-          <Typography variant="h6" sx={styles.sectionTitle}>
-            Competitor Details
-          </Typography>
+      <FormSection
+        id="section-details"
+        step={step}
+        title="Your details"
+        description="A clear photo and the details we need for check-in, ranking, and your Cubuzzle ID."
+      >
+        <PhotoUpload
+          preview={photoPreview}
+          hasFile={Boolean(photoFile || existingImageUrl)}
+          error={errors.photo}
+          uploading={photoUploadStatus === "uploading"}
+          onChange={setPhoto}
+          onRemove={removePhoto}
+        />
 
-          <PhotoUpload
-            preview={photoPreview}
-            hasFile={Boolean(photoFile || existingImageUrl)}
-            error={errors.photo}
-            uploading={photoUploadStatus === "uploading"}
-            onChange={setPhoto}
-            onRemove={removePhoto}
-          />
+        <Grid container spacing={2.5}>
+          <Grid item xs={12}>
+            <Divider sx={{ mb: -0.5 }}>
+              <Typography sx={styles.sectionCaption}>
+                Personal information
+              </Typography>
+            </Divider>
+          </Grid>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Divider sx={{ mb: -1 }}>
-                <Typography sx={styles.sectionCaption}>
-                  Personal Information
-                </Typography>
-              </Divider>
-            </Grid>
-
-            {!isHidden("name") && (
-              <Grid item xs={12} md={6}>
-                <TextInput
-                  label="Name"
-                  icon={PersonOutlineIcon}
-                  {...fieldProps("name")}
-                />
-              </Grid>
-            )}
-
-            {!isHidden("email") && (
-              <Grid item xs={12} md={6}>
-                <TextInput
-                  label="Email"
-                  type="email"
-                  icon={EmailOutlinedIcon}
-                  {...fieldProps("email")}
-                />
-              </Grid>
-            )}
-
-            {!isHidden("phoneNo") && (
-              <Grid item xs={12} md={6}>
-                <TextInput
-                  label="Phone Number"
-                  type="tel"
-                  icon={LocalPhoneOutlinedIcon}
-                  {...fieldProps("phoneNo")}
-                />
-              </Grid>
-            )}
-
+          {!isHidden("name") && (
             <Grid item xs={12} md={6}>
-              <SchoolSelect label="School" {...fieldProps("school")} />
+              <TextInput
+                label="Name"
+                icon={PersonOutlineIcon}
+                autoComplete="name"
+                {...fieldProps("name")}
+              />
             </Grid>
+          )}
 
+          {!isHidden("email") && (
             <Grid item xs={12} md={6}>
+              <TextInput
+                label="Email"
+                type="email"
+                icon={EmailOutlinedIcon}
+                autoComplete="email"
+                {...fieldProps("email")}
+              />
+            </Grid>
+          )}
+
+          {!isHidden("phoneNo") && (
+            <Grid item xs={12} md={6}>
+              <TextInput
+                label="Phone Number"
+                type="tel"
+                icon={LocalPhoneOutlinedIcon}
+                autoComplete="tel"
+                {...fieldProps("phoneNo")}
+              />
+            </Grid>
+          )}
+
+          <Grid item xs={12} md={6}>
+            <SchoolSelect label="School" {...fieldProps("school")} />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Box data-field="dob">
               <DatePicker
                 label="Date of Birth"
                 format="dd/MM/yyyy"
@@ -136,53 +135,55 @@ function CompetitorDetails({ form, hiddenFields = [] }) {
                   },
                 }}
               />
-            </Grid>
-
-            {!isHidden("gender") && (
-              <Grid item xs={12} md={6}>
-                <ChoiceGroup
-                  label="Gender"
-                  options={GENDERS}
-                  columns={{ xs: 1, sm: 3 }}
-                  cardSx={{ justifyContent: "center", minHeight: 44 }}
-                  {...fieldProps("gender")}
-                />
-              </Grid>
-            )}
-
-            <Grid item xs={12}>
-              <Divider sx={{ mb: -1 }}>
-                <Typography sx={styles.sectionCaption}>
-                  Registration Details
-                </Typography>
-              </Divider>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextInput
-                label="Order ID"
-                icon={ConfirmationNumberOutlinedIcon}
-                {...fieldProps("orderId")}
-                helperText={
-                  errors.orderId ||
-                  "Cubuzzle Order ID (starting with CBZL**)"
-                }
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <CountrySelect label="Country of Residence" {...fieldProps("country")} />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <CountrySelect
-                label="Nationality"
-                {...fieldProps("nationality")}
-              />
-            </Grid>
+            </Box>
           </Grid>
-        </CardContent>
-      </Card>
+
+          {!isHidden("gender") && (
+            <Grid item xs={12} md={6}>
+              <ChoiceGroup
+                label="Gender"
+                options={GENDERS}
+                columns={{ xs: 1, sm: 3 }}
+                cardSx={{ justifyContent: "center", minHeight: 48 }}
+                {...fieldProps("gender")}
+              />
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Divider sx={{ mb: -0.5, mt: 0.5 }}>
+              <Typography sx={styles.sectionCaption}>
+                Registration details
+              </Typography>
+            </Divider>
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextInput
+              label="Order ID"
+              icon={ConfirmationNumberOutlinedIcon}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="CBZL…"
+              {...fieldProps("orderId")}
+              helperText={
+                errors.orderId || "Cubuzzle Order ID (starting with CBZL**)"
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CountrySelect
+              label="Country of Residence"
+              {...fieldProps("country")}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CountrySelect label="Nationality" {...fieldProps("nationality")} />
+          </Grid>
+        </Grid>
+      </FormSection>
     </LocalizationProvider>
   );
 }

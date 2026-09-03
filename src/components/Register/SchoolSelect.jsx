@@ -1,4 +1,4 @@
-import { Autocomplete, InputAdornment, TextField } from "@mui/material";
+import { Autocomplete, Box, InputAdornment, TextField } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import { SCHOOLS } from "../../lib/schools";
@@ -33,69 +33,84 @@ function toSchoolValue(newValue) {
   return newValue.label ?? "";
 }
 
-function SchoolSelect({ label, value, onChange, onBlur, error, helperText }) {
+function SchoolSelect({
+  label,
+  value,
+  onChange,
+  onBlur,
+  error,
+  helperText,
+  name,
+}) {
   const selected =
     SORTED_SCHOOLS.find((school) => school.label === value) ?? (value || null);
 
   return (
-    <Autocomplete
-      freeSolo
-      selectOnFocus
-      clearOnBlur
-      handleHomeEndKeys
-      fullWidth
-      options={SORTED_SCHOOLS}
-      value={selected}
-      onChange={(event, newValue) => onChange(toSchoolValue(newValue))}
-      onBlur={onBlur}
-      getOptionLabel={getSchoolLabel}
-      isOptionEqualToValue={(option, val) =>
-        getSchoolLabel(option) === getSchoolLabel(val)
-      }
-      filterOptions={(options, params) => {
-        const filtered = filter(options, params);
-        const { inputValue } = params;
-        const isExisting = options.some(
-          (option) =>
-            option.label.toLowerCase() === inputValue.trim().toLowerCase(),
-        );
-        if (inputValue !== "" && !isExisting) {
-          filtered.push({
-            inputValue,
-            label: `Add "${inputValue}"`,
-          });
+    <Box data-field={name}>
+      <Autocomplete
+        freeSolo
+        selectOnFocus
+        clearOnBlur
+        handleHomeEndKeys
+        fullWidth
+        options={SORTED_SCHOOLS}
+        value={selected}
+        onChange={(event, newValue) => onChange(toSchoolValue(newValue))}
+        onBlur={onBlur}
+        getOptionLabel={getSchoolLabel}
+        isOptionEqualToValue={(option, val) =>
+          getSchoolLabel(option) === getSchoolLabel(val)
         }
-        return filtered;
-      }}
-      renderOption={(props, option) => {
-        const { key, ...optionProps } = props;
-        return (
-          <li key={key} {...optionProps}>
-            {option.inputValue ? option.label : getSchoolLabel(option)}
-          </li>
-        );
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          required
-          label={label}
-          error={Boolean(error)}
-          helperText={helperText}
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: (
-              <>
-                <InputAdornment position="start">
-                  <SchoolOutlinedIcon fontSize="small" color="action" />
-                </InputAdornment>
-                {params.InputProps.startAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-    />
+        filterOptions={(options, params) => {
+          const filtered = filter(options, params);
+          const { inputValue } = params;
+          const isExisting = options.some(
+            (option) =>
+              option.label.toLowerCase() === inputValue.trim().toLowerCase(),
+          );
+          if (inputValue !== "" && !isExisting) {
+            filtered.push({
+              inputValue,
+              label: `Add "${inputValue}"`,
+            });
+          }
+          return filtered;
+        }}
+        renderOption={(props, option) => {
+          const { key, ...optionProps } = props;
+          return (
+            <li key={key} {...optionProps}>
+              {option.inputValue ? option.label : getSchoolLabel(option)}
+            </li>
+          );
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            required
+            name={name}
+            label={label}
+            error={Boolean(error)}
+            helperText={helperText}
+            inputProps={{
+              ...params.inputProps,
+              "data-field": name,
+            }}
+            InputProps={{
+              ...params.InputProps,
+              startAdornment: (
+                <>
+                  <InputAdornment position="start">
+                    <SchoolOutlinedIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                  {params.InputProps.startAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+      />
+    </Box>
   );
 }
 

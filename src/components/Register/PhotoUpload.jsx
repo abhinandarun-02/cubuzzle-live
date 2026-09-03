@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,63 +10,32 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import { styles as sharedStyles } from "./styles";
 
-const styles = {
-  photoUpload: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 1.25,
-    mb: 3.5,
-  },
-  photoDropzone: {
-    position: "relative",
-    width: 128,
-    height: 128,
-    borderRadius: "50%",
-    cursor: "pointer",
-    "&:hover .photo-overlay": {
-      opacity: 1,
-    },
-  },
-  photoOverlay: {
-    position: "absolute",
-    inset: 0,
-    borderRadius: "50%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 0.5,
-    color: "#fff",
-    bgcolor: "rgba(0,0,0,0.55)",
-    opacity: 0,
-    transition: "opacity 0.15s",
-    pointerEvents: "none",
-  },
-  photoRemoveBtn: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    bgcolor: "background.paper",
-    boxShadow: 1,
-    "&:hover": {
-      bgcolor: "error.main",
-      color: "#fff",
-    },
-  },
-};
+function PhotoUpload({
+  preview,
+  hasFile,
+  error,
+  uploading,
+  onChange,
+  onRemove,
+}) {
+  const [dragOver, setDragOver] = useState(false);
 
-function PhotoUpload({ preview, hasFile, error, uploading, onChange, onRemove }) {
-  const handleChange = (event) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
+  const handleFile = (file) => {
     if (file) {
       onChange(file);
     }
+  };
+
+  const handleChange = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    handleFile(file);
   };
 
   const handleRemove = (event) => {
@@ -75,55 +45,142 @@ function PhotoUpload({ preview, hasFile, error, uploading, onChange, onRemove })
   };
 
   return (
-    <FormControl required error={Boolean(error)} sx={styles.photoUpload}>
+    <FormControl
+      required
+      error={Boolean(error)}
+      data-field="photo"
+      sx={{ display: "block", mb: 3.5 }}
+    >
       <FormLabel sx={sharedStyles.fieldLabel}>Photo</FormLabel>
-      <Box component="label" sx={styles.photoDropzone}>
-        <Avatar
-          src={preview}
-          sx={{
-            width: 128,
-            height: 128,
-            borderWidth: 3,
-            borderStyle: error || preview ? "solid" : "dashed",
-            borderColor: error ? "error.main" : "divider",
-          }}
-        >
-          <PhotoCameraIcon sx={{ fontSize: 40, color: "text.disabled" }} />
-        </Avatar>
-        <Box
-          className="photo-overlay"
-          sx={{
-            ...styles.photoOverlay,
-            ...(uploading ? { opacity: 1 } : {}),
-          }}
-        >
-          {uploading ? (
-            <>
-              <CircularProgress size={24} sx={{ color: "#fff" }} />
-              <Typography variant="caption" fontWeight={600}>
-                Uploading…
-              </Typography>
-            </>
-          ) : (
-            <>
-              <PhotoCameraIcon fontSize="small" />
-              <Typography variant="caption" fontWeight={600}>
-                {hasFile ? "Change" : "Upload"}
-              </Typography>
-            </>
+      <Box
+        component="label"
+        onDragEnter={(event) => {
+          event.preventDefault();
+          setDragOver(true);
+        }}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragOver(false);
+          handleFile(event.dataTransfer.files?.[0]);
+        }}
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
+          justifyContent: { xs: "center", sm: "flex-start" },
+          gap: { xs: 1.5, sm: 2.5 },
+          px: { xs: 2, sm: 2.5 },
+          py: 2.25,
+          borderRadius: 3,
+          border: "1.5px dashed",
+          borderColor: error
+            ? "error.main"
+            : dragOver
+              ? "primary.main"
+              : "divider",
+          bgcolor: (theme) =>
+            dragOver
+              ? alpha(theme.palette.primary.main, 0.08)
+              : theme.palette.mode === "dark"
+                ? "rgba(255,255,255,0.03)"
+                : alpha(theme.palette.primary.main, 0.03),
+          cursor: "pointer",
+          transition:
+            "border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease",
+          "&:hover": {
+            borderColor: error ? "error.main" : "primary.main",
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
+          },
+        }}
+      >
+        <Box sx={{ position: "relative", flexShrink: 0 }}>
+          <Avatar
+            src={preview}
+            sx={{
+              width: 104,
+              height: 104,
+              borderWidth: 3,
+              borderStyle: preview ? "solid" : "dashed",
+              borderColor: error ? "error.main" : "divider",
+              bgcolor: "action.hover",
+            }}
+          >
+            <PhotoCameraIcon sx={{ fontSize: 36, color: "text.disabled" }} />
+          </Avatar>
+          {(hasFile || preview) && (
+            <Tooltip title="Remove photo">
+              <IconButton
+                size="small"
+                sx={{
+                  position: "absolute",
+                  top: -6,
+                  right: -6,
+                  bgcolor: "background.paper",
+                  boxShadow: 1,
+                  "&:hover": {
+                    bgcolor: "error.main",
+                    color: "#fff",
+                  },
+                }}
+                onClick={handleRemove}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {uploading && (
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "rgba(0,0,0,0.55)",
+              }}
+            >
+              <CircularProgress size={26} sx={{ color: "#fff" }} />
+            </Box>
           )}
         </Box>
-        {(hasFile || preview) && (
-          <Tooltip title="Remove photo">
-            <IconButton
-              size="small"
-              sx={styles.photoRemoveBtn}
-              onClick={handleRemove}
+        <Box sx={{ textAlign: { xs: "center", sm: "left" }, minWidth: 0 }}>
+          <Typography variant="subtitle1" fontWeight={700}>
+            {uploading
+              ? "Uploading photo…"
+              : hasFile
+                ? "Looking good — click to change"
+                : dragOver
+                  ? "Drop your photo here"
+                  : "Upload a competition photo"}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+            JPEG, PNG or WebP, up to 5&nbsp;MB. Drag and drop or click to
+            browse.
+          </Typography>
+          {!hasFile && (
+            <Typography
+              variant="caption"
+              color="primary"
+              sx={{
+                mt: 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.75,
+                fontWeight: 700,
+              }}
             >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
+              <CloudUploadOutlinedIcon fontSize="small" />
+              Choose file
+            </Typography>
+          )}
+        </Box>
         <input
           type="file"
           hidden
@@ -131,9 +188,6 @@ function PhotoUpload({ preview, hasFile, error, uploading, onChange, onRemove })
           onChange={handleChange}
         />
       </Box>
-      <Typography variant="caption" color="text.secondary">
-        JPEG, PNG or WebP, up to 5&nbsp;MB
-      </Typography>
       {error && <FormHelperText>{error}</FormHelperText>}
     </FormControl>
   );

@@ -11,12 +11,14 @@ function TextInput({
   helperText,
   endAdornment,
   InputProps,
+  name,
   ...props
 }) {
   return (
     <TextField
       fullWidth
       required
+      name={name}
       type={type}
       label={label}
       value={value ?? ""}
@@ -24,6 +26,7 @@ function TextInput({
       onBlur={onBlur}
       error={Boolean(error)}
       helperText={helperText}
+      data-field={name}
       InputProps={{
         startAdornment: Icon && (
           <InputAdornment position="start">
