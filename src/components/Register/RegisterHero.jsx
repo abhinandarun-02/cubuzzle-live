@@ -12,7 +12,6 @@ function RegisterHero() {
         sx={{
           display: "flex",
           justifyContent: "center",
-          mb: 2,
         }}
       >
         <Box
@@ -21,7 +20,7 @@ function RegisterHero() {
           alt="Cubuzzle Champion League"
           sx={{
             width: "100%",
-            maxWidth: 128,
+            maxWidth: 192,
             height: "auto",
             display: "block",
             filter: (theme) =>
@@ -33,10 +32,10 @@ function RegisterHero() {
       </Box>
       <Chip
         label="Season 5 · Summer Championship 2026"
-        size="small"
+        size="medium"
         color="primary"
         variant="outlined"
-        sx={{ mb: 1.5, fontWeight: 600, letterSpacing: 0.2 }}
+        sx={{ mb: 1.5, fontWeight: 600, letterSpacing: 0.2, fontSize: "1.10rem" }}
       />
       <Typography
         variant="h4"
@@ -47,42 +46,8 @@ function RegisterHero() {
           fontSize: { xs: "1.75rem", sm: "2.125rem" },
         }}
       >
-        Register for Cubuzzle
+        Register for Cubuzzle Champion League
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mt: 1, mb: 2.5, maxWidth: 520, mx: "auto" }}
-      >
-        A few details and you&apos;re on the board. Returning competitors can
-        skip the basics with a Cubuzzle ID.
-      </Typography>
-      <Stack
-        direction="row"
-        spacing={1}
-        useFlexGap
-        flexWrap="wrap"
-        justifyContent="center"
-      >
-        <Chip
-          size="small"
-          icon={<PhotoCameraOutlinedIcon />}
-          label="Competition photo"
-          variant="outlined"
-        />
-        <Chip
-          size="small"
-          icon={<ConfirmationNumberOutlinedIcon />}
-          label="Order ID (CBZL…)"
-          variant="outlined"
-        />
-        <Chip
-          size="small"
-          icon={<BadgeOutlinedIcon />}
-          label="Cubuzzle ID if returning"
-          variant="outlined"
-        />
-      </Stack>
     </Box>
   );
 }
