@@ -11,6 +11,8 @@ import {
   GENDERS,
   getCategoryFromDob,
   getCategoryLabel,
+  maskEmail,
+  maskPhone,
   parseDob,
 } from "../../lib/registration";
 import ChoiceGroup from "./ChoiceGroup";
@@ -29,7 +31,14 @@ function getDobHelperText(dob) {
   return `Category : ${getCategoryLabel(category)}`;
 }
 
-function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
+const LOCKED_HELPER = "Loaded from your previous Cubuzzle profile.";
+
+function CompetitorDetails({
+  form,
+  hiddenFields = [],
+  lockedFields = [],
+  step = 2,
+}) {
   const {
     values,
     errors,
@@ -44,6 +53,9 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
 
   const dobField = fieldProps("dob");
   const isHidden = (field) => hiddenFields.includes(field);
+  const isLocked = (field) => lockedFields.includes(field);
+  const lockedHelper = (field, fallback) =>
+    isLocked(field) ? LOCKED_HELPER : fallback;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -78,6 +90,8 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
                 icon={PersonOutlineIcon}
                 autoComplete="name"
                 {...fieldProps("name")}
+                disabled={isLocked("name")}
+                helperText={lockedHelper("name", errors.name)}
               />
             </Grid>
           )}
@@ -90,6 +104,11 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
                 icon={EmailOutlinedIcon}
                 autoComplete="email"
                 {...fieldProps("email")}
+                value={
+                  isLocked("email") ? maskEmail(values.email) : values.email
+                }
+                disabled={isLocked("email")}
+                helperText={lockedHelper("email", errors.email)}
               />
             </Grid>
           )}
@@ -102,6 +121,13 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
                 icon={LocalPhoneOutlinedIcon}
                 autoComplete="tel"
                 {...fieldProps("phoneNo")}
+                value={
+                  isLocked("phoneNo")
+                    ? maskPhone(values.phoneNo)
+                    : values.phoneNo
+                }
+                disabled={isLocked("phoneNo")}
+                helperText={lockedHelper("phoneNo", errors.phoneNo)}
               />
             </Grid>
           )}
@@ -146,6 +172,8 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
                 columns={{ xs: 1, sm: 3 }}
                 cardSx={{ justifyContent: "center", minHeight: 48 }}
                 {...fieldProps("gender")}
+                disabled={isLocked("gender")}
+                hint={lockedHelper("gender")}
               />
             </Grid>
           )}

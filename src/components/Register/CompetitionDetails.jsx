@@ -14,6 +14,7 @@ const EVENT_OPTIONS = REGISTRATION_EVENTS.map((event) => ({
 function CompetitionDetails({
   form,
   showDivision = true,
+  divisionLocked = false,
   divisionHint,
   step = 3,
 }) {
@@ -33,6 +34,7 @@ function CompetitionDetails({
             hint={divisionHint}
             options={DIVISIONS}
             columns={{ xs: 1 }}
+            disabled={divisionLocked}
             cardSx={{
               gap: 1.5,
               minHeight: 76,

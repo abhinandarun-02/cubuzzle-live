@@ -84,9 +84,25 @@ export const DIVISIONS = [
   },
 ];
 
-// Fields that are filled silently from a returning participant's profile and
-// hidden from the form (unless the profile is missing that value).
-export const RETURNING_HIDDEN_FIELDS = ["name", "email", "phoneNo", "gender"];
+// Fields filled from a returning participant's profile. Hidden while lookup is
+// unresolved; locked (and masked, for confidential values) once supplied.
+export const RETURNING_PROFILE_FIELDS = ["name", "email", "phoneNo", "gender"];
+
+export const maskEmail = (email) => {
+  if (!email) return "";
+  const [user, domain] = String(email).split("@");
+  if (!domain) return email;
+  const visible = user.slice(0, 2);
+  return `${visible}${"*".repeat(Math.max(user.length - visible.length, 1))}@${domain}`;
+};
+
+export const maskPhone = (phone) => {
+  if (!phone) return "";
+  const digits = String(phone).replace(/\D/g, "");
+  if (digits.length <= 2) return String(phone);
+  const visible = digits.slice(-2);
+  return `${"*".repeat(digits.length - 2)}${visible}`;
+};
 
 export const normalizeUserId = (userId) => userId.trim().toUpperCase();
 

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import {
-  RETURNING_HIDDEN_FIELDS,
+  RETURNING_PROFILE_FIELDS,
   normalizeUserId,
   resolveCountry,
   validateImageFile,
@@ -18,10 +18,10 @@ function useRegistrationForm() {
   const [tempImagePath, setTempImagePath] = useState(null);
   const [photoUploadStatus, setPhotoUploadStatus] = useState("idle");
   const [errors, setErrors] = useState({});
-  // Which of RETURNING_HIDDEN_FIELDS the matched profile actually supplied a
+  // Which of RETURNING_PROFILE_FIELDS the matched profile actually supplied a
   // value for. `null` means no profile has resolved yet (still hide
   // everything); once a profile applies, only the fields it actually
-  // supplied stay hidden, so a sparse profile reveals what's missing instead
+  // supplied stay locked, so a sparse profile reveals what's missing instead
   // of silently submitting it blank.
   const [profileSuppliedFields, setProfileSuppliedFields] = useState(null);
   // Whether a previous 3x3 division was derived for the current returning
@@ -35,12 +35,15 @@ function useRegistrationForm() {
   const hasLocalUploadRef = useRef(false);
 
   const hiddenFields =
-    values.isPreviousParticipant === true
-      ? profileSuppliedFields === null
-        ? RETURNING_HIDDEN_FIELDS
-        : RETURNING_HIDDEN_FIELDS.filter((field) =>
-            profileSuppliedFields.has(field),
-          )
+    values.isPreviousParticipant === true && profileSuppliedFields === null
+      ? RETURNING_PROFILE_FIELDS
+      : [];
+
+  const lockedFields =
+    values.isPreviousParticipant === true && profileSuppliedFields !== null
+      ? RETURNING_PROFILE_FIELDS.filter((field) =>
+          profileSuppliedFields.has(field),
+        )
       : [];
 
   const revokePreview = () => {
@@ -199,9 +202,9 @@ function useRegistrationForm() {
   };
 
   // Called when the Cubuzzle ID changes and no matching profile is (yet)
-  // applied: clears any previously-loaded profile photo and hidden-field
+  // applied: clears any previously-loaded profile photo and locked-field
   // bookkeeping so stale data from a different ID doesn't linger, and the
-  // hidden-fields default back to "hide everything until resolved".
+  // profile fields default back to "hide everything until resolved".
   const clearExistingPhoto = () => {
     if (hasLocalUploadRef.current) return;
     setExistingImageUrl(null);
@@ -289,6 +292,7 @@ function useRegistrationForm() {
     tempImagePath,
     photoUploadStatus,
     hiddenFields,
+    lockedFields,
     skipDivision,
     setSkipDivision,
     fieldProps,

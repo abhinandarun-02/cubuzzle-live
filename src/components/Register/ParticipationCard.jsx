@@ -2,7 +2,6 @@ import {
   Alert,
   Avatar,
   Box,
-  Chip,
   CircularProgress,
   InputAdornment,
   Stack,
@@ -13,10 +12,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
-import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import ChoiceGroup from "./ChoiceGroup";
 import FormSection from "./FormSection";
 import TextInput from "./TextInput";
@@ -37,28 +32,7 @@ function UserIdStatusAdornment({ status }) {
   );
 }
 
-function maskEmail(email) {
-  if (!email) return null;
-  const [user, domain] = email.split("@");
-  if (!domain) return email;
-  const visible = user.slice(0, 2);
-  return `${visible}${"*".repeat(Math.max(user.length - visible.length, 1))}@${domain}`;
-}
-
-function maskPhone(phone) {
-  if (!phone) return null;
-  const digits = String(phone).replace(/\D/g, "");
-  if (digits.length <= 2) return phone;
-  const visible = digits.slice(-2);
-  return `${"*".repeat(digits.length - 2)}${visible}`;
-}
-
-function capitalize(value) {
-  if (!value) return value;
-  return String(value).charAt(0).toUpperCase() + String(value).slice(1);
-}
-
-function WelcomeBackBanner({ profile, previousDivision }) {
+function WelcomeBackBanner({ profile }) {
   return (
     <Box
       sx={{
@@ -89,56 +63,16 @@ function WelcomeBackBanner({ profile, previousDivision }) {
           <Typography variant="subtitle1" fontWeight={700}>
             Welcome back, {profile.name}!
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.25 }}>
+          <Typography variant="body2" color="text.secondary">
             We found your previous Cubuzzle profile and prefilled what we can.
           </Typography>
-          <Stack direction="row" flexWrap="wrap" gap={1}>
-            {profile.email && (
-              <Chip
-                size="small"
-                variant="outlined"
-                icon={<EmailOutlinedIcon fontSize="small" />}
-                label={maskEmail(profile.email)}
-              />
-            )}
-            {profile.phoneNo && (
-              <Chip
-                size="small"
-                variant="outlined"
-                icon={<LocalPhoneOutlinedIcon fontSize="small" />}
-                label={maskPhone(profile.phoneNo)}
-              />
-            )}
-            {profile.gender && (
-              <Chip
-                size="small"
-                variant="outlined"
-                icon={<WcOutlinedIcon fontSize="small" />}
-                label={capitalize(profile.gender)}
-              />
-            )}
-            {previousDivision && (
-              <Chip
-                size="small"
-                color="primary"
-                icon={<EmojiEventsOutlinedIcon fontSize="small" />}
-                label={`Division ${previousDivision}`}
-              />
-            )}
-          </Stack>
         </Box>
       </Stack>
     </Box>
   );
 }
 
-function ParticipationCard({
-  form,
-  userIdStatus,
-  profile,
-  previousDivision,
-  step = 1,
-}) {
+function ParticipationCard({ form, userIdStatus, profile, step = 1 }) {
   const { values, errors, fieldProps } = form;
 
   return (
@@ -146,7 +80,7 @@ function ParticipationCard({
       id="section-participant"
       step={step}
       title="Returning Participant?"
-      description="If you've competed with Cubuzzle before, we'll look up your profile and skip the details we already have."
+      description="If you've competed with Cubuzzle before, we'll look up your profile and lock the details we already have."
     >
       <Stack spacing={2.5}>
         <ChoiceGroup
@@ -195,11 +129,8 @@ function ParticipationCard({
           </Alert>
         )}
 
-        {profile && (
-          <WelcomeBackBanner
-            profile={profile}
-            previousDivision={previousDivision}
-          />
+        {profile && values.isPreviousParticipant === true && (
+          <WelcomeBackBanner profile={profile} />
         )}
       </Stack>
     </FormSection>

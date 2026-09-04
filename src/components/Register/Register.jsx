@@ -316,7 +316,7 @@ function Register() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const showDivision = !isReturning || (divisionResolved && !previousDivision);
+  const showDivision = !isReturning || divisionResolved;
   const photoReady = Boolean(form.tempImagePath || form.existingImageUrl);
   const completion = getCompletionState({
     values,
@@ -425,18 +425,25 @@ function Register() {
             form={form}
             userIdStatus={status}
             profile={profile}
-            previousDivision={previousDivision}
             step={1}
           />
           <CompetitorDetails
             form={form}
             hiddenFields={form.hiddenFields}
+            lockedFields={form.lockedFields}
             step={2}
           />
           <CompetitionDetails
             form={form}
             showDivision={showDivision}
-            divisionHint={isReturning ? NOT_FOUND_DIVISION_HINT : undefined}
+            divisionLocked={isReturning && Boolean(previousDivision)}
+            divisionHint={
+              !isReturning
+                ? undefined
+                : previousDivision
+                  ? "Loaded from your previous Cubuzzle profile."
+                  : NOT_FOUND_DIVISION_HINT
+            }
             step={3}
           />
 

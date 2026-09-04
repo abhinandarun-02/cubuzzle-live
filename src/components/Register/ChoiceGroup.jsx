@@ -49,6 +49,28 @@ const choiceCardSelectedSx = {
   boxShadow: (theme) => `0 0 0 1px ${theme.palette.primary.main}`,
 };
 
+const choiceCardDisabledSx = {
+  cursor: "default",
+  pointerEvents: "none",
+  opacity: 0.64,
+  "&:hover": {
+    borderColor: "divider",
+    bgcolor: "transparent",
+    transform: "none",
+  },
+  "&:focus-visible": {
+    outline: "none",
+  },
+};
+
+const choiceCardDisabledSelectedSx = {
+  "&:hover": {
+    borderColor: "primary.main",
+    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+    transform: "none",
+  },
+};
+
 function toGridColumns(columns) {
   if (columns == null) {
     return undefined;
@@ -69,17 +91,29 @@ function toGridColumns(columns) {
   return toCss(columns);
 }
 
-function ChoiceCard({ selected, onClick, children, sx, role, ...props }) {
+function ChoiceCard({
+  selected,
+  onClick,
+  children,
+  sx,
+  role,
+  disabled = false,
+  ...props
+}) {
   return (
     <Box
       component="button"
       type="button"
       role={role}
+      disabled={disabled}
+      aria-disabled={disabled || undefined}
       aria-pressed={role === "radio" ? undefined : selected}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       sx={{
         ...choiceCardSx,
         ...(selected && choiceCardSelectedSx),
+        ...(disabled && choiceCardDisabledSx),
+        ...(disabled && selected && choiceCardDisabledSelectedSx),
         ...sx,
       }}
       {...props}
@@ -135,12 +169,17 @@ function ChoiceGroup({
   error,
   multiple = false,
   required = true,
+  disabled = false,
   renderOption,
   cardSx,
 }) {
   const selectedValues = multiple ? (value ?? []) : [value];
 
   const handleSelect = (optionValue) => {
+    if (disabled) {
+      return;
+    }
+
     if (!multiple) {
       onChange(optionValue);
       return;
@@ -162,6 +201,7 @@ function ChoiceGroup({
     <FormControl
       required={required}
       error={Boolean(error)}
+      disabled={disabled}
       fullWidth
       data-field={name}
     >
@@ -178,6 +218,7 @@ function ChoiceGroup({
       <Box
         role={multiple ? "group" : "radiogroup"}
         aria-label={label}
+        aria-disabled={disabled || undefined}
         sx={{
           display: "grid",
           gridTemplateColumns: toGridColumns(columns),
@@ -192,6 +233,7 @@ function ChoiceGroup({
               role={multiple ? undefined : "radio"}
               aria-checked={multiple ? undefined : selected}
               selected={selected}
+              disabled={disabled}
               onClick={() => handleSelect(option.value)}
               sx={cardSx}
             >
