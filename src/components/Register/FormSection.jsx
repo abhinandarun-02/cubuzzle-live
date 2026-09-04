@@ -55,8 +55,6 @@ function FormSection({ id, step, title, description, children }) {
               fontSize: 14,
               bgcolor: "primary.main",
               color: "primary.contrastText",
-              boxShadow: (theme) =>
-                `0 8px 18px ${alpha(theme.palette.primary.main, 0.38)}`,
             }}
           >
             {step}

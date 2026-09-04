@@ -1,6 +1,10 @@
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, Typography, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 function RegisterHero() {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Box
       sx={{ textAlign: "center", mb: { xs: 3, md: 4 }, pt: { xs: 0.5, md: 1 } }}
@@ -26,14 +30,14 @@ function RegisterHero() {
       </Box>
       <Chip
         label="Season 5 · Summer Championship 2026"
-        size="medium"
+        size={isSmallScreen ? "small" : "medium"}
         color="primary"
         variant="outlined"
         sx={{
           mb: 1.5,
           fontWeight: 600,
           letterSpacing: 0.2,
-          fontSize: "1.10rem",
+          fontSize: { xs: "0.8125rem", sm: "1rem" },
           bgcolor: "rgba(5, 7, 12, 0.45)",
           backdropFilter: "blur(10px)",
         }}
