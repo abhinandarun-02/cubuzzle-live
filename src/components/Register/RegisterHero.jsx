@@ -1,7 +1,4 @@
-import { Box, Chip, Stack, Typography } from "@mui/material";
-import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
-import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
-import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import { Box, Chip, Typography } from "@mui/material";
 
 function RegisterHero() {
   return (
@@ -23,10 +20,7 @@ function RegisterHero() {
             maxWidth: 192,
             height: "auto",
             display: "block",
-            filter: (theme) =>
-              theme.palette.mode === "dark"
-                ? "drop-shadow(0 8px 24px rgba(144, 202, 249, 0.18))"
-                : "drop-shadow(0 8px 18px rgba(25, 118, 210, 0.18))",
+            filter: "drop-shadow(0 8px 24px rgba(144, 202, 249, 0.22))",
           }}
         />
       </Box>
@@ -35,7 +29,14 @@ function RegisterHero() {
         size="medium"
         color="primary"
         variant="outlined"
-        sx={{ mb: 1.5, fontWeight: 600, letterSpacing: 0.2, fontSize: "1.10rem" }}
+        sx={{
+          mb: 1.5,
+          fontWeight: 600,
+          letterSpacing: 0.2,
+          fontSize: "1.10rem",
+          bgcolor: "rgba(5, 7, 12, 0.45)",
+          backdropFilter: "blur(10px)",
+        }}
       />
       <Typography
         variant="h4"
@@ -44,6 +45,7 @@ function RegisterHero() {
           fontWeight: 800,
           letterSpacing: -0.4,
           fontSize: { xs: "1.75rem", sm: "2.125rem" },
+          textShadow: "0 8px 28px rgba(0, 0, 0, 0.45)",
         }}
       >
         Register for Cubuzzle Champion League

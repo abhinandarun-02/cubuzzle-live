@@ -1,21 +1,77 @@
+const cubePattern = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="84" height="96" viewBox="0 0 84 96">
+    <g fill="none" stroke="rgba(186,220,255,0.28)" stroke-width="1">
+      <path d="M42 8 L74 26 L74 62 L42 80 L10 62 L10 26 Z"/>
+      <path d="M42 8 L42 44"/>
+      <path d="M10 26 L42 44 L74 26"/>
+      <path d="M42 44 L42 80"/>
+    </g>
+  </svg>`,
+);
+
 export const styles = {
-  page: {
+  pageShell: {
     position: "relative",
-    pb: { xs: 2, md: 4 },
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "calc(100vh - 96px)",
+    overflow: "hidden",
+    bgcolor: "#05070c",
   },
-  pageGlow: {
+  pageBackdrop: {
     pointerEvents: "none",
     position: "absolute",
-    top: -96,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "min(760px, 140%)",
-    height: 320,
+    inset: 0,
     zIndex: 0,
-    background: (theme) =>
-      theme.palette.mode === "dark"
-        ? "radial-gradient(ellipse at center, rgba(144, 202, 249, 0.16) 0%, transparent 70%)"
-        : "radial-gradient(ellipse at center, rgba(25, 118, 210, 0.14) 0%, transparent 70%)",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  },
+  pageBackdropImage: {
+    width: "100%",
+    height: "auto",
+    maxHeight: "none",
+    flexShrink: 0,
+    objectFit: "contain",
+    objectPosition: "center top",
+    display: "block",
+    position: "relative",
+    zIndex: 1,
+    WebkitMaskImage:
+      "linear-gradient(to bottom, #000 0%, #000 55%, rgba(0,0,0,0.55) 78%, transparent 100%)",
+    maskImage:
+      "linear-gradient(to bottom, #000 0%, #000 55%, rgba(0,0,0,0.55) 78%, transparent 100%)",
+  },
+  pageBackdropImageLower: {
+    flex: 1,
+    width: "100%",
+    minHeight: 0,
+    mt: { xs: "-88px", sm: "-128px", md: "-176px" },
+    objectFit: "cover",
+    objectPosition: "center top",
+    display: "block",
+    WebkitMaskImage:
+      "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 18%, #000 36%, #000 100%)",
+    maskImage:
+      "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 18%, #000 36%, #000 100%)",
+  },
+  pageCubePattern: {
+    position: "absolute",
+    inset: 0,
+    opacity: 0.12,
+    backgroundImage: `url("data:image/svg+xml,${cubePattern}")`,
+    backgroundSize: "84px 96px",
+  },
+  pageVignette: {
+    position: "absolute",
+    inset: 0,
+    background:
+      "linear-gradient(180deg, rgba(5, 7, 12, 0.1) 0%, rgba(5, 7, 12, 0.16) 24%, rgba(5, 7, 12, 0.28) 46%, rgba(5, 7, 12, 0.42) 100%)",
+  },
+  page: {
+    position: "relative",
+    py: { xs: 2, md: 4 },
   },
   pageInner: {
     position: "relative",
@@ -37,14 +93,8 @@ export const styles = {
     border: "1px solid",
     borderColor: "divider",
     backdropFilter: "blur(14px)",
-    bgcolor: (theme) =>
-      theme.palette.mode === "dark"
-        ? "rgba(18, 18, 18, 0.82)"
-        : "rgba(255, 255, 255, 0.88)",
-    boxShadow: (theme) =>
-      theme.palette.mode === "dark"
-        ? "0 10px 30px rgba(0, 0, 0, 0.35)"
-        : "0 10px 30px rgba(15, 23, 42, 0.08)",
+    bgcolor: "rgba(10, 14, 22, 0.72)",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
   },
   card: {
     mb: 3,
@@ -95,14 +145,9 @@ export const styles = {
     borderRadius: 3,
     border: "1px solid",
     borderColor: "divider",
-    bgcolor: (theme) =>
-      theme.palette.mode === "dark"
-        ? "rgba(255, 255, 255, 0.04)"
-        : "background.paper",
-    boxShadow: (theme) =>
-      theme.palette.mode === "dark"
-        ? "none"
-        : "0 12px 32px rgba(15, 23, 42, 0.08)",
+    bgcolor: "rgba(12, 16, 24, 0.72)",
+    backdropFilter: "blur(16px)",
+    boxShadow: "0 12px 32px rgba(0, 0, 0, 0.28)",
   },
   successContainer: {
     container: {

@@ -51,14 +51,10 @@ function RegistrationSuccess({ competitor, onRegisterAnother }) {
         borderRadius: 4,
         overflow: "hidden",
         position: "relative",
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.03)"
-            : "background.paper",
-        boxShadow: (theme) =>
-          theme.palette.mode === "dark"
-            ? "none"
-            : "0 16px 40px rgba(15, 23, 42, 0.08)",
+        bgcolor: "rgba(12, 16, 24, 0.78)",
+        backdropFilter: "blur(18px)",
+        borderColor: "rgba(255,255,255,0.12)",
+        boxShadow: "0 16px 40px rgba(0, 0, 0, 0.32)",
       }}
     >
       <Box

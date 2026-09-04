@@ -1,0 +1,59 @@
+import { useEffect } from "react";
+import { Box } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { blue, pink } from "@mui/material/colors";
+import cubeBg from "../../assets/cube-bg.png";
+import cubeBgLower from "../../assets/cube-background.png";
+import { styles } from "./styles";
+
+const registerTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: blue[200],
+    },
+    secondary: {
+      main: pink["A400"],
+    },
+    background: {
+      default: "#05070c",
+      paper: "rgba(12, 16, 24, 0.78)",
+    },
+  },
+});
+
+function RegisterBackground({ children }) {
+  useEffect(() => {
+    const previous = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = "#05070c";
+    return () => {
+      document.body.style.backgroundColor = previous;
+    };
+  }, []);
+
+  return (
+    <ThemeProvider theme={registerTheme}>
+      <Box sx={styles.pageShell}>
+        <Box sx={styles.pageBackdrop} aria-hidden>
+          <Box
+            component="img"
+            src={cubeBg}
+            alt=""
+            sx={styles.pageBackdropImage}
+          />
+          <Box
+            component="img"
+            src={cubeBgLower}
+            alt=""
+            sx={styles.pageBackdropImageLower}
+          />
+          <Box sx={styles.pageCubePattern} />
+          <Box sx={styles.pageVignette} />
+        </Box>
+        <Box sx={styles.pageInner}>{children}</Box>
+      </Box>
+    </ThemeProvider>
+  );
+}
+
+export default RegisterBackground;

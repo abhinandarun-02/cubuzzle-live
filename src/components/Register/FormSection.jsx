@@ -11,15 +11,10 @@ function FormSection({ id, step, title, description, children }) {
         borderRadius: 3,
         overflow: "hidden",
         scrollMarginTop: 96,
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.03)"
-            : "background.paper",
-        borderColor: "divider",
-        boxShadow: (theme) =>
-          theme.palette.mode === "dark"
-            ? "none"
-            : "0 10px 28px rgba(15, 23, 42, 0.06)",
+        bgcolor: "rgba(12, 16, 24, 0.74)",
+        backdropFilter: "blur(18px)",
+        borderColor: "rgba(255,255,255,0.12)",
+        boxShadow: "0 16px 40px rgba(0, 0, 0, 0.28)",
       }}
     >
       <Box

@@ -23,6 +23,7 @@ import { copyTempImageToUser } from "../../lib/firebase/storage";
 import CompetitionDetails from "./CompetitionDetails";
 import CompetitorDetails from "./CompetitorDetails";
 import ParticipationCard from "./ParticipationCard";
+import RegisterBackground from "./RegisterBackground";
 import RegisterHero from "./RegisterHero";
 import RegistrationSuccess from "./RegistrationSuccess";
 import { COMPETITION_ID } from "./constants";
@@ -343,19 +344,20 @@ function Register() {
 
   if (registeredCompetitor) {
     return (
-      <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 } }}>
-        <RegistrationSuccess
-          competitor={registeredCompetitor}
-          onRegisterAnother={handleRegisterAnother}
-        />
-      </Container>
+      <RegisterBackground>
+        <Container maxWidth="md" sx={styles.page}>
+          <RegistrationSuccess
+            competitor={registeredCompetitor}
+            onRegisterAnother={handleRegisterAnother}
+          />
+        </Container>
+      </RegisterBackground>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={styles.page}>
-      <Box sx={styles.pageGlow} />
-      <Box sx={styles.pageInner}>
+    <RegisterBackground>
+      <Container maxWidth="md" sx={styles.page}>
         <RegisterHero />
 
         <Box
@@ -449,7 +451,7 @@ function Register() {
               bgcolor: (theme) =>
                 alpha(
                   theme.palette.primary.main,
-                  theme.palette.mode === "dark" ? 0.08 : 0.05,
+                  0.12,
                 ),
             }}
           >
@@ -528,8 +530,8 @@ function Register() {
             </Stack>
           </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </RegisterBackground>
   );
 }
 
