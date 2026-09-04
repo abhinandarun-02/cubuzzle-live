@@ -57,11 +57,31 @@ export const MODES = [
 ];
 
 export const DIVISIONS = [
-  { value: "A+", label: "A+", hint: "Sub 10 seconds" },
-  { value: "A", label: "A", hint: "10-19 seconds" },
-  { value: "B", label: "B", hint: "20-29 seconds" },
-  { value: "C", label: "C", hint: "30-45 seconds" },
-  { value: "D", label: "D", hint: "45+ seconds" },
+  {
+    value: "A+",
+    label: "Division A+",
+    hint: "If your average solve is Sub 9.99",
+  },
+  {
+    value: "A",
+    label: "Division A",
+    hint: "If your average solve is between 10 - 19.99 seconds",
+  },
+  {
+    value: "B",
+    label: "Division B",
+    hint: "If your average solve is between 20 - 29.99 seconds",
+  },
+  {
+    value: "C",
+    label: "Division C",
+    hint: "If your average solve is between 30 - 44.99 seconds",
+  },
+  {
+    value: "D",
+    label: "Division D",
+    hint: "If your average solve is 45 seconds & above",
+  },
 ];
 
 // Fields that are filled silently from a returning participant's profile and

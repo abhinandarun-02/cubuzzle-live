@@ -125,11 +125,11 @@ export function withImageWidth(imageUrl, width = 100) {
 export function splitResultsByDivision(results) {
   const divisionOrder = ["A+", "A", "B", "C", "D"];
   const divisionTime = {
-    "A+": "Sub 10 seconds",
-    A: "10-19 seconds",
-    B: "20-29 seconds",
-    C: "30-45 seconds",
-    D: "45+ seconds",
+    "A+": "Sub 9.99",
+    A: "10 - 19.99 seconds",
+    B: "20 - 29.99 seconds",
+    C: "30 - 44.99 seconds",
+    D: "45 seconds & above",
   };
 
   // Group results by division

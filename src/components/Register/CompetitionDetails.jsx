@@ -19,9 +19,6 @@ const MODE_OPTIONS = MODES.map((mode) => ({
   icon: mode.value === "onsite" ? PlaceOutlinedIcon : LanguageIcon,
 }));
 
-const DEFAULT_DIVISION_HINT =
-  "Choose the division closest to your typical 3x3 average";
-
 function CompetitionDetails({
   form,
   showDivision = true,
@@ -40,47 +37,46 @@ function CompetitionDetails({
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3.5 }}>
         {showDivision && (
           <ChoiceGroup
-            label="Division"
-            hint={divisionHint || DEFAULT_DIVISION_HINT}
+            label="Select your Division based on your Average Time"
+            hint={divisionHint}
             options={DIVISIONS}
-            columns={{ xs: 2, sm: 3, md: 5 }}
+            columns={{ xs: 1 }}
             cardSx={{
-              flexDirection: "column",
+              gap: 1.5,
+              minHeight: 76,
               alignItems: "center",
-              justifyContent: "center",
-              gap: 1,
-              minHeight: 112,
-              px: 1.25,
-              py: 1.75,
-              textAlign: "center",
+              px: 1.75,
+              py: 1.5,
             }}
             renderOption={(option, { selected }) => (
               <>
                 <Box
                   sx={{
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
+                    flexShrink: 0,
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontWeight: 800,
-                    fontSize: option.value === "A+" ? 16 : 18,
+                    fontSize: option.value === "A+" ? 15 : 16,
                     bgcolor: selected
                       ? "primary.main"
                       : (theme) => alpha(theme.palette.primary.main, 0.12),
                     color: selected ? "primary.contrastText" : "primary.main",
                   }}
                 >
-                  {option.label}
+                  {option.value}
                 </Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ textAlign: "center", lineHeight: 1.3 }}
-                >
-                  {option.hint}
-                </Typography>
+                <Box sx={{ minWidth: 0, flex: 1, pr: 2 }}>
+                  <Typography variant="subtitle2" fontWeight={700} lineHeight={1.25}>
+                    {option.label}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {option.hint}
+                  </Typography>
+                </Box>
               </>
             )}
             {...fieldProps("registeredDivision")}
