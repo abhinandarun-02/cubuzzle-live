@@ -5,11 +5,19 @@ import { SCHOOLS } from "../../lib/schools";
 
 const filter = createFilterOptions();
 
-const SORTED_SCHOOLS = [...SCHOOLS].sort(
-  (a, b) =>
-    a.label.localeCompare(b.label, undefined, { sensitivity: "base" }) ||
-    a.emirate.localeCompare(b.emirate, undefined, { sensitivity: "base" }),
-);
+const NOT_APPLICABLE_SCHOOL = {
+  value: "not-applicable",
+  label: "Not Applicable",
+};
+
+const SORTED_SCHOOLS = [
+  NOT_APPLICABLE_SCHOOL,
+  ...[...SCHOOLS].sort(
+    (a, b) =>
+      a.label.localeCompare(b.label, undefined, { sensitivity: "base" }) ||
+      a.emirate.localeCompare(b.emirate, undefined, { sensitivity: "base" }),
+  ),
+];
 
 function formatSchoolOption(school) {
   if (!school?.label) return "";

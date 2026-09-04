@@ -6,6 +6,12 @@ import cubeBg from "../../assets/cube-bg.png";
 import cubeBgLower from "../../assets/cube-background.png";
 import { styles } from "./styles";
 
+const overlayPaper = {
+  backgroundColor: "#0c1018",
+  backgroundImage: "none",
+  backdropFilter: "none",
+};
+
 const registerTheme = createTheme({
   palette: {
     mode: "dark",
@@ -17,7 +23,30 @@ const registerTheme = createTheme({
     },
     background: {
       default: "#05070c",
-      paper: "rgba(12, 16, 24, 0.78)",
+      paper: "#0c1018",
+    },
+  },
+  components: {
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: overlayPaper,
+        listbox: overlayPaper,
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: overlayPaper,
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: overlayPaper,
+      },
+    },
+    MuiPickersPopper: {
+      styleOverrides: {
+        paper: overlayPaper,
+      },
     },
   },
 });
