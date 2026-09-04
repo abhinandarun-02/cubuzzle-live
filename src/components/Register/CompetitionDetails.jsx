@@ -23,7 +23,7 @@ function CompetitionDetails({
     <FormSection
       id="section-competition"
       step={step}
-      title="Competition details"
+      title="Competition Details"
       description="Pick your division and every event you want to enter."
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3.5 }}>

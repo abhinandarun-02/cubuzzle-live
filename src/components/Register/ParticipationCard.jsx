@@ -145,7 +145,7 @@ function ParticipationCard({
     <FormSection
       id="section-participant"
       step={step}
-      title="Returning participant?"
+      title="Returning Participant?"
       description="If you've competed with Cubuzzle before, we'll look up your profile and skip the details we already have."
     >
       <Stack spacing={2.5}>

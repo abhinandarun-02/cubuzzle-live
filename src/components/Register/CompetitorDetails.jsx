@@ -50,7 +50,7 @@ function CompetitorDetails({ form, hiddenFields = [], step = 2 }) {
       <FormSection
         id="section-details"
         step={step}
-        title="Your details"
+        title="Your Details"
         description="A clear photo and the details we need for check-in, ranking, and your Cubuzzle ID."
       >
         <PhotoUpload
