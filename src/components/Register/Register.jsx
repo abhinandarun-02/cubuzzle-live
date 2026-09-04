@@ -49,7 +49,6 @@ const FIELD_ORDER = [
   "country",
   "nationality",
   "registeredDivision",
-  "modeOfParticipation",
   "events",
   "termsConsent",
 ];
@@ -113,7 +112,6 @@ function getCompletionState({
   if (showDivision) {
     checks.push(Boolean(values.registeredDivision));
   }
-  checks.push(Boolean(values.modeOfParticipation));
   checks.push(Array.isArray(values.events) && values.events.length > 0);
   checks.push(values.termsConsent === true);
 
@@ -214,7 +212,7 @@ function Register() {
         dob: data.dob,
         orderId: data.orderId.trim(),
         registeredDivision: previousDivision ?? data.registeredDivision,
-        modeOfParticipation: data.modeOfParticipation,
+        modeOfParticipation: "online",
         country: data.country,
         nationality: data.nationality,
         events: data.events,

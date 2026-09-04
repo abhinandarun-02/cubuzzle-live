@@ -13,7 +13,7 @@ export const INITIAL_VALUES = {
   dob: "",
   orderId: "",
   registeredDivision: "",
-  modeOfParticipation: "",
+  modeOfParticipation: "online",
   country: getCountryByCode(DEFAULT_COUNTRY_CODE),
   nationality: getCountryByCode(DEFAULT_COUNTRY_CODE),
   events: [],

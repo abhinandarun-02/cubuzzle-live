@@ -1,8 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
-import LanguageIcon from "@mui/icons-material/Language";
-import { DIVISIONS, MODES, REGISTRATION_EVENTS } from "../../lib/registration";
+import { DIVISIONS, REGISTRATION_EVENTS } from "../../lib/registration";
 import CubingIcon from "../CubingIcon/CubingIcon";
 import ChoiceGroup from "./ChoiceGroup";
 import FormSection from "./FormSection";
@@ -11,12 +9,6 @@ import { styles } from "./styles";
 const EVENT_OPTIONS = REGISTRATION_EVENTS.map((event) => ({
   value: event.id,
   label: event.label,
-}));
-
-const MODE_OPTIONS = MODES.map((mode) => ({
-  ...mode,
-  hint: mode.value === "onsite" ? "Compete in person" : "Compete remotely",
-  icon: mode.value === "onsite" ? PlaceOutlinedIcon : LanguageIcon,
 }));
 
 function CompetitionDetails({
@@ -32,7 +24,7 @@ function CompetitionDetails({
       id="section-competition"
       step={step}
       title="Competition details"
-      description="Pick your division, how you'll compete, and every event you want to enter."
+      description="Pick your division and every event you want to enter."
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3.5 }}>
         {showDivision && (
@@ -82,14 +74,6 @@ function CompetitionDetails({
             {...fieldProps("registeredDivision")}
           />
         )}
-
-        <ChoiceGroup
-          label="Mode of Participation"
-          options={MODE_OPTIONS}
-          columns={{ xs: 1, sm: 2 }}
-          cardSx={{ gap: 1.25, minHeight: 80, alignItems: "flex-start" }}
-          {...fieldProps("modeOfParticipation")}
-        />
 
         <ChoiceGroup
           label="Events"
